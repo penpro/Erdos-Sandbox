@@ -105,4 +105,61 @@ theorem Bgen_add_mul_period {A : Finset ℕ} {L : ℕ} (hL : ∀ a ∈ A, a ∣ 
     rw [this, Bgen_add_period hL, ih]
     ring
 
+/-- Decompose `x ≥ N` as `x = x₀ + q·L` with `x₀` in the window `[N, N+L)`. -/
+private lemma window_decomp {N L : ℕ} (hL0 : 0 < L) {x : ℕ} (hx : N ≤ x) :
+    ∃ q x0, N ≤ x0 ∧ x0 < N + L ∧ x = x0 + q * L := by
+  refine ⟨(x - N) / L, N + (x - N) % L, by omega, ?_, ?_⟩
+  · have := Nat.mod_lt (x - N) hL0; omega
+  · have hdm : (x - N) % L + (x - N) / L * L = x - N := Nat.mod_add_div' (x - N) L
+    omega
+
+/-- Global lower bound from a window check + a density-slope condition. -/
+private lemma le_window {A : Finset ℕ} {N L c d : ℕ} (hL0 : 0 < L)
+    (hLdvd : ∀ a ∈ A, a ∣ L)
+    (hslope : c * L ≤ d * (Bgen A L).card)
+    (hwin : ∀ x, N ≤ x → x < N + L → c * x ≤ d * (Bgen A x).card)
+    {x : ℕ} (hx : N ≤ x) : c * x ≤ d * (Bgen A x).card := by
+  obtain ⟨q, x0, hx0N, hx0L, hxeq⟩ := window_decomp hL0 hx
+  have hB : (Bgen A x).card = (Bgen A x0).card + q * (Bgen A L).card := by
+    rw [hxeq, Bgen_add_mul_period hLdvd]
+  have hw := hwin x0 hx0N hx0L
+  have hqsl : q * (c * L) ≤ q * (d * (Bgen A L).card) := Nat.mul_le_mul_left q hslope
+  calc c * x = c * x0 + q * (c * L) := by rw [hxeq]; ring
+    _ ≤ d * (Bgen A x0).card + q * (d * (Bgen A L).card) := by omega
+    _ = d * ((Bgen A x0).card + q * (Bgen A L).card) := by ring
+    _ = d * (Bgen A x).card := by rw [hB]
+
+/-- Global upper bound from a window check + a density-slope condition. -/
+private lemma ge_window {A : Finset ℕ} {N L e d : ℕ} (hL0 : 0 < L)
+    (hLdvd : ∀ a ∈ A, a ∣ L)
+    (hslope : d * (Bgen A L).card ≤ e * L)
+    (hwin : ∀ x, N ≤ x → x < N + L → d * (Bgen A x).card ≤ e * x)
+    {x : ℕ} (hx : N ≤ x) : d * (Bgen A x).card ≤ e * x := by
+  obtain ⟨q, x0, hx0N, hx0L, hxeq⟩ := window_decomp hL0 hx
+  have hB : (Bgen A x).card = (Bgen A x0).card + q * (Bgen A L).card := by
+    rw [hxeq, Bgen_add_mul_period hLdvd]
+  have hw := hwin x0 hx0N hx0L
+  have hqsl : q * (d * (Bgen A L).card) ≤ q * (e * L) := Nat.mul_le_mul_left q hslope
+  calc d * (Bgen A x).card = d * (Bgen A x0).card + q * (d * (Bgen A L).card) := by rw [hB]; ring
+    _ ≤ e * x0 + q * (e * L) := by omega
+    _ = e * x := by rw [hxeq]; ring
+
+/-- **Finite-window certificate.** To prove EP488 for a fixed `A`, it suffices to
+check, over ONE period `L` (any common multiple of `A`): the two density slopes
+`c·L ≤ d·B(L) ≤ e·L`, the ratio bounds `c·x ≤ d·B(x) ≤ e·x` on the single window
+`[N, N+L)`, and `e < 2c`.  All finitely checkable. -/
+theorem ep488_of_window {A : Finset ℕ} {N L c e d : ℕ} (hN : 1 ≤ N) (hL0 : 0 < L)
+    (hLdvd : ∀ a ∈ A, a ∣ L)
+    (hslopeL : c * L ≤ d * (Bgen A L).card)
+    (hslopeU : d * (Bgen A L).card ≤ e * L)
+    (hwinLow : ∀ x, N ≤ x → x < N + L → c * x ≤ d * (Bgen A x).card)
+    (hwinUpp : ∀ x, N ≤ x → x < N + L → d * (Bgen A x).card ≤ e * x)
+    (hcert : e < 2 * c)
+    {n m : ℕ} (hn : N ≤ n) (hm : n < m) :
+    n * (Bgen A m).card < 2 * m * (Bgen A n).card :=
+  ep488_of_certificate hN
+    (fun x hx => le_window hL0 hLdvd hslopeL hwinLow hx)
+    (fun x hx => ge_window hL0 hLdvd hslopeU hwinUpp hx)
+    hcert hn hm
+
 end Erdos488

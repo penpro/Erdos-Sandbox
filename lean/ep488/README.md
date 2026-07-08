@@ -84,12 +84,17 @@ Lean:
   *why* the infinite check collapses to one period — proved by induction on the
   one-step count increment plus `L`-periodicity of "divisible by some element",
   with no residue-bijection machinery.
+- **`ep488_of_window`**: the full finite reduction. To prove EP488 for a fixed
+  `A` it suffices to check, over ONE period `L`, the two density slopes
+  `c·L ≤ d·B(L) ≤ e·L`, the ratio bounds `c·x ≤ d·B(x) ≤ e·x` on the single window
+  `[N, N+L)`, and `e < 2c`. Writing `x = x₀ + q·L`, the window value plus the slope
+  propagates the bound to every `x ≥ N`, so no monotonicity argument is needed.
 
-Together these are the sorry-free core of the finite-window / periodicity
-principle: for any fixed `A` (including open `|core| ≥ 4` sets), an exact
-one-period computation yields the `[c/d, e/d]` bounds that `ep488_of_certificate`
-consumes. (Automating the extraction of those bounds from one period is the next
-step; the two pieces here are the load-bearing lemmas.)
+Together these are the sorry-free finite-window / periodicity principle: for any
+fixed `A` (including open `|core| ≥ 4` sets), a one-period computation feeding
+`ep488_of_window` gives a machine-checked proof of EP488 for that set. This does
+NOT prove the general `|core| ≥ 4` case (infinitely many sets, unbounded `L`) — it
+makes each individual set rigorously certifiable.
 
 ## Honest scope
 

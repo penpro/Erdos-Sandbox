@@ -1,3 +1,4 @@
 'Erdos488.ep488_of_certificate' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos488.Bgen_add_period' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos488.Bgen_add_mul_period' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.ep488_of_window' depends on axioms: [propext, Classical.choice, Quot.sound]
