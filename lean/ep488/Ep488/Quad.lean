@@ -299,4 +299,29 @@ lemma yh_ge_two {a b c d n : ℕ}
     rw [Finset.sum_pair hab, hRa, hRb]; norm_num
   linarith [hle, hpair]
 
+/-- **Two-good-charge, step 1: `2B ≥ s + 4`.** For a primitive quadruple with `c,d`
+good (charge conditions) and `a,b` as the H-pair, combining `2B = 2s−2P₂+2T₃−2T₄`,
+`ΣX = s−2P₂`, `Y_H(a,b) ≥ 2`, and `X_c, X_d ≥ 1`. -/
+lemma two_B_ge_s4 {a b c d n : ℕ}
+    (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (han : a ≤ n) (hbn : b ≤ n) (hcn : c ≤ n) (hdn : d ≤ n) (hab : a ≠ b)
+    (hba : ¬ b ∣ a) (hca : ¬ c ∣ a) (hda : ¬ d ∣ a)
+    (hab2 : ¬ a ∣ b) (hcb : ¬ c ∣ b) (hdb : ¬ d ∣ b)
+    (hc_good : (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+             + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+             < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c))
+    (hd_good : (Nat.lcm d b / d) * (Nat.lcm d c / d) + (Nat.lcm d a / d) * (Nat.lcm d c / d)
+             + (Nat.lcm d a / d) * (Nat.lcm d b / d)
+             < (Nat.lcm d a / d) * (Nat.lcm d b / d) * (Nat.lcm d c / d)) :
+    (sfun4 a b c d n : ℤ) + 4 ≤ 2 * ((Bgen {a, b, c, d} n).card : ℤ) := by
+  have h2B := two_B_eq a b c d n
+  have hcs := charge_sum4 a b c d n
+  have hYH := yh_ge_two ha hb han hbn hab hba hca hda hab2 hcb hdb
+  have hXc := charge_ge_one_int hc ha hb hd hcn hc_good
+  have hXd := charge_ge_one_int hd ha hb hc hdn hd_good
+  rw [Nat.lcm_comm c a, Nat.lcm_comm c b] at hXc
+  rw [Nat.lcm_comm d a, Nat.lcm_comm d b, Nat.lcm_comm d c] at hXd
+  simp only [sfun4, p2fun4, Nat.cast_add] at h2B hcs ⊢
+  linarith [h2B, hcs, hYH, hXc, hXd]
+
 end Erdos488
