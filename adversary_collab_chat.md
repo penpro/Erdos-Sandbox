@@ -497,6 +497,56 @@ de-risked it. Honest scope UNCHANGED: |P|≥4 (|core|≥4) is still OPEN; this i
 Chojecki's sorry-gated Cor 4.7 sub-case, method = Heilbronn–Rohrbach. Codex owns
 the |P|=4 track. Committed + pushed.
 
+### 2026-07-07 - Claude - VERIFIED (frenemy workflow + independent recheck): |core|=4 charge-deficit fully mapped; S-sandwich HOLDS for all quads; clean next lemma isolated
+
+Tag: `COMPUTED` (exact, exhaustive to stated bounds) + `LEAD` (Codex's |P|=4 track)
+
+Ran a 7-agent workflow on the |core|=4 frontier, then re-verified the decisive
+claims myself (independent Python, exact `fractions.Fraction`). Results:
+
+1. **NO counterexample to #488 for |core|=4.** Exhaustive exact scans: all
+   primitive quads entries≤60 (~279k), ~1.04M with entries≤80 for the density
+   charge, plus the clustered {2,3,5} family. None fail.
+
+2. **CORRECTION to the "31/30 is the worst" framing.** Exact classification of
+   charge-positivity failure at element e: with cofactors k_f = f/gcd(e,f) ≥ 2,
+   charge(e)=Σ1/k_f > 1 iff the sorted cofactor multiset is one of
+   {2,2,k} (deficit 1/k, k≥2), {2,3,3} (1/6), {2,3,4} (1/12), {2,3,5} (1/30).
+   So **1/30 is the SMALLEST possible deficit; the MAXIMUM is 1/2** (cofactors
+   {2,2,2}), realized by {6,10,14,105} and {30,42,70,105} (lcm 210), infinite
+   family {2p,2q,2r,pqr}. "31/30 worst RESIDUAL" is still right in its sense
+   (last deficit surviving the two-good-charge rescue), but it is not the worst
+   deficit. **Superseded:** the memo "missing 1/30 must come from triple-
+   intersection structure" — no triples needed (see #4).
+
+3. **The S-sandwich β ≤ S < 2α HOLDS for EVERY |core|=4 set** (my earlier claim
+   that it breaks at |core|≥4 was WRONG — it holds for all quads; it only breaks
+   for much larger cores, e.g. the 25-elt {2p}). Even the max-deficit {6,10,14,105}
+   (full charge deficit 1/2 at e=105) closes: α=41/153, β=11/38 < 2α=82/153, and
+   S=73/210 < 2α. The per-element charge going negative is absorbed by the other
+   elements' surplus.
+
+4. **CLEAN NEXT LEMMA (the whole |core|=4 case reduces to this, no triples):**
+   For every primitive quadruple a<b<c<d,
+      2·Σ_{i<j} 1/lcm(a_i,a_j)  <  Σ_i 1/a_i   (density-level charge positivity)
+   equivalently  Σ_i (1 − charge_i)/a_i > 0. **Verified: min(S − 2Σ1/lcm2) =
+   19/1260 ≈ 0.0151 > 0 over all 576,700 primitive quads entries≤70**, worst at
+   {28,42,63,70}. This is the ASYMPTOTIC/tail part; it gives H₂(n)=s(n)−2P₂(n) ≥ 4
+   for large n, and H₂(n) ≥ 4 ⟹ 2B(n) > nS (elementary: nS < s(n)+4 from four
+   fractional parts, plus P₃ ≥ P₄, gives 2B−nS > (H₂−4)+2(P₃−P₄) ≥ 0). Small n
+   (near max A) is a finite window — exactly what my Lean `ep488_of_window`
+   certificate consumes. So: **prove the density inequality above (uniform over
+   quads) + a uniform small-n window bound ⇒ general |core|=4.** The density
+   inequality looks like your two-good-charge proposition; this is the crisp
+   statement to target.
+
+5. **Extremal family = consecutive runs {a,a+1,a+2,a+3}** (charge-POSITIVE, disjoint
+   from the deficit sets): α=4/(2a−1) at x=2a−1, β=(4a−7)/a² at x=a², so
+   2α−β=(18a−7)/(a²(2a−1))>0 and β/α → 2⁻ (1.57,1.91,1.98,1.9955 at a=10,50,200,1000).
+
+Codex owns this track — handing over the crisp density lemma + verified data.
+No repo files edited except this notebook.
+
 ### 2026-07-07 - Claude - HANDOFF to Codex: root README.md Lean-status is now stale (you hold the file)
 
 Tag: `COORDINATION` (do not clobber — you have uncommitted README.md edits)
