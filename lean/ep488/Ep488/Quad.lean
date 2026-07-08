@@ -561,4 +561,43 @@ lemma b_bad_forces_q_two {a b c d : ℕ} (hb : 0 < b) (hab : a < b) (hbc : b < c
   have e2 := cofactor_three_eq hb hbd hnbd hv3
   omega
 
+/-- a-term for the `c/b = 3/2` case: with `q=2` (`a = 2·gcd(a,b)`) and `2c=3b`,
+the a-cofactor `p = a/gcd(a,c) = 4` (parity chain: `m` odd ⟹ `g` even ⟹ `p=4`). -/
+lemma aterm_case32 {a b c : ℕ} (ha : 0 < a) (hb : 0 < b) (hnab : ¬ a ∣ b)
+    (hq : a = 2 * Nat.gcd a b) (h32 : 2 * c = 3 * b) :
+    a / Nat.gcd a c = 4 := by
+  set g := Nat.gcd a b with hgdef
+  obtain ⟨m, hm⟩ : g ∣ b := Nat.gcd_dvd_right a b
+  have hg0 : 0 < g := Nat.gcd_pos_of_pos_left b ha
+  -- m is odd: else a = 2·gcd ∣ gcd·m = b
+  have hmodd : m % 2 = 1 := by
+    by_contra h
+    obtain ⟨m', rfl⟩ : 2 ∣ m := by omega
+    exact hnab ⟨m', by rw [hq, hm]; ring⟩
+  -- 2 | g: 2c = 3·(gcd·m); 3 and m coprime to 2 ⟹ gcd even
+  have h2g : 2 ∣ g := by
+    have h2bc : (2 : ℕ) ∣ 3 * (g * m) := by
+      have heq : 3 * (g * m) = 2 * c := by rw [← hm]; omega
+      rw [heq]; exact dvd_mul_right 2 c
+    have hc3 : Nat.Coprime 2 3 := by decide
+    have hcm : Nat.Coprime 2 m := (Nat.prime_two.coprime_iff_not_dvd).mpr (by omega)
+    exact Nat.Coprime.dvd_of_dvd_mul_right hcm (Nat.Coprime.dvd_of_dvd_mul_left hc3 h2bc)
+  obtain ⟨g1, hg1⟩ := h2g
+  have hg1pos : 0 < g1 := by rw [hg1] at hg0; omega
+  have ha4 : a = g1 * 4 := by rw [hq, hg1]; ring
+  -- gcd(a,c) = g1·gcd(4,3m) = g1
+  have hac : Nat.gcd a c = g1 := by
+    have hc3 : c = g1 * (3 * m) := by
+      have h2 : 2 * c = 2 * (g1 * (3 * m)) := by rw [h32, hm, hg1]; ring
+      omega
+    rw [ha4, hc3, Nat.gcd_mul_left]
+    have hco : Nat.gcd 4 (3 * m) = 1 := by
+      have c4 : Nat.Coprime 4 (3 * m) := by
+        have h4 : (4 : ℕ) = 2 ^ 2 := by norm_num
+        rw [h4]
+        exact Nat.Coprime.pow_left 2 ((Nat.prime_two.coprime_iff_not_dvd).mpr (by omega))
+      exact c4
+    rw [hco, Nat.mul_one]
+  rw [hac, ha4, Nat.mul_div_cancel_left 4 hg1pos]
+
 end Erdos488
