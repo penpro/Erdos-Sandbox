@@ -18,7 +18,8 @@ Every lemma in the chain is `#print axioms`-clean — it depends only on
 `propext, Classical.choice, Quot.sound`, with **no `sorryAx` and no literal
 `sorry`**. The audits are committed: [`axioms-check.txt`](axioms-check.txt)
 (Basic), [`counting-axioms.txt`](counting-axioms.txt) (Counting),
-[`reduction-axioms.txt`](reduction-axioms.txt) (Reduction).
+[`reduction-axioms.txt`](reduction-axioms.txt) (Reduction),
+[`certificate-axioms.txt`](certificate-axioms.txt) (Certificate) — 21 theorems.
 
 Build & check:
 ```
@@ -69,6 +70,26 @@ lake env lean Ep488/ReductionCheck.lean   # prints the axiom audit for the top t
 - **`ep488_primitive`**: EP488 for *any* positive `∣`-antichain of size ≤ 3,
   dispatched by `card_eq_one/two/three` with a `min' < middle < max'` extraction.
 - **`ep488_core`**: the final theorem (above).
+
+### `Ep488/Certificate.lean` — the per-set certificate engine
+
+Turns the "compute exact ratio bounds and check `β < 2α`" strategy into rigorous
+Lean:
+
+- **`ep488_of_certificate`**: if `c/d ≤ B_A(x)/x ≤ e/d` for all `x ≥ N ≥ 1` and
+  `e < 2c` (i.e. `β < 2α`), then EP488 holds for `A`. The clean interface between
+  a finite computation and the theorem.
+- **`Bgen_add_period`** / **`Bgen_add_mul_period`**: `B_A(x + L) = B_A(x) + B_A(L)`
+  (and the `q`-fold version) whenever every element of `A` divides `L`. This is
+  *why* the infinite check collapses to one period — proved by induction on the
+  one-step count increment plus `L`-periodicity of "divisible by some element",
+  with no residue-bijection machinery.
+
+Together these are the sorry-free core of the finite-window / periodicity
+principle: for any fixed `A` (including open `|core| ≥ 4` sets), an exact
+one-period computation yields the `[c/d, e/d]` bounds that `ep488_of_certificate`
+consumes. (Automating the extraction of those bounds from one period is the next
+step; the two pieces here are the load-bearing lemmas.)
 
 ## Honest scope
 
