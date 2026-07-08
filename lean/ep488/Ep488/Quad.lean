@@ -132,4 +132,68 @@ def t3fun4 (a b c d n : ℕ) : ℕ :=
 /-- `T₄(n) = ⌊n/lcm(a,b,c,d)⌋`. -/
 def t4fun4 (a b c d n : ℕ) : ℕ := n / Nat.lcm (Nat.lcm (Nat.lcm a b) c) d
 
+/-- `lcm(x,y) ∣ k ↔ x∣k ∧ y∣k`, as an indicator equality. -/
+lemma lcm2_ind (x y k : ℕ) :
+    (if Nat.lcm x y ∣ k then (1 : ℤ) else 0) = if x ∣ k ∧ y ∣ k then 1 else 0 := by
+  have h : (Nat.lcm x y ∣ k) ↔ (x ∣ k ∧ y ∣ k) :=
+    ⟨fun h => ⟨(Nat.dvd_lcm_left x y).trans h, (Nat.dvd_lcm_right x y).trans h⟩,
+     fun h => Nat.lcm_dvd h.1 h.2⟩
+  simp only [h]
+
+/-- `lcm(lcm(x,y),z) ∣ k ↔ x∣k ∧ y∣k ∧ z∣k`, as an indicator equality. -/
+lemma lcm3_ind (x y z k : ℕ) :
+    (if Nat.lcm (Nat.lcm x y) z ∣ k then (1 : ℤ) else 0)
+      = if x ∣ k ∧ y ∣ k ∧ z ∣ k then 1 else 0 := by
+  have h : (Nat.lcm (Nat.lcm x y) z ∣ k) ↔ (x ∣ k ∧ y ∣ k ∧ z ∣ k) := by
+    constructor
+    · intro hd
+      have h1 : Nat.lcm x y ∣ k := (Nat.dvd_lcm_left _ _).trans hd
+      exact ⟨(Nat.dvd_lcm_left x y).trans h1, (Nat.dvd_lcm_right x y).trans h1,
+        (Nat.dvd_lcm_right _ _).trans hd⟩
+    · rintro ⟨hx, hy, hz⟩
+      exact Nat.lcm_dvd (Nat.lcm_dvd hx hy) hz
+  simp only [h]
+
+/-- `lcm(lcm(lcm(x,y),z),w) ∣ k ↔ x∣k ∧ y∣k ∧ z∣k ∧ w∣k`, as an indicator equality. -/
+lemma lcm4_ind (x y z w k : ℕ) :
+    (if Nat.lcm (Nat.lcm (Nat.lcm x y) z) w ∣ k then (1 : ℤ) else 0)
+      = if x ∣ k ∧ y ∣ k ∧ z ∣ k ∧ w ∣ k then 1 else 0 := by
+  have h : (Nat.lcm (Nat.lcm (Nat.lcm x y) z) w ∣ k)
+      ↔ (x ∣ k ∧ y ∣ k ∧ z ∣ k ∧ w ∣ k) := by
+    constructor
+    · intro hd
+      have h2 : Nat.lcm (Nat.lcm x y) z ∣ k := (Nat.dvd_lcm_left _ _).trans hd
+      have h1 : Nat.lcm x y ∣ k := (Nat.dvd_lcm_left _ _).trans h2
+      exact ⟨(Nat.dvd_lcm_left x y).trans h1, (Nat.dvd_lcm_right x y).trans h1,
+        (Nat.dvd_lcm_right _ _).trans h2, (Nat.dvd_lcm_right _ _).trans hd⟩
+    · rintro ⟨hx, hy, hz, hw⟩
+      exact Nat.lcm_dvd (Nat.lcm_dvd (Nat.lcm_dvd hx hy) hz) hw
+  simp only [h]
+
+/-- **Exact 4-set inclusion–exclusion** (in `ℤ`): `B = s − P₂ + T₃ − T₄`. -/
+lemma card_ie4 (a b c d n : ℕ) :
+    ((Bgen {a, b, c, d} n).card : ℤ)
+      = (sfun4 a b c d n : ℤ) - (p2fun4 a b c d n : ℤ)
+        + (t3fun4 a b c d n : ℤ) - (t4fun4 a b c d n : ℤ) := by
+  have hL : ((Bgen {a, b, c, d} n).card : ℤ)
+      = ∑ k ∈ Finset.Ioc 0 n, if a ∣ k ∨ b ∣ k ∨ c ∣ k ∨ d ∣ k then (1 : ℤ) else 0 := by
+    rw [Bgen_eq_filter, Finset.card_filter, Nat.cast_sum]
+    refine Finset.sum_congr rfl (fun k _ => ?_)
+    have hiff : (∃ e ∈ ({a, b, c, d} : Finset ℕ), e ∣ k) ↔ (a ∣ k ∨ b ∣ k ∨ c ∣ k ∨ d ∣ k) := by
+      simp only [Finset.mem_insert, Finset.mem_singleton]
+      constructor
+      · rintro ⟨e, (rfl | rfl | rfl | rfl), h⟩ <;> tauto
+      · rintro (h | h | h | h)
+        exacts [⟨a, Or.inl rfl, h⟩, ⟨b, Or.inr (Or.inl rfl), h⟩,
+          ⟨c, Or.inr (Or.inr (Or.inl rfl)), h⟩, ⟨d, Or.inr (Or.inr (Or.inr rfl)), h⟩]
+    by_cases hk : a ∣ k ∨ b ∣ k ∨ c ∣ k ∨ d ∣ k <;> simp [hiff, hk]
+  rw [hL]
+  simp only [sfun4, p2fun4, t3fun4, t4fun4, Nat.cast_add, cast_div_eq_sum_indicator,
+    ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl (fun k _ => ?_)
+  rw [lcm4_ind, lcm3_ind, lcm3_ind, lcm3_ind, lcm3_ind,
+    lcm2_ind, lcm2_ind, lcm2_ind, lcm2_ind, lcm2_ind, lcm2_ind]
+  have hb := ie4_bool (a ∣ k) (b ∣ k) (c ∣ k) (d ∣ k)
+  linarith [hb]
+
 end Erdos488
