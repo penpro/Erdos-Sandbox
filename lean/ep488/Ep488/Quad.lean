@@ -463,4 +463,65 @@ theorem ep488_quad_two_good {a b c d n m : ℕ}
       _ = 2 * m * (Bgen {a, b, c, d} n).card * (a * b * c * d) := by ring
   exact lt_of_mul_lt_mul_right keyN (Nat.zero_le _)
 
+/-! ## Closing lemmas: every primitive quadruple has ≥ 2 good elements -/
+
+/-- If the cofactor `lcm(a,y)/a = 3` (for `a < y`, `¬a∣y`), then `y = 3a/2`
+(i.e. `2y = 3a`). Hence at most one `y` among the larger elements can give `3`. -/
+lemma cofactor_three_eq {a y : ℕ} (ha : 0 < a) (hay : a < y) (hnay : ¬ a ∣ y)
+    (h3 : Nat.lcm a y / a = 3) : 2 * y = 3 * a := by
+  have hg : 0 < Nat.gcd a y := Nat.gcd_pos_of_pos_left y ha
+  have hgy : Nat.gcd a y ∣ y := Nat.gcd_dvd_right a y
+  have hga : Nat.gcd a y ∣ a := Nat.gcd_dvd_left a y
+  have ex : Nat.lcm a y / a = y / Nat.gcd a y := by
+    have h : Nat.lcm a y = a * (y / Nat.gcd a y) := by
+      rw [Nat.lcm, Nat.mul_div_assoc a hgy]
+    rw [h, Nat.mul_div_cancel_left _ ha]
+  rw [ex] at h3
+  have hy3g : y = 3 * Nat.gcd a y := by
+    have h := Nat.div_mul_cancel hgy; rw [h3] at h; omega
+  have h2 : 2 ≤ a / Nat.gcd a y := (ratio_bounds ha hay hnay).2
+  have hlt : a / Nat.gcd a y < 3 := by
+    rw [Nat.div_lt_iff_lt_mul hg]; omega
+  have ha2g : a = 2 * Nat.gcd a y := by
+    have hq : a / Nat.gcd a y = 2 := by omega
+    have h := Nat.div_mul_cancel hga; rw [hq] at h; omega
+  omega
+
+/-- Arithmetic: for `x,y,z ≥ 3` with `x+y+z ≥ 10` (i.e. not all `= 3`),
+`yz + xz + xy < xyz` (equivalently `1/x + 1/y + 1/z < 1`). -/
+lemma three_prod_ineq {x y z : ℕ} (hx : 3 ≤ x) (hy : 3 ≤ y) (hz : 3 ≤ z) (hs : 10 ≤ x + y + z) :
+    y * z + x * z + x * y < x * y * z := by
+  have hx' : (3 : ℤ) ≤ x := by exact_mod_cast hx
+  have hy' : (3 : ℤ) ≤ y := by exact_mod_cast hy
+  have hz' : (3 : ℤ) ≤ z := by exact_mod_cast hz
+  have hs' : (10 : ℤ) ≤ (x : ℤ) + y + z := by exact_mod_cast hs
+  have goalZ : ((y : ℤ) * z + x * z + x * y) < (x : ℤ) * y * z := by
+    nlinarith [hs', mul_nonneg (mul_nonneg (by linarith : (0:ℤ) ≤ (x:ℤ) - 3)
+        (by linarith : (0:ℤ) ≤ (y:ℤ) - 3)) (by linarith : (0:ℤ) ≤ (z:ℤ) - 3),
+      mul_nonneg (by linarith : (0:ℤ) ≤ (x:ℤ) - 3) (by linarith : (0:ℤ) ≤ (y:ℤ) - 3),
+      mul_nonneg (by linarith : (0:ℤ) ≤ (y:ℤ) - 3) (by linarith : (0:ℤ) ≤ (z:ℤ) - 3),
+      mul_nonneg (by linarith : (0:ℤ) ≤ (x:ℤ) - 3) (by linarith : (0:ℤ) ≤ (z:ℤ) - 3)]
+  exact_mod_cast goalZ
+
+/-- **Lemma A: the least element is good.** For `a < b,c,d` with `a ∤ b,c,d`
+(so `a` is the smallest of a primitive quadruple), the charge of `a` is `< 1`. -/
+lemma least_good {a b c d : ℕ} (ha : 0 < a) (hab : a < b) (hac : a < c) (had : a < d)
+    (hnab : ¬ a ∣ b) (hnac : ¬ a ∣ c) (hnad : ¬ a ∣ d) (hbc : b ≠ c) :
+    (Nat.lcm a c / a) * (Nat.lcm a d / a) + (Nat.lcm a b / a) * (Nat.lcm a d / a)
+        + (Nat.lcm a b / a) * (Nat.lcm a c / a)
+      < (Nat.lcm a b / a) * (Nat.lcm a c / a) * (Nat.lcm a d / a) := by
+  have hkb : 3 ≤ Nat.lcm a b / a := (lcm_ratio ha (ha.trans hab) hab hnab).1
+  have hkc : 3 ≤ Nat.lcm a c / a := (lcm_ratio ha (ha.trans hac) hac hnac).1
+  have hkd : 3 ≤ Nat.lcm a d / a := (lcm_ratio ha (ha.trans had) had hnad).1
+  have hbc3 : ¬ (Nat.lcm a b / a = 3 ∧ Nat.lcm a c / a = 3) := by
+    rintro ⟨h1, h2⟩
+    have e1 := cofactor_three_eq ha hab hnab h1
+    have e2 := cofactor_three_eq ha hac hnac h2
+    omega
+  have hsum : 10 ≤ Nat.lcm a b / a + Nat.lcm a c / a + Nat.lcm a d / a := by
+    by_contra h
+    push_neg at h
+    exact hbc3 ⟨by omega, by omega⟩
+  exact three_prod_ineq hkb hkc hkd hsum
+
 end Erdos488
