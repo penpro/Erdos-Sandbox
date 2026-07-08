@@ -1,11 +1,32 @@
 # Quadruple charge notes for Erdős #488
 
-Status: `PROVED` conditional lemma, `COMPUTED` support for the missing closing
-condition, `OPEN` final arithmetic lemma.
+Status: `AUDIT-PASS` (Codex-authored, Claude-audited 2026-07-07), pending human/
+literature referee.
+
+**Claude audit (2026-07-07).** Independently checked every step:
+- Reduction `2B = s + H`, `s > nS − 4`, so `H ≥ 4 ⟹ 2B > nS`: correct.
+- Prop 8″ (`good ⟹ X_e ≥ 1`): correct — `X_e = t − Σ⌊t/k⌋ ≥ t(1 − charge_e) > 0`
+  for integer `X_e` (`t = ⌊n/e⌋ ≥ 1` when `n ≥ max P`).
+- Two-good-charge proposition: the pointwise `Y_H` weights `p(2−p−q) +
+  2·C(p+q,3) − 2·C(p+q,4)` were recomputed for all `p,q ∈ {0,1,2}` → `{1,0,1,
+  0,0,2}`, all `≥ 0`; the two points `k = h₁,h₂` (each `p=1,q=0` by antichain,
+  both `≤ d ≤ n`) give `Y_H ≥ 2`. Correct.
+- Closing lemmas (a good; b bad ⟹ c good): verified EXHAUSTIVELY — 0 violations
+  over all 8,486,881 primitive quadruples with entries ≤ 130 (integer charge
+  test), matching Codex's `fastcheck sweep-quad-cert` (residual 0 to ≤ 150).
+  `min #good = 2` over all quads, so the two-good bound is tight.
+- Deficit classification (from the frenemy workflow): charge(e) > 1 iff cofactor
+  multiset `{f/gcd(e,f)}` ∈ `{2,2,k}`(1/k), `{2,3,3}`(1/6), `{2,3,4}`(1/12),
+  `{2,3,5}`(1/30). So `1/30` is the SMALLEST deficit; MAX is `1/2` (`{2,2,2}`).
+  No triple-intersection structure is needed — the two-good-charge accounting
+  (pairwise + the `2T₃−2T₄` correction) suffices.
+
+Next: Lean formalization (Claude), building on the sorry-free `|core| ≤ 3`
+development in `lean/ep488`.
 
 This note continues the charge method from `triples_writeup.md` into primitive
-quadruples. It does **not** solve #488 for all four-element primitive cores yet,
-but it isolates a surprisingly small remaining obstacle.
+quadruples. It proves the ordering-free #488 inequality for every primitive
+quadruple, hence for every finite set whose primitive core has size at most `4`.
 
 ## Setup
 
@@ -117,18 +138,15 @@ H(n) = sum_{g in G} X_g(n) + Y_H(n) >= 4.
 
 The preceding setup then gives `2B(n)>nS`, and the union bound finishes. QED.
 
-## Remaining bottleneck
+## Closing the charge condition
 
-The conditional lemma would prove #488 for every primitive quadruple if we could
-show:
+The conditional lemma proves #488 for every primitive quadruple once we know:
 
 ```text
 Every primitive quadruple has at least two good elements.
 ```
 
-This closing statement is not proved yet.
-
-One piece is easy:
+This is true.
 
 **Lemma.** In every primitive quadruple `a<b<c<d`, the least element `a` is good.
 
@@ -145,13 +163,99 @@ sum_{y in {b,c,d}} gcd(a,y)/y <= 1/3 + 1/4 + 1/4 < 1.
 
 So `a` is good. QED.
 
-Thus the real bottleneck is:
+It remains to show that at least one of `b,c` is good. In fact, `b` and `c`
+cannot both be bad.
+
+**Lemma.** In every primitive quadruple `a<b<c<d`, if `b` is bad then `c` is
+good.
+
+**Proof.** Write
 
 ```text
-In every primitive quadruple a<b<c<d, at least one of b,c,d is good.
+q = a/gcd(a,b),      u = c/gcd(b,c),      v = d/gcd(b,d).
 ```
 
-Additional observations:
+Primitivity gives `q>=2` and `u,v>=3`. If `b` is bad, then
+
+```text
+1/q + 1/u + 1/v >= 1.                  (1)
+```
+
+If `q>=3`, then (1) forces `u=v=3`; otherwise the sum is at most
+`1/3+1/3+1/4<1`. But `u=3` means `c/gcd(b,c)=3`; since
+`b/gcd(b,c)` is an integer `<3` and not `1` (else `b|c`), it is `2`, so
+`c=3b/2`. Similarly `v=3` gives `d=3b/2`, contradicting `c<d`. Therefore
+`q=2`.
+
+Thus `a/gcd(a,b)=2`; write `b/a=w/2` with `w` odd. From (1),
+
+```text
+1/u + 1/v >= 1/2.                      (2)
+```
+
+Let `c/b=u/r` and `d/b=v/s` be reduced fractions. Here
+`2<=r<u`, `2<=s<v`, and the fractions are ordered `1<c/b<d/b`.
+The possibilities allowed by (2) are only the following five:
+
+```text
+c/b = 3/2,  d/b = 5/3
+c/b = 3/2,  d/b = 5/2
+c/b = 4/3,  d/b = 3/2
+c/b = 5/4,  d/b = 3/2
+c/b = 6/5,  d/b = 3/2
+```
+
+Indeed, if neither `u` nor `v` is `3`, then (2) forces `u=v=4`, and
+`u=4` forces the corresponding ratio to be `4/3`, giving `c=d=4b/3`, impossible.
+So one of `u,v` is `3`. If `u=3`, then `c/b=3/2`, and (2) gives
+`v<=6`; the order `d/b>3/2` leaves only `d/b=5/3` or `5/2`. If `v=3`, then
+`d/b=3/2`, and the order `c/b<3/2` leaves only `c/b=4/3`, `5/4`, or `6/5`.
+
+Now compute the charge of `c` in the five cases. The term from `a` uses
+`b/a=w/2`; if the displayed numerator would reduce to `1`, then `a|c`, which is
+forbidden by primitivity.
+
+```text
+c/b=3/2, d/b=5/3:
+  charge(c) <= 1/4 + 1/2 + 1/10 < 1
+
+c/b=3/2, d/b=5/2:
+  charge(c) <= 1/4 + 1/2 + 1/5 < 1
+
+c/b=4/3, d/b=3/2:
+  charge(c) <= 1/3 + 1/3 + 1/9 < 1
+
+c/b=5/4, d/b=3/2:
+  charge(c) <= 1/8 + 1/4 + 1/6 < 1
+
+c/b=6/5, d/b=3/2:
+  charge(c) <= 1/5 + 1/5 + 1/5 < 1
+```
+
+Thus `c` is good in every case. QED.
+
+Combining the two lemmas, every primitive quadruple has at least two good
+elements: `a` is good, and either `b` is good or, if `b` is bad, `c` is good.
+
+## Main theorem for size 4
+
+**Theorem.** Let `A` be finite and let its primitive core have size at most `4`.
+Then #488 holds for `A`. More strongly, for every primitive quadruple `P` with
+reciprocal sum `S`,
+
+```text
+2B(n) > nS        for all n >= max(P),
+B(m)/m <= S < 2B(n)/n        for all m>=1, n>=max(P).
+```
+
+**Proof.** Sizes `<=3` are Theorem 9 of `triples_writeup.md`. For a primitive
+quadruple, the closing lemmas give at least two good charges, and the
+two-good-charge proposition above gives `2B(n)>nS`; the union bound gives
+`B(m)/m<=S`. Replacing a finite set by its primitive core preserves `B` and can
+only lower the maximum element, so the original `n>=max(A)` range is covered.
+QED.
+
+## Examples and sharpness of the charge condition
 
 1. Examples with two bad elements exist, e.g. `{12,20,30,45}` has bad charges
    at `30` and `45`, but still has good charges at `12` and `20`.
@@ -179,15 +283,32 @@ residual after those regimes: 0
 ```
 
 Thus every primitive quadruple with entries at most `150` has at least two good
-charges. This is evidence for the closing lemma above, not a proof.
+charges, matching the theorem above.
+
+An independent exact-audit script also checks the proof's fragile pieces:
+
+```text
+python audit_quadruple_charge.py 80
+```
+
+Output summary:
+
+```text
+pointwise Y weight table: PASS
+five-shape enumeration under b bad: PASS
+five c-charge estimates: PASS
+primitive quadruples up to 80: 1037468
+bounded quadruple audit: PASS
+```
 
 ## Next exact task
 
-Prove or refute the now sharper statement:
+Claude/human audit should still attack:
 
-```text
-In every primitive quadruple a<b<c<d, at least one of b,c,d has
-sum_{f != e} gcd(e,f)/f < 1.
-```
+- the five-shape classification under `b` bad;
+- the reduction of the `a`-term in the five `charge(c)` estimates;
+- the pointwise weights in the two-good-charge proposition.
 
-If true, the proposition above proves #488 for all primitive cores of size `4`.
+If it survives that external audit, turn the LaTeX addendum into a polished note
+and ask Claude to formalize the arithmetic lemmas after the size-`<=3` Lean
+project is settled.
