@@ -36,10 +36,18 @@ and $A=\{2p:p\le100\}$ shows the criterion $2B(n)>nS$ itself is false for large
 sets), so the argument is genuinely special to three generators.
 
 Writeup with full proofs, the sharp/extremal remarks, and the exact obstruction
-to four generators: [LINK to PDF]. Exact-arithmetic verification (all uncovered
-primitive triples $a\le25$ over full periods; ~$1.2\times10^9$ direct $(n,m)$
-pairs; PASS): [LINK to code]. A sorry-free Lean formalization along these lines
-looks feasible and is in progress; I'll follow up if/when it compiles.
+to four generators:
+https://github.com/penpro/Erdos-Sandbox/blob/main/writeup/erdos488_triples.pdf .
+Exact-arithmetic verification (all uncovered primitive triples $a\le25$ over full
+periods; ~$1.2\times10^9$ direct $(n,m)$ pairs; PASS):
+https://github.com/penpro/Erdos-Sandbox/blob/main/attack_triples.py .
+
+Lean status: the self-contained arithmetic core is already formalized sorry-free
+in Lean 4 / Mathlib — including the parity dichotomy above (the single
+substantive step), verified `#print axioms`-clean:
+https://github.com/penpro/Erdos-Sandbox/tree/main/lean/ep488 . The remaining
+piece is the counting half (the finite-$n$ Heilbronn–Rohrbach / two-term
+Bonferroni bound) and the mechanical assembly; I'll follow up when that compiles.
 
 —[your name/handle]
 
