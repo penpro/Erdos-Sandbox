@@ -67,4 +67,25 @@ lemma charge_ge_one {e f1 f2 f3 n : ℕ}
   exact floor_bound3 ht (one_le_lcm_div he hf1) (one_le_lcm_div he hf2)
     (one_le_lcm_div he hf3) hcharge
 
+/-! ### Pointwise arithmetic core of the two-good-charge proposition
+
+For a 4-element set, a point `k` is divided by `d ≤ 4` of the elements. These two
+facts are the per-point content of the inclusion–exclusion identity `2B = s + H`
+and of the `Y_H ≥ 2` weight bound; both are pure `ℕ` arithmetic (`interval_cases`
++ `decide`), independent of the Finset bookkeeping that sums them over `(0,n]`. -/
+
+/-- **4-set inclusion–exclusion, per point.** For a point with `d ≤ 4` divisors,
+`2·[d ≥ 1] = 2d − 2·C(d,2) + 2·C(d,3) − 2·C(d,4)` (additive form, no ℕ subtraction).
+Summed over `k ∈ (0,n]` this is `2·B(n) = s − 2P₂ + 2T₃ − 2T₄ + s = s + H`. -/
+lemma ie4_pointwise {d : ℕ} (hd : d ≤ 4) :
+    2 * min d 1 + 2 * d.choose 2 + 2 * d.choose 4 = 2 * d + 2 * d.choose 3 := by
+  interval_cases d <;> decide
+
+/-- **`Y_H` weight nonnegativity, per point.** With `p` = #(H-elements dividing k)
+and `q` = #(G-elements dividing k), both `≤ 2`, the `Y_H` weight
+`p(2−p−q) + 2·C(p+q,3) − 2·C(p+q,4) ≥ 0` (additive form). -/
+lemma yh_weight_nonneg {p q : ℕ} (hp : p ≤ 2) (hq : q ≤ 2) :
+    p * (p + q) + 2 * (p + q).choose 4 ≤ 2 * p + 2 * (p + q).choose 3 := by
+  interval_cases p <;> interval_cases q <;> decide
+
 end Erdos488
