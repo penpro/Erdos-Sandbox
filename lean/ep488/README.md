@@ -96,6 +96,16 @@ fixed `A` (including open `|core| ≥ 4` sets), a one-period computation feeding
 NOT prove the general `|core| ≥ 4` case (infinitely many sets, unbounded `L`) — it
 makes each individual set rigorously certifiable.
 
+### `Ep488/Example.lean` — the engine, exercised
+
+- **`ep488_example_4_6_10_15`**: EP488 for `A = {4,6,10,15}` — a `∣`-antichain of
+  size 4 (the smallest-lcm size-4 primitive core, `lcm = 60`), so it is **outside**
+  the `|core| ≤ 3` theorem. Proved end-to-end by `ep488_of_window`: slopes
+  `4·60 ≤ 12·B(60) ≤ 6·60` and the ratio bounds on the window `[15, 75)`, all
+  discharged by **kernel `decide`** (not `native_decide`) — so the theorem depends
+  only on `propext, Classical.choice, Quot.sound`. This is the certificate engine
+  verified by using it: a real, machine-checked #488 instance for a size-4 set.
+
 ## Honest scope
 
 This formalizes the `|primitive core| ≤ 3` case only. The general Erdős #488
