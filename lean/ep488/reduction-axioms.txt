@@ -1,0 +1,7 @@
+'Erdos488.ep488_singleton' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.ep488_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.Bgen_core_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.core_antichain' depends on axioms: [propext, Quot.sound]
+'Erdos488.exists_core_dvd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.ep488_primitive' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.ep488_core' depends on axioms: [propext, Classical.choice, Quot.sound]
