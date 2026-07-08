@@ -524,4 +524,41 @@ lemma least_good {a b c d : ℕ} (ha : 0 < a) (hab : a < b) (hac : a < c) (had :
     exact hbc3 ⟨by omega, by omega⟩
   exact three_prod_ineq hkb hkc hkd hsum
 
+/-- If three cofactors `q,u,v ≥ 3` satisfy the bad inequality `quv ≤ uv+qv+qu`
+(i.e. `1/q+1/u+1/v ≥ 1`), then all three equal `3`. -/
+lemma three_all_three {q u v : ℕ} (hq : 3 ≤ q) (hu : 3 ≤ u) (hv : 3 ≤ v)
+    (h : q * u * v ≤ u * v + q * v + q * u) : q = 3 ∧ u = 3 ∧ v = 3 := by
+  have hq3 : q ≤ 3 := by
+    by_contra hq4
+    have h10 : 10 ≤ q + u + v := by omega
+    have := three_prod_ineq hq hu hv h10
+    omega
+  have hu3 : u ≤ 3 := by
+    by_contra hu4
+    have h10 : 10 ≤ q + u + v := by omega
+    have := three_prod_ineq hq hu hv h10
+    omega
+  have hv3 : v ≤ 3 := by
+    by_contra hv4
+    have h10 : 10 ≤ q + u + v := by omega
+    have := three_prod_ineq hq hu hv h10
+    omega
+  exact ⟨by omega, by omega, by omega⟩
+
+/-- **`b` bad forces `q = 2`.** If `b` (2nd smallest) is bad, its `a`-cofactor
+`lcm(a,b)/b = 2`: else `q ≥ 3` forces `u=v=3`, giving `2c=3b=2d`, so `c=d`. -/
+lemma b_bad_forces_q_two {a b c d : ℕ} (hb : 0 < b) (hab : a < b) (hbc : b < c) (hbd : b < d)
+    (hcd : c ≠ d) (hnbc : ¬ b ∣ c) (hnbd : ¬ b ∣ d)
+    (hq : 2 ≤ Nat.lcm a b / b) (hu : 3 ≤ Nat.lcm b c / b) (hv : 3 ≤ Nat.lcm b d / b)
+    (hbad : (Nat.lcm a b / b) * (Nat.lcm b c / b) * (Nat.lcm b d / b)
+      ≤ (Nat.lcm b c / b) * (Nat.lcm b d / b) + (Nat.lcm a b / b) * (Nat.lcm b d / b)
+        + (Nat.lcm a b / b) * (Nat.lcm b c / b)) :
+    Nat.lcm a b / b = 2 := by
+  by_contra hq2
+  have hq3 : 3 ≤ Nat.lcm a b / b := by omega
+  obtain ⟨_, hu3, hv3⟩ := three_all_three hq3 hu hv hbad
+  have e1 := cofactor_three_eq hb hbc hnbc hu3
+  have e2 := cofactor_three_eq hb hbd hnbd hv3
+  omega
+
 end Erdos488
