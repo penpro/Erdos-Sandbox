@@ -457,6 +457,49 @@ fn is_uncovered(a: &[u64]) -> bool {
     }
 }
 
+/// Strict `>` on ratios given as `(num, den)`, `den > 0`.
+fn ratio_gt(a: (u128, u128), b: (u128, u128)) -> bool {
+    a.0 * b.1 > b.0 * a.1
+}
+/// Equality on ratios given as `(num, den)`, `den > 0`.
+fn ratio_eq(a: (u128, u128), b: (u128, u128)) -> bool {
+    a.0 * b.1 == b.0 * a.1
+}
+
+/// A per-thread partial result of a windowed `search`, mergeable so the search
+/// can be split across cores and reduced exactly (bit-identical to serial).
+#[derive(Clone)]
+struct SearchPartial {
+    tested: u64,
+    skipped: u64,
+    worst: (u128, u128),
+    worst_set: Vec<u64>,
+    ces: Vec<(Vec<u64>, u64, u64)>,
+}
+
+impl SearchPartial {
+    fn empty() -> Self {
+        SearchPartial { tested: 0, skipped: 0, worst: (0, 1), worst_set: Vec::new(), ces: Vec::new() }
+    }
+    /// Merge, keeping the larger worst-ratio; ties are broken by the
+    /// lexicographically smaller witness set so the result is deterministic
+    /// regardless of thread scheduling.
+    fn merge(mut self, mut other: SearchPartial) -> SearchPartial {
+        self.tested += other.tested;
+        self.skipped += other.skipped;
+        let take = ratio_gt(other.worst, self.worst)
+            || (ratio_eq(other.worst, self.worst)
+                && !other.worst_set.is_empty()
+                && (self.worst_set.is_empty() || other.worst_set < self.worst_set));
+        if take {
+            self.worst = other.worst;
+            self.worst_set = other.worst_set;
+        }
+        self.ces.append(&mut other.ces);
+        self
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn rec(
     depth: usize,
@@ -466,70 +509,97 @@ fn rec(
     k: usize,
     factor: u64,
     uncovered_only: bool,
-    tested: &mut u64,
-    skipped: &mut u64,
-    worst: &mut (u128, u128),
-    worst_set: &mut Vec<u64>,
-    ces: &mut Vec<(Vec<u64>, u64, u64)>,
+    p: &mut SearchPartial,
 ) {
     if depth == k {
         if !is_primitive(idx) {
             return;
         }
         if uncovered_only && !is_uncovered(idx) {
-            *skipped += 1;
+            p.skipped += 1;
             return;
         }
         let w = window_for(idx, factor);
         let (ce, r) = ep488_window(idx, w);
-        *tested += 1;
+        p.tested += 1;
         if let Some((n, m)) = ce {
-            ces.push((idx.clone(), n, m));
+            p.ces.push((idx.clone(), n, m));
         }
-        if r.0 * worst.1 > worst.0 * r.1 {
-            *worst = r;
-            *worst_set = idx.clone();
+        let take = ratio_gt(r, p.worst)
+            || (ratio_eq(r, p.worst)
+                && (p.worst_set.is_empty() || idx.as_slice() < p.worst_set.as_slice()));
+        if take {
+            p.worst = r;
+            p.worst_set = idx.clone();
         }
         return;
     }
     let mut v = start_val;
     while v <= amax {
         idx[depth] = v;
-        rec(
-            depth + 1, v + 1, amax, idx, k, factor, uncovered_only, tested, skipped, worst,
-            worst_set, ces,
-        );
+        rec(depth + 1, v + 1, amax, idx, k, factor, uncovered_only, p);
         v += 1;
     }
 }
 
+/// Number of worker threads. Defaults to all available cores; override with the
+/// `FASTCHECK_THREADS` environment variable (e.g. `FASTCHECK_THREADS=1` to force
+/// the serial path, useful for benchmarking or a loaded machine).
+fn worker_count() -> usize {
+    if let Ok(v) = std::env::var("FASTCHECK_THREADS") {
+        if let Ok(n) = v.parse::<usize>() {
+            if n >= 1 {
+                return n;
+            }
+        }
+    }
+    std::thread::available_parallelism().map(|n| n.get()).unwrap_or(1).max(1)
+}
+
 fn search(k: usize, amax: u64, factor: u64, uncovered_only: bool) {
     let start = Instant::now();
-    let mut tested = 0u64;
-    let mut skipped = 0u64;
-    let mut worst = (0u128, 1u128);
-    let mut worst_set: Vec<u64> = vec![];
-    let mut ces: Vec<(Vec<u64>, u64, u64)> = vec![];
-    let mut idx = vec![0u64; k];
-    rec(
-        0, 2, amax, &mut idx, k, factor, uncovered_only, &mut tested, &mut skipped, &mut worst,
-        &mut worst_set, &mut ces,
-    );
+    let nthreads = worker_count();
+    // Split the first element a0 in [2, amax] across threads round-robin; each
+    // thread owns disjoint a0 values, so the subtrees never overlap. Round-robin
+    // (rather than contiguous blocks) balances load, since small a0 have larger
+    // subtrees. The merge is exact, so the result matches the serial version.
+    let partials: Vec<SearchPartial> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads)
+            .map(|t| {
+                s.spawn(move || {
+                    let mut p = SearchPartial::empty();
+                    let mut idx = vec![0u64; k];
+                    let mut a0 = 2 + t as u64;
+                    while a0 <= amax {
+                        idx[0] = a0;
+                        rec(1, a0 + 1, amax, &mut idx, k, factor, uncovered_only, &mut p);
+                        a0 += nthreads as u64;
+                    }
+                    p
+                })
+            })
+            .collect();
+        handles.into_iter().map(|h| h.join().unwrap()).collect()
+    });
+    let result = partials.into_iter().fold(SearchPartial::empty(), SearchPartial::merge);
     let dt = start.elapsed().as_secs_f64();
-    println!("k={k} amax={amax} window_factor={factor} uncovered_only={uncovered_only}");
-    println!("  primitive sets tested = {tested}   skipped(covered) = {skipped}   time = {dt:.2}s");
+    println!("k={k} amax={amax} window_factor={factor} uncovered_only={uncovered_only} threads={nthreads}");
+    println!(
+        "  primitive sets tested = {}   skipped(covered) = {}   time = {dt:.2}s",
+        result.tested, result.skipped
+    );
     println!(
         "  worst ratio = {}/{} = {:.9}   at set = {:?}",
-        worst.0,
-        worst.1,
-        ratio_f(worst),
-        worst_set
+        result.worst.0,
+        result.worst.1,
+        ratio_f(result.worst),
+        result.worst_set
     );
-    if ces.is_empty() {
+    if result.ces.is_empty() {
         println!("  COUNTEREXAMPLES (n*B(m) >= 2*m*B(n), m>n>=maxA) : NONE in window");
     } else {
-        println!("  *** COUNTEREXAMPLES FOUND: {} ***", ces.len());
-        for (s, n, m) in ces.iter().take(20) {
+        println!("  *** COUNTEREXAMPLES FOUND: {} ***", result.ces.len());
+        for (s, n, m) in result.ces.iter().take(20) {
             println!("      set={s:?}  n={n} m={m}");
         }
     }
@@ -582,6 +652,116 @@ fn command_cert(raw: Option<&String>, cap_raw: Option<&String>) -> Result<(), St
     Ok(())
 }
 
+/// Per-thread accumulator for the quadruple certificate sweep, mergeable so the
+/// sweep can be split across cores and reduced exactly.
+struct SweepPartial {
+    primitive: u64,
+    sparse: u64,
+    charge: u64,
+    two_good_rescued: u64,
+    symbolic: u64,
+    residual: u64,
+    attempted: u64,
+    cert_pass: u64,
+    cert_fail: u64,
+    separator_pass: u64,
+    skipped_lcm: u64,
+    worst_pass: Option<(ExactRatio, Vec<u64>, PeriodicCertificate)>,
+    worst_fail: Option<(ExactRatio, Vec<u64>, PeriodicCertificate)>,
+    skipped_examples: Vec<(Vec<u64>, u64)>,
+}
+
+impl SweepPartial {
+    fn empty() -> Self {
+        SweepPartial {
+            primitive: 0, sparse: 0, charge: 0, two_good_rescued: 0, symbolic: 0,
+            residual: 0, attempted: 0, cert_pass: 0, cert_fail: 0, separator_pass: 0,
+            skipped_lcm: 0, worst_pass: None, worst_fail: None, skipped_examples: Vec::new(),
+        }
+    }
+    fn merge(mut self, other: SweepPartial) -> SweepPartial {
+        self.primitive += other.primitive;
+        self.sparse += other.sparse;
+        self.charge += other.charge;
+        self.two_good_rescued += other.two_good_rescued;
+        self.symbolic += other.symbolic;
+        self.residual += other.residual;
+        self.attempted += other.attempted;
+        self.cert_pass += other.cert_pass;
+        self.cert_fail += other.cert_fail;
+        self.separator_pass += other.separator_pass;
+        self.skipped_lcm += other.skipped_lcm;
+        if let Some((r, set, cert)) = other.worst_pass {
+            update_cert_worst(&mut self.worst_pass, r, set, cert);
+        }
+        if let Some((r, set, cert)) = other.worst_fail {
+            update_cert_worst(&mut self.worst_fail, r, set, cert);
+        }
+        for e in other.skipped_examples {
+            if self.skipped_examples.len() < 8 {
+                self.skipped_examples.push(e);
+            }
+        }
+        self
+    }
+}
+
+/// The `b<c<d` sweep for a fixed smallest element `a` (one parallel unit).
+fn sweep_quad_for_a(a: u64, amax: u64, cap: u64) -> Result<SweepPartial, String> {
+    let mut p = SweepPartial::empty();
+    for b in a + 1..=amax - 2 {
+        for c in b + 1..=amax - 1 {
+            for d in c + 1..=amax {
+                let set = vec![a, b, c, d];
+                if !is_primitive(&set) {
+                    continue;
+                }
+                p.primitive += 1;
+                let is_sparse = reciprocal_sparse(&set);
+                if charge_positive(&set) {
+                    p.charge += 1;
+                }
+                let is_two_good_rescued = at_least_two_good_charges(&set);
+                if is_sparse {
+                    p.sparse += 1;
+                }
+                if is_two_good_rescued {
+                    p.two_good_rescued += 1;
+                }
+                if is_sparse || is_two_good_rescued {
+                    p.symbolic += 1;
+                    continue;
+                }
+
+                p.residual += 1;
+                let Some(lcm) = lcm_set(&set, cap) else {
+                    p.skipped_lcm += 1;
+                    if p.skipped_examples.len() < 8 {
+                        if let Some(full_lcm) = lcm_set(&set, u64::MAX) {
+                            p.skipped_examples.push((set, full_lcm));
+                        }
+                    }
+                    continue;
+                };
+
+                p.attempted += 1;
+                let cert = periodic_certificate_with_lcm(&set, lcm)?;
+                if cert.union_bound_separator {
+                    p.separator_pass += 1;
+                }
+                if cert.ordering_free {
+                    p.cert_pass += 1;
+                    update_cert_worst(&mut p.worst_pass, cert.beta_over_alpha, set, cert);
+                } else {
+                    p.cert_fail += 1;
+                    update_cert_worst(&mut p.worst_fail, cert.beta_over_alpha, set, cert);
+                }
+            }
+        }
+    }
+    Ok(p)
+}
+
 fn command_sweep_quad_cert(amax_raw: Option<&String>, cap_raw: Option<&String>) -> Result<(), String> {
     let amax = match amax_raw {
         Some(x) => parse_u64_arg(x)?,
@@ -596,74 +776,36 @@ fn command_sweep_quad_cert(amax_raw: Option<&String>, cap_raw: Option<&String>) 
     }
 
     let start = Instant::now();
-    let mut primitive = 0u64;
-    let mut sparse = 0u64;
-    let mut charge = 0u64;
-    let mut two_good_rescued = 0u64;
-    let mut symbolic = 0u64;
-    let mut residual = 0u64;
-    let mut attempted = 0u64;
-    let mut cert_pass = 0u64;
-    let mut cert_fail = 0u64;
-    let mut separator_pass = 0u64;
-    let mut skipped_lcm = 0u64;
-    let mut worst_pass: Option<(ExactRatio, Vec<u64>, PeriodicCertificate)> = None;
-    let mut worst_fail: Option<(ExactRatio, Vec<u64>, PeriodicCertificate)> = None;
-    let mut skipped_examples: Vec<(Vec<u64>, u64)> = Vec::new();
-
-    for a in 2..=amax - 3 {
-        for b in a + 1..=amax - 2 {
-            for c in b + 1..=amax - 1 {
-                for d in c + 1..=amax {
-                    let set = vec![a, b, c, d];
-                    if !is_primitive(&set) {
-                        continue;
+    let nthreads = worker_count();
+    let a_hi = amax - 3;
+    // Split the smallest element `a` across threads round-robin; the b<c<d sweeps
+    // for distinct `a` are independent, and the merge is exact — the counts and
+    // worst certificates match the serial version.
+    let thread_results: Vec<Result<SweepPartial, String>> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads)
+            .map(|t| {
+                s.spawn(move || {
+                    let mut acc = SweepPartial::empty();
+                    let mut a = 2 + t as u64;
+                    while a <= a_hi {
+                        acc = acc.merge(sweep_quad_for_a(a, amax, cap)?);
+                        a += nthreads as u64;
                     }
-                    primitive += 1;
-                    let is_sparse = reciprocal_sparse(&set);
-                    let is_charge = charge_positive(&set);
-                    let is_two_good_rescued = at_least_two_good_charges(&set);
-                    if is_sparse {
-                        sparse += 1;
-                    }
-                    if is_charge {
-                        charge += 1;
-                    }
-                    if is_two_good_rescued {
-                        two_good_rescued += 1;
-                    }
-                    if is_sparse || is_two_good_rescued {
-                        symbolic += 1;
-                        continue;
-                    }
-
-                    residual += 1;
-                    let Some(lcm) = lcm_set(&set, cap) else {
-                        skipped_lcm += 1;
-                        if skipped_examples.len() < 8 {
-                            if let Some(full_lcm) = lcm_set(&set, u64::MAX) {
-                                skipped_examples.push((set, full_lcm));
-                            }
-                        }
-                        continue;
-                    };
-
-                    attempted += 1;
-                    let cert = periodic_certificate_with_lcm(&set, lcm)?;
-                    if cert.union_bound_separator {
-                        separator_pass += 1;
-                    }
-                    if cert.ordering_free {
-                        cert_pass += 1;
-                        update_cert_worst(&mut worst_pass, cert.beta_over_alpha, set, cert);
-                    } else {
-                        cert_fail += 1;
-                        update_cert_worst(&mut worst_fail, cert.beta_over_alpha, set, cert);
-                    }
-                }
-            }
-        }
+                    Ok(acc)
+                })
+            })
+            .collect();
+        handles.into_iter().map(|h| h.join().unwrap()).collect()
+    });
+    let mut merged = SweepPartial::empty();
+    for tr in thread_results {
+        merged = merged.merge(tr?);
     }
+    let SweepPartial {
+        primitive, sparse, charge, two_good_rescued, symbolic, residual, attempted,
+        cert_pass, cert_fail, separator_pass, skipped_lcm, worst_pass, worst_fail,
+        skipped_examples,
+    } = merged;
 
     println!("primitive quadruples with entries <= {amax}: {primitive}");
     println!("reciprocal-sparse theorem applies: {sparse}");

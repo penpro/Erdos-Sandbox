@@ -50,6 +50,24 @@ same loop in CPython did **not** finish in 120 s — a **>400×** speedup (the t
 factor is larger). This is the entire point of the workbench: it lets the OPEN
 `|P| >= 4` frontier be searched at a scale Python cannot reach.
 
+### Multi-core
+
+The enumeration modes (`triples`/`quads`/`quints`) and the exact
+`sweep-quad-cert` sweep are parallelised across all cores with `std::thread`
+(no external crate — the offline-by-default rule holds). The smallest element is
+split round-robin across threads and the per-thread partial results are merged
+**exactly**, so the output (counts, worst ratio + witness, certificate tallies)
+is bit-identical to the serial run. On the 32-thread 14900K:
+
+```text
+quads 90 (1,735,597 primitive quadruples, windowed):
+  FASTCHECK_THREADS=1   31.91 s
+  all cores (32)         2.06 s        -> 15.5x, identical worst ratio 1.9409...
+```
+
+Set `FASTCHECK_THREADS=N` to pin the worker count (e.g. `=1` to force the serial
+path for benchmarking or on a loaded machine); the default is all logical cores.
+
 ## Findings so far (all consistent with EP488 being true)
 
 - **No counterexample found** to EP488 in any search: primitive triples to
@@ -59,17 +77,20 @@ factor is larger). This is the entire point of the workbench: it lets the OPEN
   `{a, a+1, ..., a+k-1}`, whose ratio tends to `2` from below (e.g. triples
   `{98,99,100} ~ 1.9566`, quads `{117,118,119,120} ~ 1.9417`). (This corrected an
   earlier over-strong "singletons only" claim.)
-- **Exact certification:** every primitive quadruple with small enough `lcm` up to
-  `N = 150` is *proof-strength* certified (`beta < 2*alpha` over a full period),
-  after the charge-positivity / covered-zone theorems dispose of the rest.
+- **Size-4 symbolic check:** every primitive quadruple with entries up to
+  `N = 150` satisfies the two-good-charge rescue condition from
+  `../quadruple_charge_notes.md`; there is no residual after that symbolic
+  regime. The `cert` command remains available for proof-strength certificates
+  of individual finite sets when the lcm is small enough.
 
 ## Honest scope (please read)
 
 - `triples`/`quads`/`quints`/`set` give **bounded-window evidence**, not proof.
-- `cert`/`sweep-quad-cert` give a **proof-strength certificate for that specific
-  finite set** (exact, full-period) — this is NOT a general theorem for
-  `|P| >= 4`, which remains **open**. The proved result is `|P| <= 3` (see
-  `../writeup`, `../lean/ep488`).
+- `cert` gives a **proof-strength certificate for that specific finite set**
+  (exact, full-period).
+- `sweep-quad-cert` is now mostly a symbolic-regime audit for the local size-4
+  addendum. Treat `|P|<=4` as internal until human/literature review; the open
+  frontier is `|P|>=5`.
 
 Division of labor: the windowed searcher is Claude's; the exact certificate layer
 is Codex's (the two cross-validate — e.g. both give `{19,20,21} -> 666/361`).
