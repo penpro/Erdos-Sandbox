@@ -248,4 +248,55 @@ lemma yh_raw_nonneg (h1 h2 g1 g2 : Prop)
         - 2 * (if h1 ∧ h2 ∧ g1 ∧ g2 then (1:ℤ) else 0)) := by
   by_cases h1 <;> by_cases h2 <;> by_cases g1 <;> by_cases g2 <;> simp_all
 
+/-- The raw pointwise `Y_H` contribution at `k` (H-elements `a,b`, G-elements `c,d`). -/
+def yhRaw (a b c d k : ℕ) : ℤ :=
+  (if a ∣ k then 1 else 0) + (if b ∣ k then 1 else 0)
+    - 2 * (if a ∣ k ∧ b ∣ k then 1 else 0)
+    - ((if a ∣ k ∧ c ∣ k then 1 else 0) + (if a ∣ k ∧ d ∣ k then 1 else 0)
+      + (if b ∣ k ∧ c ∣ k then 1 else 0) + (if b ∣ k ∧ d ∣ k then 1 else 0))
+    + 2 * ((if a ∣ k ∧ b ∣ k ∧ c ∣ k then 1 else 0) + (if a ∣ k ∧ b ∣ k ∧ d ∣ k then 1 else 0)
+      + (if a ∣ k ∧ c ∣ k ∧ d ∣ k then 1 else 0) + (if b ∣ k ∧ c ∣ k ∧ d ∣ k then 1 else 0))
+    - 2 * (if a ∣ k ∧ b ∣ k ∧ c ∣ k ∧ d ∣ k then 1 else 0)
+
+/-- **`Y_H = Σ_k yhRaw`.** The pointwise expansion of `X_a + X_b + 2T₃ − 2T₄`. -/
+lemma yh_eq_sum (a b c d n : ℕ) :
+    ((((n / a : ℕ) : ℤ) - ((n / Nat.lcm a b : ℕ) : ℤ) - ((n / Nat.lcm a c : ℕ) : ℤ)
+        - ((n / Nat.lcm a d : ℕ) : ℤ))
+      + (((n / b : ℕ) : ℤ) - ((n / Nat.lcm a b : ℕ) : ℤ) - ((n / Nat.lcm b c : ℕ) : ℤ)
+        - ((n / Nat.lcm b d : ℕ) : ℤ))
+      + 2 * (t3fun4 a b c d n : ℤ) - 2 * (t4fun4 a b c d n : ℤ))
+      = ∑ k ∈ Finset.Ioc 0 n, yhRaw a b c d k := by
+  simp only [yhRaw, t3fun4, t4fun4, Nat.cast_add, cast_div_eq_sum_indicator, Finset.mul_sum,
+    ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl (fun k _ => ?_)
+  rw [lcm2_ind, lcm2_ind, lcm2_ind, lcm2_ind, lcm2_ind, lcm3_ind, lcm3_ind, lcm3_ind, lcm3_ind,
+    lcm4_ind]
+  ring
+
+/-- **`Y_H ≥ 2`.** For H-elements `a,b` (`≤ n`, positive) with `b∤a, c∤a, d∤a` and
+`a∤b, c∤b, d∤b` (antichain), the raw sum is `≥ 2` — the two points `k=a,b` each
+contribute `1` and the rest are `≥ 0`. -/
+lemma yh_ge_two {a b c d n : ℕ}
+    (ha : 0 < a) (hb : 0 < b) (han : a ≤ n) (hbn : b ≤ n) (hab : a ≠ b)
+    (hba : ¬ b ∣ a) (hca : ¬ c ∣ a) (hda : ¬ d ∣ a)
+    (hab2 : ¬ a ∣ b) (hcb : ¬ c ∣ b) (hdb : ¬ d ∣ b) :
+    2 ≤ (((n / a : ℕ) : ℤ) - ((n / Nat.lcm a b : ℕ) : ℤ) - ((n / Nat.lcm a c : ℕ) : ℤ)
+        - ((n / Nat.lcm a d : ℕ) : ℤ))
+      + (((n / b : ℕ) : ℤ) - ((n / Nat.lcm a b : ℕ) : ℤ) - ((n / Nat.lcm b c : ℕ) : ℤ)
+        - ((n / Nat.lcm b d : ℕ) : ℤ))
+      + 2 * (t3fun4 a b c d n : ℤ) - 2 * (t4fun4 a b c d n : ℤ) := by
+  rw [yh_eq_sum]
+  have hnn : ∀ k ∈ Finset.Ioc 0 n, k ∉ ({a, b} : Finset ℕ) → 0 ≤ yhRaw a b c d k :=
+    fun k _ _ => yh_raw_nonneg (a ∣ k) (b ∣ k) (c ∣ k) (d ∣ k)
+  have hsub : ({a, b} : Finset ℕ) ⊆ Finset.Ioc 0 n := by
+    intro x hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with rfl | rfl <;> simp only [Finset.mem_Ioc] <;> omega
+  have hle := Finset.sum_le_sum_of_subset_of_nonneg hsub hnn
+  have hRa : yhRaw a b c d a = 1 := by simp [yhRaw, hba, hca, hda]
+  have hRb : yhRaw a b c d b = 1 := by simp [yhRaw, hab2, hcb, hdb]
+  have hpair : ∑ k ∈ ({a, b} : Finset ℕ), yhRaw a b c d k = 2 := by
+    rw [Finset.sum_pair hab, hRa, hRb]; norm_num
+  linarith [hle, hpair]
+
 end Erdos488
