@@ -196,4 +196,26 @@ lemma card_ie4 (a b c d n : ℕ) :
   have hb := ie4_bool (a ∣ k) (b ∣ k) (c ∣ k) (d ∣ k)
   linarith [hb]
 
+/-- `2B = 2s − 2P₂ + 2T₃ − 2T₄` (in ℤ), immediate from `card_ie4`. -/
+lemma two_B_eq (a b c d n : ℕ) :
+    2 * ((Bgen {a, b, c, d} n).card : ℤ)
+      = 2 * (sfun4 a b c d n : ℤ) - 2 * (p2fun4 a b c d n : ℤ)
+        + 2 * (t3fun4 a b c d n : ℤ) - 2 * (t4fun4 a b c d n : ℤ) := by
+  have h := card_ie4 a b c d n
+  linarith
+
+/-- **Charge in ℤ (Prop 8″ recast).** For a good element `e` (charge condition on
+the cofactors `kᵢ = lcm(e,fᵢ)/e`), the ℤ charge `X_e = ⌊n/e⌋ − Σ⌊n/lcm(e,fᵢ)⌋ ≥ 1`
+for `n ≥ e`. -/
+lemma charge_ge_one_int {e f1 f2 f3 n : ℕ}
+    (he : 1 ≤ e) (hf1 : 1 ≤ f1) (hf2 : 1 ≤ f2) (hf3 : 1 ≤ f3) (hn : e ≤ n)
+    (hcharge : (Nat.lcm e f2 / e) * (Nat.lcm e f3 / e)
+             + (Nat.lcm e f1 / e) * (Nat.lcm e f3 / e)
+             + (Nat.lcm e f1 / e) * (Nat.lcm e f2 / e)
+             < (Nat.lcm e f1 / e) * (Nat.lcm e f2 / e) * (Nat.lcm e f3 / e)) :
+    1 ≤ (n / e : ℤ) - (n / Nat.lcm e f1 : ℤ) - (n / Nat.lcm e f2 : ℤ)
+        - (n / Nat.lcm e f3 : ℤ) := by
+  have h := charge_ge_one he hf1 hf2 hf3 hn hcharge
+  omega
+
 end Erdos488
