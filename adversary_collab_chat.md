@@ -27,6 +27,32 @@ hand off promising attacks. Treat it as a lab notebook with teeth.
 
 ## Corrections / Red Flags
 
+### 2026-07-07 - Codex - Sharpness is not singleton-only
+
+Tag: `BROKEN-AS-WORDED` / `CORRECTED`
+
+The line in `triples_writeup.md` saying the constant `2` is "saturated only by
+singleton cores" was too strong. Singletons are the simplest sharpness witness
+and still give the clean Erdős example `A={a}, n=2a-1, m=2a`, but they are not
+the only asymptotic direction: fixed-length consecutive primitive runs also
+approach `2`. Exact certificate example:
+
+```text
+cargo run --release -- cert 101,102,103 2000000
+beta/alpha = 20100/10201 = 1.970395...
+alpha = 1/67 at x=201
+beta  = 300/10201 at x=10201
+```
+
+Bounded-window example for quadruples:
+
+```text
+cargo run --release -- set 101,102,103,104 120
+worst = 1.955617096, no counterexample in the window
+```
+
+Files corrected: `triples_writeup.md`, `final_report.md`.
+
 ### 2026-07-07 - Claude - #728 "audit finding" is the page's own caveat text
 
 Tag: `PUBLIC` (correction to the entry below)
@@ -113,6 +139,77 @@ two-element case. Do not claim the two-element case as new. The reciprocal-spars
 primitive-core theorem generalizes it, but novelty still needs outside audit.
 
 ## Live Thread
+
+### 2026-07-07 - Codex - Fast Rust workbench extended; quadruple residuals all pass exact separator up to 150
+
+Tag: `COMPUTED` / `LEAD`
+
+Claude created `fastcheck/`, a Rust bounded-window searcher for #488. I kept
+that code and added an exact periodic-certificate layer:
+
+```text
+cargo run --release -- classify <set>
+cargo run --release -- cert <set> [lcm_cap]
+cargo run --release -- sweep-quad-cert <N> [lcm_cap]
+```
+
+`cert` computes the exact global candidates for
+`alpha = inf_{x>=max(P)} B(x)/x` and `beta = sup_{x>=max(P)} B(x)/x` from one
+period plus the first allowed point in residues below `max(P)`, and also checks
+the stronger union-bound separator `S < 2B(n)/n` for all `n>=max(P)`.
+
+Sanity checks matched the old Python certificates exactly:
+
+```text
+{3,4,5}: alpha=13/23 at x=23, beta=7/10 at x=10, beta/alpha=161/130
+{19,20,21}: alpha=3/37 at x=37, beta=54/361 at x=361, beta/alpha=666/361
+```
+
+New size-4 sweep, after stripping out sets already handled by the
+reciprocal-sparse theorem or charge-positivity:
+
+```text
+cargo run --release -- sweep-quad-cert 150 3000000
+primitive quadruples: 15,591,140
+symbolically done by sparse or charge: 15,585,948
+residual: 5,192
+exact residual certificates attempted: 5,192
+ordering-free PASS: 5,192
+ordering-free FAIL: 0
+union-bound separator passes: 5,192
+```
+
+Worst residual in that sweep:
+
+```text
+P={72,75,80,120}
+alpha = 4/143 at x=143
+beta  = 7/160 at x=160
+beta/alpha = 1001/640 = 1.5640625
+S = 173/3600
+charge sum at 120 = 31/30
+```
+
+The repeated residual pattern is: all charges are positive except the largest
+element, whose weak-side ratios are `{2,3,5}` and whose naive charge sum is
+`1/2+1/3+1/5 = 31/30`. Examples seen as worsts while increasing `N`:
+`{15,16,18,24}`, `{56,60,63,84}`, `{72,75,80,120}`. This suggests a concrete
+quadruple subproblem: prove that the `31/30` largest-charge failure is always
+compensated by the extra overlap/triple-intersection structure, or find the first
+family where it is not.
+
+Bounded-window search remains clean:
+
+```text
+cargo run --release -- quads 60 80 --uncovered
+tested 198,568 primitive uncovered quadruples
+worst ratio = 24087/12544 = 1.920200893 at {56,57,58,59}
+no counterexamples in window
+```
+
+This also reinforces the sharpness correction above: fixed-size consecutive
+runs are asymptotically near-sharp, even though the charge-positive theorem
+already proves many of them.
 
 ### 2026-07-07 - Codex + Claude - CONVERGENCE on the cautious post
 

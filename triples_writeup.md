@@ -268,9 +268,13 @@ targeted range `4 ≤ a < b < c`.
 
 ## 7. Sharpness and what remains open
 
-* The constant `2` is saturated only by singleton cores (`A = {a}`,
-  `n = 2a−1`, `m = 2a`, ratio `2 − 1/a`). For triples the proof above gives a
-  quantitative gap: in the uncovered zone the proof of Theorem 8 yields
+* The constant `2` is sharp already for singleton cores (`A = {a}`,
+  `n = 2a−1`, `m = 2a`, ratio `2 − 1/a`). It is **not** unique to singletons as
+  an asymptotic direction: fixed-length consecutive primitive runs such as
+  `{a,a+1,a+2}` also have beta/alpha ratios tending to `2` (for example
+  `{101,102,103}` has `beta/alpha = 20100/10201 ≈ 1.9704`). For triples the
+  proof above gives a quantitative gap for each fixed set: in the uncovered zone
+  the proof of Theorem 8 yields
   `2·B(n)/n − S ≥ [(s(n) − 2P(n) − 3) + (3 − {n/a} − {n/b} − {n/c})]/n > 0`
   (first bracket `≥ 0` by Lemma 5, second `> 0`); in the covered zone
   Theorem 6 gives `2·B(n)/n > 2/a ≥ S ≥ B(m)/m`.

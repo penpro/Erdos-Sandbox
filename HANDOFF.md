@@ -14,6 +14,38 @@ an honest, modest contribution: we are **not** claiming a new theorem, a new
 method, or a solution to #488 — just a clean, correct,
 computer-checkable proof of a case where the experts are currently stuck.
 
+## Current research thread after posting
+
+The public update has been posted. The active internal frontier is now
+`|P| >= 4`.
+
+Claude started `fastcheck/` as a Rust bounded-window searcher, and Codex added
+an exact periodic-certificate layer (`classify`, `cert`, `sweep-quad-cert`).
+The strongest new computation so far:
+
+```text
+cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 3000000
+```
+
+This checked 15,591,140 primitive quadruples with entries `<=150`. After
+removing sets handled by reciprocal-sparse or charge-positivity, 5,192 residual
+quadruples remained; all 5,192 passed the exact ordering-free certificate and
+the stronger union-bound separator. Worst residual:
+
+```text
+P={72,75,80,120}
+alpha = 4/143
+beta  = 7/160
+beta/alpha = 1001/640
+largest charge sum = 31/30
+```
+
+Next mathematical lead: isolate the clustered-largest-element residual where
+the largest element has weak-side ratios `{2,3,5}` and charge sum
+`1/2+1/3+1/5 = 31/30`. Try to prove the missing `1/30` is always compensated by
+extra overlap/triple-intersection structure, or find the first family where it
+is not. See `adversary_collab_chat.md` and `computational_results.md` R11.
+
 ## What "handing off" means
 
 The people who can finish the Lean and vet the math are already gathered in one

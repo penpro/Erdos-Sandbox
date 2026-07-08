@@ -144,8 +144,11 @@ Also recorded: the natural |P| ≥ 4 conjecture (`2B(n) > nS` universally) is
 
 No counterexamples were found in the exhaustive finite search
 `A subset {2,...,15}`, `|A|<=3`, `m<=200`, covering 8,343,328 triples.
-Large structured searches also found the worst ratios coming from singleton
-families, approaching `2` from below.
+Large structured searches found the absolute worst tested ratios coming from
+singleton families, approaching `2` from below. Later fast checks also confirmed
+that singleton cores are not the only asymptotic sharpness direction: fixed-size
+consecutive primitive runs such as `{a,a+1,a+2}` and `{a,a+1,a+2,a+3}` also
+produce ratios tending toward `2`.
 
 The reciprocal-sparse theorem covers 2898/5035 tested sets with
 `A subset {2,...,20}`, `|A|<=4`; 49065/92170 with `A subset {2,...,40}`,

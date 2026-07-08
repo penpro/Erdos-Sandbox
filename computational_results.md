@@ -202,6 +202,54 @@ or of the per-period criterion `B(n) > nS/2`.
 multiples are even (`sup g <= 1/2 < 2*delta`). Recorded in
 `triples_writeup.md` §7 and `adversary_collab_chat.md`.
 
+## R11. Fast Rust workbench and size-4 residual sweep
+
+Claude started `fastcheck/` as a Rust bounded-window checker; Codex added exact
+periodic-certificate commands:
+
+```text
+cargo run --release -- classify 2,3,5,7
+cargo run --release -- cert 19,20,21 1000000
+cargo run --release -- sweep-quad-cert 150 3000000
+```
+
+Sanity checks matched the older Python certificates exactly:
+
+```text
+{3,4,5}: alpha=13/23 at x=23, beta=7/10 at x=10, beta/alpha=161/130
+{19,20,21}: alpha=3/37 at x=37, beta=54/361 at x=361, beta/alpha=666/361
+```
+
+Quadruple residual sweep:
+
+```text
+primitive quadruples with entries <= 150: 15,591,140
+reciprocal-sparse theorem applies: 6,090,059
+charge-positivity theorem applies: 15,577,302
+symbolically done by sparse or charge: 15,585,948
+residual after those regimes: 5,192
+exact residual certificates attempted with lcm <= 3,000,000: 5,192
+ordering-free PASS: 5,192
+ordering-free FAIL: 0
+union-bound separator passes among attempted: 5,192
+```
+
+Worst residual certificate in that sweep:
+
+```text
+P={72,75,80,120}
+alpha = 4/143 at x=143
+beta  = 7/160 at x=160
+beta/alpha = 1001/640
+charge sum at 120 = 31/30
+```
+
+Lead: the residuals that beat the naive charge theorem repeatedly have exactly
+one failed charge, at the largest element, with weak-side ratios `{2,3,5}` and
+charge sum `1/2+1/3+1/5 = 31/30`. The next proof attempt should isolate this
+clustered-largest-element case and test whether triple-intersection bookkeeping
+always compensates for the missing `1/30`.
+
 ## Reproduce everything
 
 ```bash
@@ -211,4 +259,6 @@ python verify_min3_triples.py             # R7 exact min-3 certificate (supersed
 python verify_triples_min_leq.py 20       # R8 bounded-triple certificate (superseded by R9)
 python attack_triples.py                  # R9 full verification of Theorem 9 (PASS)
 python sweep_criterion.py 40 40           # R10 criterion sweep (PASS)
+cargo run --release --manifest-path fastcheck/Cargo.toml -- selftest
+cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 3000000
 ```
