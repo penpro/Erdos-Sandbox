@@ -101,4 +101,35 @@ lemma cast_div_eq_sum_indicator (L n : ℕ) :
   refine Finset.sum_congr rfl (fun k _ => ?_)
   by_cases h : L ∣ k <;> simp [h]
 
+/-- **Pointwise 4-event inclusion–exclusion.** For four decidable props (at a
+fixed `k`: the events `a∣k, …, d∣k`), the union indicator equals the alternating
+sum of the single/pair/triple/quad indicators. Proved by `decide` over the 16
+boolean cases. -/
+lemma ie4_bool (a b c d : Prop) [Decidable a] [Decidable b] [Decidable c] [Decidable d] :
+    (if a ∨ b ∨ c ∨ d then (1 : ℤ) else 0)
+      = ((if a then 1 else 0) + (if b then 1 else 0) + (if c then 1 else 0)
+          + (if d then (1:ℤ) else 0))
+        - ((if a ∧ b then 1 else 0) + (if a ∧ c then 1 else 0) + (if a ∧ d then 1 else 0)
+          + (if b ∧ c then 1 else 0) + (if b ∧ d then 1 else 0) + (if c ∧ d then (1:ℤ) else 0))
+        + ((if a ∧ b ∧ c then 1 else 0) + (if a ∧ b ∧ d then 1 else 0)
+          + (if a ∧ c ∧ d then 1 else 0) + (if b ∧ c ∧ d then (1:ℤ) else 0))
+        - (if a ∧ b ∧ c ∧ d then (1:ℤ) else 0) := by
+  by_cases a <;> by_cases b <;> by_cases c <;> by_cases d <;> simp_all
+
+/-- `s(n) = ⌊n/a⌋+⌊n/b⌋+⌊n/c⌋+⌊n/d⌋`. -/
+def sfun4 (a b c d n : ℕ) : ℕ := n / a + n / b + n / c + n / d
+
+/-- `P₂(n)` = sum of `⌊n/lcm⌋` over the 6 pairs. -/
+def p2fun4 (a b c d n : ℕ) : ℕ :=
+  n / Nat.lcm a b + n / Nat.lcm a c + n / Nat.lcm a d
+    + n / Nat.lcm b c + n / Nat.lcm b d + n / Nat.lcm c d
+
+/-- `T₃(n)` = sum of `⌊n/lcm⌋` over the 4 triples (fixed nested-lcm order). -/
+def t3fun4 (a b c d n : ℕ) : ℕ :=
+  n / Nat.lcm (Nat.lcm a b) c + n / Nat.lcm (Nat.lcm a b) d
+    + n / Nat.lcm (Nat.lcm a c) d + n / Nat.lcm (Nat.lcm b c) d
+
+/-- `T₄(n) = ⌊n/lcm(a,b,c,d)⌋`. -/
+def t4fun4 (a b c d n : ℕ) : ℕ := n / Nat.lcm (Nat.lcm (Nat.lcm a b) c) d
+
 end Erdos488

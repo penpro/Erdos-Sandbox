@@ -5,3 +5,4 @@ open Erdos488
 #print axioms ie4_pointwise
 #print axioms yh_weight_nonneg
 #print axioms cast_div_eq_sum_indicator
+#print axioms ie4_bool
