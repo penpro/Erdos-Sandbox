@@ -34,8 +34,9 @@ The commands above are Codex's exact periodic-certificate layer.
   `beta = sup B(x)/x` over `x >= max(A)`. If `beta < 2*alpha`, this proves the
   ordering-free strengthening for that finite set.
 - `sweep-quad-cert` enumerates primitive quadruples up to `N`, skips those
-  already handled by reciprocal-sparse or charge-positivity, and tries exact
-  certificates on the residual sets whose lcm is below the chosen cap.
+  already handled by reciprocal-sparse or the two-good-charge rescue lemma in
+  `../quadruple_charge_notes.md`, and tries exact certificates on any remaining
+  residual sets whose lcm is below the chosen cap.
 
 All proof-relevant comparisons are integer/rational comparisons. Decimal output
 is diagnostic only.

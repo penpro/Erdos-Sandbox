@@ -1,0 +1,12 @@
+Axiom audit for Ep488/Counting.lean (the counting half + assembly).
+Reproduce: lake build Ep488.CountingCheck
+
+'Erdos488.bonferroni' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.charge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.two_B_gt_nS' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.ep488_uncovered_triple' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+All depend ONLY on [propext, Classical.choice, Quot.sound] -- no sorryAx.
+This machine-verifies EP488 for the uncovered primitive triple (the hard case,
+using the parity dichotomy). Remaining for full |P|<=3: covered zone, singleton,
+pair, and the primitive-core reduction (all elementary union-bound arguments).

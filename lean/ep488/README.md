@@ -33,22 +33,29 @@ lake build Ep488.Basic  # compiles clean
 
 ## What is NOT yet formalized (honest)
 
-This is **not** a complete sorry-free proof of EP488 for `|P| ≤ 3` yet. What
-remains is the *counting* half plus the assembly:
+### The counting half is now formalized too (`Ep488/Counting.lean`, sorry-free)
 
-- **Bonferroni / Heilbronn–Rohrbach (Lemma 2):** `B(n) ≥ s(n) − P₂(n)`, the
-  two-term inclusion–exclusion for the counting function of a set of multiples.
-  This is the classical Heilbronn–Rohrbach inequality (1937) in finite-`n` form;
-  in Lean it needs `Finset` cardinality of `{k ≤ n : d ∣ k}` (`= n/d`) plus a
-  3-set inclusion–exclusion.
-- **Assembly (Lemma 5 → Theorem 8 → Theorem 9):** the charge sum
-  `s(n) − 2P₂(n) = X_a+X_b+X_c ≥ 3` (each `X ≥ 1` via `floor_bound` +
-  `ratio_bounds` + `parity_dichotomy`), then `2·B(n) > n·S`, then EP488 with the
-  primitive-core reduction and the covered zone.
+The hard case — **EP488 for an uncovered primitive triple** — is now fully
+machine-verified (axiom audit in `counting-axioms.txt`: only
+`propext, Classical.choice, Quot.sound`):
 
-The remaining work is *classical + mechanical* (no new mathematics); the novel
-content is the arithmetic core above, which is done. Estimated ~300–500 more Lean
-lines — the natural next chunk, or a candidate to hand to an automated prover.
+- **`bonferroni`** (Lemma 2): `s(n) ≤ B(n) + P₂(n)` — the finite-`n` two-term
+  inclusion–exclusion (density-level = classical Heilbronn–Rohrbach 1937), via
+  `Nat.Ioc_filter_dvd_card_eq_div` (count of multiples `= n/d`) and the 3-set
+  `Finset.card_union_add_card_inter` chain.
+- **`charge`** (Lemma 5): `2·P₂(n) + 3 ≤ s(n)` for `n ≥ c` — the charge
+  decomposition, using `floor_bound`, `ratio_bounds`, and `parity_dichotomy`.
+- **`two_B_gt_nS`** (Theorem 8): `n·(bc+ac+ab) < 2·B(n)·abc`, i.e. `2B(n)/n > S`.
+- **`ep488_uncovered_triple`**: `n·B(m) < 2·m·B(n)` for all `m > n ≥ c`.
+
+### What still remains (all elementary)
+
+Only the *easy* cases are left before the full `|P| ≤ 3` theorem: the covered
+zone `1/b+1/c ≤ 1/a` (union bound `B(n) ≥ ⌊n/a⌋+1 > n/a`, `B(m) ≤ 2m/a`), the
+singleton and pair cases, and the primitive-core reduction to a general finite
+set `A`. These need no charge/parity machinery — just the union bound already in
+`B_le_s`. The mathematically substantive content (the parity dichotomy + charge +
+Bonferroni) is done.
 
 ## Provenance
 

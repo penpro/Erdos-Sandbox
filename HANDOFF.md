@@ -27,24 +27,27 @@ The strongest new computation so far:
 cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 3000000
 ```
 
-This checked 15,591,140 primitive quadruples with entries `<=150`. After
-removing sets handled by reciprocal-sparse or charge-positivity, 5,192 residual
-quadruples remained; all 5,192 passed the exact ordering-free certificate and
-the stronger union-bound separator. Worst residual:
+This checked 15,591,140 primitive quadruples with entries `<=150`. The new
+conditional lemma in `quadruple_charge_notes.md` says that if at least two
+generator charges are good, exact four-set inclusion-exclusion proves
+`2B(n)>nS` for all `n>=max(P)`. In the sweep, every primitive quadruple up to
+150 satisfied this two-good-charge condition:
 
 ```text
-P={72,75,80,120}
-alpha = 4/143
-beta  = 7/160
-beta/alpha = 1001/640
-largest charge sum = 31/30
+two-good-charge rescue condition applies: 15,591,140
+residual after those regimes: 0
 ```
 
-Next mathematical lead: isolate the clustered-largest-element residual where
-the largest element has weak-side ratios `{2,3,5}` and charge sum
-`1/2+1/3+1/5 = 31/30`. Try to prove the missing `1/30` is always compensated by
-extra overlap/triple-intersection structure, or find the first family where it
-is not. See `adversary_collab_chat.md` and `computational_results.md` R11.
+The least element is now proved good in `quadruple_charge_notes.md`, so the next
+mathematical lead is the sharper closing arithmetic lemma:
+
+```text
+In every primitive quadruple a<b<c<d, at least one of b,c,d is good.
+```
+
+If true, the conditional lemma proves #488 for every primitive core of size 4.
+See `quadruple_charge_notes.md`, `adversary_collab_chat.md`, and
+`computational_results.md` R11.
 
 ## What "handing off" means
 

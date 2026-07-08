@@ -176,3 +176,10 @@ at scale x/2). The public record at |P| ≥ 4 has only Chojecki's Conjecture 4.8
 reduction and MalekZ's tripod family. Also worth doing regardless: Lean-
 formalize Theorem 9 (elementary; squarely in Aristotle's demonstrated range),
 which would give the first sorry-free formal proof of the size-≤3 case.
+
+Post-update progress: `quadruple_charge_notes.md` proves a conditional size-4
+lemma: any primitive quadruple with at least two good charges satisfies the
+ordering-free #488 inequality. `fastcheck` verified that every primitive
+quadruple with entries `<=150` has at least two good charges. The sharp next
+task is to prove or refute that closing charge lemma for all primitive
+quadruples.

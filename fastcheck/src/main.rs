@@ -276,6 +276,14 @@ fn charge_positive(a: &[u64]) -> bool {
         .all(|&e| charge_sum_at(a, e).lt(ExactRatio::new(1, 1)))
 }
 
+fn at_least_two_good_charges(a: &[u64]) -> bool {
+    let good = a
+        .iter()
+        .filter(|&&e| charge_sum_at(a, e).lt(ExactRatio::new(1, 1)))
+        .count();
+    good >= 2
+}
+
 fn separator_holds(bx: u64, x: u64, s: ExactRatio) -> bool {
     2 * bx as u128 * s.den > x as u128 * s.num
 }
@@ -536,6 +544,10 @@ fn command_classify(raw: Option<&String>) -> Result<(), String> {
     println!("S = {}", reciprocal_sum(&a));
     println!("reciprocal-sparse theorem applies = {}", reciprocal_sparse(&a));
     println!("charge-positivity theorem applies = {}", charge_positive(&a));
+    println!(
+        "quadruple two-good-charge rescue condition applies = {}",
+        a.len() == 4 && at_least_two_good_charges(&a)
+    );
     for &e in &a {
         println!("  charge sum at {e} = {}", charge_sum_at(&a, e));
     }
@@ -587,6 +599,7 @@ fn command_sweep_quad_cert(amax_raw: Option<&String>, cap_raw: Option<&String>) 
     let mut primitive = 0u64;
     let mut sparse = 0u64;
     let mut charge = 0u64;
+    let mut two_good_rescued = 0u64;
     let mut symbolic = 0u64;
     let mut residual = 0u64;
     let mut attempted = 0u64;
@@ -609,13 +622,17 @@ fn command_sweep_quad_cert(amax_raw: Option<&String>, cap_raw: Option<&String>) 
                     primitive += 1;
                     let is_sparse = reciprocal_sparse(&set);
                     let is_charge = charge_positive(&set);
+                    let is_two_good_rescued = at_least_two_good_charges(&set);
                     if is_sparse {
                         sparse += 1;
                     }
                     if is_charge {
                         charge += 1;
                     }
-                    if is_sparse || is_charge {
+                    if is_two_good_rescued {
+                        two_good_rescued += 1;
+                    }
+                    if is_sparse || is_two_good_rescued {
                         symbolic += 1;
                         continue;
                     }
@@ -651,7 +668,8 @@ fn command_sweep_quad_cert(amax_raw: Option<&String>, cap_raw: Option<&String>) 
     println!("primitive quadruples with entries <= {amax}: {primitive}");
     println!("reciprocal-sparse theorem applies: {sparse}");
     println!("charge-positivity theorem applies: {charge}");
-    println!("symbolically done by sparse or charge: {symbolic}");
+    println!("two-good-charge rescue condition applies: {two_good_rescued}");
+    println!("symbolically done by sparse or two-good-charge rescue: {symbolic}");
     println!("residual after those regimes: {residual}");
     println!("exact residual certificates attempted with lcm <= {cap}: {attempted}");
     println!("  ordering-free PASS: {cert_pass}");

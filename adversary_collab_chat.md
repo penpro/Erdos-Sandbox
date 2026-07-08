@@ -140,6 +140,119 @@ primitive-core theorem generalizes it, but novelty still needs outside audit.
 
 ## Live Thread
 
+### 2026-07-07 - Codex - PROVED conditional |P|=4 lemma: two good charges suffice
+
+Tag: `PROVED` (conditional lemma) / `COMPUTED` (closing condition up to 150) / `LEAD`
+
+The `31/30` largest-charge lead has been upgraded. Full note:
+`quadruple_charge_notes.md`.
+
+For a primitive quadruple `P={a,b,c,d}`, define
+
+```text
+X_e(n) = floor(n/e) - sum_{f != e} floor(n/lcm(e,f)).
+```
+
+Call `e` good when `sum_{f != e} gcd(e,f)/f < 1`; then `X_e(n)>=1` for
+`n>=d`. New conditional theorem:
+
+```text
+If at least two elements of a primitive quadruple are good, then
+2B(n) > nS for every n>=d, hence the ordering-free #488 inequality holds.
+```
+
+Proof idea: use exact 4-set inclusion-exclusion
+`B=s-P2+T3-T4`. It is enough to show
+
+```text
+H = s - 2P2 + 2T3 - 2T4 >= 4.
+```
+
+Take two good elements `G` and the remaining two elements `H0`. The two good
+charges contribute at least `2`. Group the other two charges with all triple and
+quadruple terms:
+
+```text
+Y = sum_{h in H0} X_h + 2T3 - 2T4.
+```
+
+Pointwise, for a number divisible by `p` of the two grouped generators and `q`
+of the two good generators, the possible weights are
+
+```text
+p=1,q=0: 1
+p=1,q=1: 0
+p=1,q=2: 1
+p=2,q=0: 0
+p=2,q=1: 0
+p=2,q=2: 2
+```
+
+All are nonnegative, and the two grouped generators themselves each contribute
+`1` by primitivity, so `Y>=2`; hence `H>=4` and `2B(n)>nS`.
+
+Updated fastcheck classification:
+
+```text
+cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 3000000
+primitive quadruples with entries <= 150: 15,591,140
+two-good-charge rescue condition applies: 15,591,140
+residual after those regimes: 0
+```
+
+The least element is always good: for `y>a`, `y/gcd(a,y)>=3`, and equality can
+occur for at most one of `b,c,d` (it forces `y=3a/2`), so the least-element
+charge is at most `1/3+1/4+1/4<1`.
+
+Remaining exact task, now sharply isolated:
+
+```text
+Prove or refute: in every primitive quadruple a<b<c<d, at least one of b,c,d
+is good.
+```
+
+If true, the conditional lemma proves #488 for every primitive core of size 4.
+Evidence: verified for all primitive quadruples with entries `<=150`. Examples
+show two bad charges can occur (`{12,20,30,45}`), so the target is exactly
+"at least two good", not full charge-positivity.
+
+### 2026-07-07 - Claude - PROGRESS: Lean counting half DONE (sorry-free) for the uncovered triple
+
+Tag: `PROVED` (Lean, sorry-free)
+
+`lean/ep488/Ep488/Counting.lean` now machine-verifies the HARD case of the
+|P|≤3 proof — EP488 for an uncovered primitive triple — sorry-free (axiom audit
+`counting-axioms.txt`: only propext/Classical.choice/Quot.sound). Chain:
+- `bonferroni` : s(n) ≤ B(n)+P₂(n)  (finite-n Heilbronn–Rohrbach 3-set incl-excl;
+  count of multiples = n/d via `Nat.Ioc_filter_dvd_card_eq_div`, cards chained
+  with `card_union_add_card_inter`).
+- `charge` : 2·P₂(n)+3 ≤ s(n) for n≥c  (uses floor_bound + ratio_bounds +
+  parity_dichotomy from Basic; nested-floor via `Nat.div_div_eq_div_mul`).
+- `two_B_gt_nS` : n·(bc+ac+ab) < 2·B(n)·abc  (i.e. 2B(n)/n > S).
+- `ep488_uncovered_triple` : n·B(m) < 2·m·B(n) for m>n≥c (union bound `B_le_s`
+  + the above, cancel abc).
+This was the piece the README called "not yet formalized." Remaining for the
+FULL |P|≤3: covered zone / singleton / pair / primitive-core reduction — all
+elementary union-bound (no charge/parity), next up. Codex owns the |P|=4 track.
+
+### 2026-07-07 - Claude - Division of labor: Claude→Lean, Codex→|P|=4 (31/30 lead)
+
+Tag: `LEAD` (coordination)
+
+Per Wes: split the two open tracks, one each.
+- **Codex has already started track A** = the |P|=4 math lead (prove the `31/30`
+  largest-charge deficit — clustered top element with weak-side ratios {2,3,5} —
+  is always compensated by triple-intersection structure, or find the family
+  where it isn't). Codex owns this; it's driving the fastcheck cert exploration.
+- **Claude takes track B** = finish the **Lean** formalization of the |P|≤3
+  theorem: the counting half (`B(n) ≥ s(n) − P₂(n)`, the finite-n
+  Heilbronn–Rohrbach / 3-set Bonferroni, via Finset inclusion–exclusion + count
+  of multiples = `n/d`) and the assembly (Lemma 5 charge → Theorem 8 `2B(n)>nS`
+  → covered/singleton/pair → the full `|P|≤3` theorem). This also fits the tool
+  split: `lake` is not on Codex's PATH, so only Claude can compile Lean.
+  Working in `lean/ep488/` (Basic.lean already has the sorry-free arithmetic
+  core: floor_bound, ratio_bounds, parity_dichotomy).
+
 ### 2026-07-07 - Codex - Fast Rust workbench extended; quadruple residuals all pass exact separator up to 150
 
 Tag: `COMPUTED` / `LEAD`

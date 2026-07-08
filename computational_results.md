@@ -202,16 +202,11 @@ or of the per-period criterion `B(n) > nS/2`.
 multiples are even (`sup g <= 1/2 < 2*delta`). Recorded in
 `triples_writeup.md` §7 and `adversary_collab_chat.md`.
 
-## R11. Fast Rust workbench and size-4 residual sweep
+## R11. Fast Rust workbench and size-4 charge rescue
 
 Claude started `fastcheck/` as a Rust bounded-window checker; Codex added exact
-periodic-certificate commands:
-
-```text
-cargo run --release -- classify 2,3,5,7
-cargo run --release -- cert 19,20,21 1000000
-cargo run --release -- sweep-quad-cert 150 3000000
-```
+periodic-certificate commands and a symbolic classifier for the new quadruple
+charge lemma in `quadruple_charge_notes.md`.
 
 Sanity checks matched the older Python certificates exactly:
 
@@ -220,35 +215,35 @@ Sanity checks matched the older Python certificates exactly:
 {19,20,21}: alpha=3/37 at x=37, beta=54/361 at x=361, beta/alpha=666/361
 ```
 
-Quadruple residual sweep:
+New conditional lemma: for a primitive quadruple, if at least two generator
+charges satisfy
 
 ```text
+sum_{f != e} gcd(e,f)/f < 1,
+```
+
+then exact four-set inclusion-exclusion gives `2B(n)>nS` for all
+`n>=max(P)`, hence the ordering-free #488 inequality.
+
+Quadruple sweep:
+
+```text
+cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 3000000
+
 primitive quadruples with entries <= 150: 15,591,140
 reciprocal-sparse theorem applies: 6,090,059
 charge-positivity theorem applies: 15,577,302
-symbolically done by sparse or charge: 15,585,948
-residual after those regimes: 5,192
-exact residual certificates attempted with lcm <= 3,000,000: 5,192
-ordering-free PASS: 5,192
-ordering-free FAIL: 0
-union-bound separator passes among attempted: 5,192
+two-good-charge rescue condition applies: 15,591,140
+symbolically done by sparse or two-good-charge rescue: 15,591,140
+residual after those regimes: 0
 ```
 
-Worst residual certificate in that sweep:
-
-```text
-P={72,75,80,120}
-alpha = 4/143 at x=143
-beta  = 7/160 at x=160
-beta/alpha = 1001/640
-charge sum at 120 = 31/30
-```
-
-Lead: the residuals that beat the naive charge theorem repeatedly have exactly
-one failed charge, at the largest element, with weak-side ratios `{2,3,5}` and
-charge sum `1/2+1/3+1/5 = 31/30`. The next proof attempt should isolate this
-clustered-largest-element case and test whether triple-intersection bookkeeping
-always compensates for the missing `1/30`.
+Thus every primitive quadruple with entries `<=150` has at least two good
+charges. This is evidence for the missing closing lemma, not a proof. Examples
+with exactly two good charges exist, e.g. `{12,20,30,45}`, so the target is
+precisely "at least two good", not full charge-positivity. The least element is
+proved good in `quadruple_charge_notes.md`, so the remaining arithmetic target is
+to prove that at least one of the other three elements is good.
 
 ## Reproduce everything
 
