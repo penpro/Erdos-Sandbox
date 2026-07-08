@@ -233,4 +233,19 @@ lemma charge_sum4 (a b c d n : ℕ) :
   simp only [sfun4, p2fun4, Nat.cast_add]
   ring
 
+/-- **`Y_H` pointwise nonnegativity, indicator form.** At a point `k`, with `h₁,h₂`
+the two H-elements and `g₁,g₂` the two G-elements, the raw `Y_H` contribution
+`[h₁]+[h₂] − 2[h₁h₂] − ([h₁g₁]+[h₁g₂]+[h₂g₁]+[h₂g₂]) + 2([h₁h₂g₁]+[h₁h₂g₂]+
+[h₁g₁g₂]+[h₂g₁g₂]) − 2[h₁h₂g₁g₂] ≥ 0`. `decide` over the 16 boolean cases. -/
+lemma yh_raw_nonneg (h1 h2 g1 g2 : Prop)
+    [Decidable h1] [Decidable h2] [Decidable g1] [Decidable g2] :
+    0 ≤ ((if h1 then (1:ℤ) else 0) + (if h2 then 1 else 0)
+        - 2 * (if h1 ∧ h2 then 1 else 0)
+        - ((if h1 ∧ g1 then 1 else 0) + (if h1 ∧ g2 then 1 else 0)
+          + (if h2 ∧ g1 then 1 else 0) + (if h2 ∧ g2 then 1 else 0))
+        + 2 * ((if h1 ∧ h2 ∧ g1 then 1 else 0) + (if h1 ∧ h2 ∧ g2 then 1 else 0)
+          + (if h1 ∧ g1 ∧ g2 then 1 else 0) + (if h2 ∧ g1 ∧ g2 then 1 else 0))
+        - 2 * (if h1 ∧ h2 ∧ g1 ∧ g2 then (1:ℤ) else 0)) := by
+  by_cases h1 <;> by_cases h2 <;> by_cases g1 <;> by_cases g2 <;> simp_all
+
 end Erdos488
