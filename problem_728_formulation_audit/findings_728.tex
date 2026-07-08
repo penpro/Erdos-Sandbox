@@ -1,0 +1,112 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem*{theorem}{Theorem}
+
+\title{A Formulation Audit of Erdos Problem \#728}
+\author{Codex sandbox note}
+\date{July 7, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This note records a non-novel formulation audit of Erdos Problems \#728.
+The literal written statement is true for a degenerate reason: it imposes
+lower bounds on \(a,b\), but no upper bounds. The construction below should
+not be read as a solution of the intended nontrivial problem.
+\end{abstract}
+
+\section*{Status}
+
+This is an internal sandbox finding, not claimed as novel, and not worth
+publishing as a standalone mathematical result. It is useful only as a
+statement-normalization check.
+
+The source page is
+\[
+\text{\url{https://www.erdosproblems.com/728}}.
+\]
+
+\section*{Written Statement}
+
+Problem \#728 asks whether, for sufficiently small constants \(C>0\) and
+\(\epsilon>0\), there are infinitely many integers \(a,b,n\) such that
+\[
+a\geq \epsilon n,\qquad b\geq \epsilon n,\qquad
+a!b!\mid n!(a+b-n)!,
+\]
+and
+\[
+a+b>n+C\log n.
+\]
+
+\section*{Result}
+
+\begin{theorem}
+For every fixed \(C>0\) and every fixed \(\epsilon>0\), the written
+statement of Problem \#728 has infinitely many solutions.
+\end{theorem}
+
+\begin{proof}
+Fix \(C>0\) and \(\epsilon>0\). For any sufficiently large positive integer
+\(n\), choose an integer
+\[
+w\geq \max(C\log n,\epsilon n).
+\]
+Define
+\[
+a=n+w+1,\qquad b=\frac{(n+w+1)!}{n!}-1.
+\]
+Then \(a\geq \epsilon n\), and \(b\geq \epsilon n\) for all sufficiently large
+\(n\). Also
+\[
+a+b-n=b+w+1.
+\]
+Now compute
+\[
+\frac{n!(a+b-n)!}{a!b!}
+=
+\frac{n!(b+w+1)!}{(n+w+1)!b!}.
+\]
+Since
+\[
+\frac{(n+w+1)!}{n!}=b+1,
+\]
+we obtain
+\[
+\frac{n!(a+b-n)!}{a!b!}
+=
+\frac{(b+1)(b+2)\cdots(b+w+1)}{b+1}
+=(b+2)(b+3)\cdots(b+w+1),
+\]
+which is an integer. Hence \(a!b!\mid n!(a+b-n)!\).
+
+Finally,
+\[
+a+b-n=b+w+1>C\log n,
+\]
+so \(a+b>n+C\log n\). Since \(n\) can be chosen arbitrarily large, there
+are infinitely many such triples.
+\end{proof}
+
+\section*{Interpretation}
+
+The construction uses \(a>n\) and huge \(b\). Therefore it does not touch
+the intended logarithmic-barrier problem. It only shows that the written
+statement is too weak unless additional upper bounds are included, for
+example \(a,b\leq (1-\delta)n\).
+
+Even adding only \(a,b\leq n\) would not fully remove degeneracy, since
+\(a=b=n\) gives \(n!n!\mid n!n!\) and \(2n>n+C\log n\) for all sufficiently
+large \(n\).
+
+\section*{Verdict}
+
+This is a useful formulation audit, but not a publishable new finding.
+The active search for publishable work should move to a genuinely open
+target or to a strengthened version of \#728 with the intended hypotheses.
+
+\end{document}

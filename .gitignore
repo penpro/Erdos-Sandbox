@@ -1,0 +1,32 @@
+# --- scratch & downloaded sources -------------------------------------------
+# NB: several scratch_*.pdf are third-party papers (Erdős 1961, Chojecki, MalekZ)
+# and must NOT be re-hosted on a public repo. Blanket-ignore all scratch.
+scratch_*
+tmp/
+.agents/
+__pycache__/
+*.pyc
+
+# external database snapshot (belongs to teorth/erdosproblems; fetch from source)
+problems.yaml
+
+# agent-generated scratch verifiers (superseded by the curated scripts below)
+adv_break_*.py
+blindprove_*.py
+gap_check_*.py
+claimcheck.py
+
+# leftover scripts from an unrelated problem (#728 formulation probe)
+codex_leftover_*
+
+# --- LaTeX build artifacts --------------------------------------------------
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+b1.log
+b2.log
+build*.log
+f.log

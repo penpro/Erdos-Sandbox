@@ -1,0 +1,451 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\lcm}{\operatorname{lcm}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\dens}{\delta}          % natural density
+
+\title{An elementary proof of Erd\H{o}s Problem 488 for sets with at most three
+primitive generators}
+\author{Sandbox note (Claude + Codex collaboration)}
+\date{7 July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $A$ be a finite set of integers $\ge 2$, let $B=\{k\ge 1: a\mid k \text{ for
+some } a\in A\}$ be its set of multiples, and let $B(x)=|B\cap[1,x]|$.
+Erd\H{o}s Problem 488 asks whether $B(m)/m < 2\,B(n)/n$ for all $m>n\ge\max A$,
+with the constant $2$ known to be best possible. We give a short, self-contained,
+elementary proof of this inequality whenever the primitive core of $A$ has at most
+three elements (in particular for every $A$ with $|A|\le 3$). The engine is the
+classical two-term Bonferroni bound for a set of multiples---at the density level
+the Heilbronn--Rohrbach inequality (1937)---kept \emph{finitary} and combined with
+one observation: each generator's ``charge'' is a positive integer. This upgrades
+the density bound to the sharp constant $2$ on the only nontrivial reciprocal
+regime, via a single one-line parity dichotomy. The argument uses no counting
+function beyond $B$, no case split on $n$, and no transport machinery; we argue it
+is formalizable in Lean without the case-analysis gap left unproved in the one
+existing proof of this statement, and we record the exact obstruction to four
+generators. We claim no novel \emph{method} (the backbone is classical) and no
+priority for the \emph{result} (it is Chojecki's, below); the contribution is a
+correct, elementary, and formally clean proof of a case where the public frontier
+is stuck.
+\end{abstract}
+
+\section{Introduction}
+
+For a finite set $A\subset\{2,3,4,\dots\}$ write
+\[
+  B=B_A=\{k\ge 1: a\mid k\ \text{for some }a\in A\}, \qquad B(x)=|B\cap[1,x]|.
+\]
+Erd\H{o}s~\cite[Problem~27, p.~236]{Erdos61} asked (after correcting a typo in the
+printed statement; see Remark~\ref{rem:typo}):
+
+\begin{quote}
+\textbf{(EP488)} Is it true that for every $m>n\ge\max A$,
+\(
+   \dfrac{B(m)}{m} < 2\,\dfrac{B(n)}{n}\;?
+\)
+\end{quote}
+
+The constant $2$ cannot be lowered: for $A=\{a\}$, $n=2a-1$, $m=2a$ one has
+$B(n)=1$, $B(m)=2$, and the ratio $\tfrac{B(m)/m}{B(n)/n}=2-\tfrac1a\to 2$. This
+witness is Erd\H{o}s's own, and it only makes sense for the multiples reading of
+the problem, which fixes the intended statement (Remark~\ref{rem:typo}).
+
+The problem is listed as \emph{open} on \texttt{erdosproblems.com/488} (status
+unchanged as of July 2026: ``no solutions, partial or complete, claimed''). On the
+discussion thread the case $|A|=2$ is settled, and the most complete attempt at
+larger sets is a $27$-page note of Chojecki~\cite{Chojecki} (with a Lean
+formalization) which \emph{claims} (EP488) for every $A$ whose \emph{primitive
+core} has at most three elements. That proof proceeds through a signed-lcm
+``transport'' identity, a two-block decomposition, and a
+``pair-against-one-forbidden-modulus'' theorem whose crux is a combinatorial
+lemma (``there are at least four exact-one points'') that is left as an unverified
+\texttt{sorry} in the accompanying Lean development; moreover Tao (April 2026)
+exhibited a family showing the reduction underlying that step \emph{fails} once
+$\min A\ge 3$. So the three-generator case is, in practice, still open.
+
+Our contribution is a proof of the three-generator statement that is elementary,
+self-contained, and---we argue---formally clean. We prove the stronger
+\emph{order-free} bound
+\[
+   \sup_{m\ge 1}\frac{B(m)}{m} \;<\; 2\inf_{n\ge \max A}\frac{B(n)}{n}
+\]
+by establishing, in the only nontrivial regime, the pointwise estimate
+$2B(n) > nS$ for every $n\ge\max A$, where $S=\sum_{d\in P}1/d$ is the reciprocal
+sum of the primitive core $P$ (Section~\ref{sec:notation}). The one substantive
+step is a parity dichotomy (Lemma~\ref{lem:parity}); everything else is the
+finitary Heilbronn--Rohrbach bound plus an integrality remark. We make no claim of
+priority for the statement (Chojecki's Corollary~4.7), and none of novelty for the
+method (Remark~\ref{rem:HR}); we record only that the proof is different,
+elementary, and free of the formalization gap.
+
+\paragraph{Notation.}\label{sec:notation} A set $\{a,b,c\}$ with $a<b<c$ is
+\emph{primitive} if no element divides another. Replacing $A$ by its primitive
+core $P$ (the elements of $A$ divisible by no smaller element of $A$) leaves $B$
+unchanged and satisfies $\max P\le\max A$, so it suffices to prove (EP488) for
+primitive $A$ on the wider range $n\ge\max P$; and $S:=\sum_{d\in P}1/d$ is then
+the relevant reciprocal sum. For a primitive triple $\{a,b,c\}$,
+\[
+  S=\tfrac1a+\tfrac1b+\tfrac1c,\quad
+  s(n)=\floor{\tfrac na}+\floor{\tfrac nb}+\floor{\tfrac nc},\quad
+  P_2(n)=\floor{\tfrac n{L_{ab}}}+\floor{\tfrac n{L_{ac}}}+\floor{\tfrac n{L_{bc}}},
+\]
+where $L_{xy}=\lcm(x,y)$. Since $1\notin B$, we always have $B(x)\le x-1$.
+
+\section{Two elementary ingredients}
+
+\begin{proposition}[Singleton case, sharp]\label{prop:singleton}
+If $A=\{a\}$ with $a\ge 2$, then $B(m)/m<2\,B(n)/n$ for all $m>n\ge a$.
+\end{proposition}
+\begin{proof}
+Here $B(x)=\floor{x/a}$, so $B(m)/m\le 1/a$ for all $m$. Writing
+$n=a\floor{n/a}+r$ with $0\le r<a$ and $\floor{n/a}\ge 1$ (as $n\ge a$), we have
+$a\floor{n/a}\ge a>r$, hence $2a\floor{n/a}>a\floor{n/a}+r=n$, i.e.
+$2B(n)/n=2\floor{n/a}/n>1/a\ge B(m)/m$.
+\end{proof}
+
+\begin{proposition}[Reciprocal-sparse core: the covered zone]\label{prop:sparse}
+Let $P$ be a primitive set with least element $a$ and $|P|\ge 2$, and suppose
+$\sum_{d\in P}1/d\le 2/a$. Then (EP488) holds for $P$.
+\end{proposition}
+\begin{proof}
+Fix $n\ge\max P$. Pick any $b\in P\setminus\{a\}$; then $b\le\max P\le n$, $b\in
+B$, and $a\nmid b$ by primitivity, so $b$ is not among the $\floor{n/a}$ multiples
+of $a$ in $[1,n]$. Hence $B(n)\ge\floor{n/a}+1>n/a$. On the other hand
+$B(m)\le\sum_{d\in P}\floor{m/d}\le m\sum_{d\in P}1/d\le 2m/a$ for every $m$.
+Therefore $B(m)/m\le 2/a<2B(n)/n$.
+\end{proof}
+
+For a primitive triple the hypothesis of Proposition~\ref{prop:sparse} reads
+$\tfrac1b+\tfrac1c\le\tfrac1a$. Thus only the \emph{uncovered zone}
+\begin{equation}\label{eq:uncovered}
+  \tfrac1b+\tfrac1c>\tfrac1a
+\end{equation}
+remains; everything in the next two sections concerns that case.
+
+\section{Floor facts, ratio bounds, and the parity dichotomy}
+
+\begin{lemma}\label{lem:floor}
+Let $n\ge 0$ and $d,q,q'\ge 1$ be integers.
+\begin{enumerate}[label=\textup{(\roman*)}]
+\item $\floor{n/(qd)}=\floor{\floor{n/d}/q}$.
+\item If $t\ge 1$ is an integer and $\{q,q'\}$ satisfies $q\ge 2,\ q'\ge 3$ (in
+either order), then $t-\floor{t/q}-\floor{t/q'}\ge 1$. The same holds when
+$q,q'\ge 3$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+(i) is the standard identity $\floor{\floor{x}/q}=\floor{x/q}$ with $x=n/d$; both
+sides count multiples of $qd$ in $[1,n]$.
+(ii) $t-\floor{t/q}-\floor{t/q'}\ge t\bigl(1-\tfrac1q-\tfrac1{q'}\bigr)\ge
+t\bigl(1-\tfrac12-\tfrac13\bigr)=t/6>0$; being an integer, it is $\ge 1$.
+\end{proof}
+
+\begin{lemma}[Two-term Bonferroni for three sets]\label{lem:bonf}
+For every $n\ge 0$, $\;B(n)\ge s(n)-P_2(n)$.
+\end{lemma}
+\begin{proof}
+Each $k\in[1,n]$ divisible by exactly $j\in\{0,1,2,3\}$ of $a,b,c$ contributes
+$\mathbf 1[j\ge1]$ to $B(n)$ and exactly $j-\binom j2$ to $s(n)-P_2(n)$ (a $k$
+divisible by exactly two of $a,b,c$ is divisible by exactly one pairwise lcm; one
+divisible by all three is divisible by all three pairwise lcms). Since
+$j-\binom j2=0,1,1,0$ for $j=0,1,2,3$, each right-hand contribution is at most the
+corresponding left-hand one.
+\end{proof}
+
+Dividing Lemma~\ref{lem:bonf} by $n$ and letting $n\to\infty$ recovers the
+classical Heilbronn--Rohrbach inequality $\dens(B)\ge\sum_d\frac1d-\sum_{d<e}
+\frac1{L_{de}}$ (see Remark~\ref{rem:HR}); the point of what follows is that the
+finite-$n$ form, with a second subtraction absorbed by integrality, is strong
+enough to reach the sharp constant $2$.
+
+\begin{lemma}[Ratios from primitivity]\label{lem:ratio}
+If $x<y$ and $x\nmid y$, with $g=\gcd(x,y)$, then
+$L_{xy}/x=y/g\ge 3$ and $L_{xy}/y=x/g\ge 2$.
+\end{lemma}
+\begin{proof}
+$g\mid y$ and $g\le x<y$, so $g\ne y$. If $g=y/2$ then $y/2=g\mid x$ and
+$y/2\le x<y$ force $x=y/2$, i.e.\ $x\mid y$, a contradiction; so $g$ is a divisor
+of $y$ other than $y$ and $y/2$, whence $g\le y/3$ and $y/g\ge 3$. For the second
+bound, $g=x$ would give $x\mid y$; so $g\le x/2$ and $x/g\ge 2$.
+\end{proof}
+
+Applied to the three pairs of a primitive triple $a<b<c$, Lemma~\ref{lem:ratio}
+gives
+\begin{equation}\label{eq:R}
+\begin{aligned}
+&L_{ab}/a\ge 3, && L_{ac}/a\ge 3, && L_{bc}/b\ge 3, \\
+&L_{ab}/b\ge 2, && L_{ac}/c\ge 2, && L_{bc}/c\ge 2.
+\end{aligned}
+\end{equation}
+
+\begin{lemma}[Parity dichotomy]\label{lem:parity}
+Let $\{a,b,c\}$ be a primitive triple in the uncovered zone \eqref{eq:uncovered}.
+Then not both $L_{ac}/c=2$ and $L_{bc}/c=2$; i.e.\ at least one of the last two
+ratios in \eqref{eq:R} is $\ge 3$.
+\end{lemma}
+\begin{proof}
+Suppose $L_{ac}/c=a/\gcd(a,c)=2$ and $L_{bc}/c=b/\gcd(b,c)=2$. Then
+$\gcd(a,c)=a/2$ (so $a/2\mid c$) and $\gcd(b,c)=b/2$ (so $b/2\mid c$). Write
+$c=k\cdot(a/2)$; since $a\nmid c$, $k$ is odd, and $c>a$ gives $k\ge 3$. Likewise
+$c=\ell\cdot(b/2)$ with $\ell\ge 3$ odd. From $a<b$ we get
+$k=2c/a>2c/b=\ell$, and both are odd, so $k\ge\ell+2$. Hence, using
+$1/a=k/(2c)$, $1/b=\ell/(2c)$, $1/c=2/(2c)$,
+\[
+  \frac1a=\frac{k}{2c}\ge\frac{\ell+2}{2c}=\frac{\ell}{2c}+\frac{2}{2c}
+        =\frac1b+\frac1c,
+\]
+contradicting \eqref{eq:uncovered}.
+\end{proof}
+
+\begin{remark}
+Lemma~\ref{lem:parity} is exactly where the covered/uncovered split earns its
+keep. Boundary triples such as $\{6,10,15\}$ (with $\tfrac1{10}+\tfrac1{15}
+=\tfrac16$) have $L_{ac}/c=L_{bc}/c=2$; they satisfy
+$\tfrac1b+\tfrac1c=\tfrac1a$, lie in the covered zone, and are handled by
+Proposition~\ref{prop:sparse}.
+\end{remark}
+
+\section{The charge decomposition and the main theorem}
+
+\begin{lemma}[Charge decomposition]\label{lem:charge}
+Let $\{a,b,c\}$ be a primitive triple in the uncovered zone \eqref{eq:uncovered}.
+Then $s(n)-2P_2(n)\ge 3$ for every integer $n\ge c$.
+\end{lemma}
+\begin{proof}
+Put $t_a=\floor{n/a}$, $t_b=\floor{n/b}$, $t_c=\floor{n/c}$; all are $\ge 1$ since
+$n\ge c>b>a$. Define
+\[
+  X_a=t_a-\floor{\tfrac n{L_{ab}}}-\floor{\tfrac n{L_{ac}}},\quad
+  X_b=t_b-\floor{\tfrac n{L_{ab}}}-\floor{\tfrac n{L_{bc}}},\quad
+  X_c=t_c-\floor{\tfrac n{L_{ac}}}-\floor{\tfrac n{L_{bc}}}.
+\]
+Each pairwise-lcm floor appears in exactly the two $X$'s of its constituents, so
+$X_a+X_b+X_c=s(n)-2P_2(n)$. By Lemma~\ref{lem:floor}(i),
+$\floor{n/L_{ab}}=\floor{t_a/(L_{ab}/a)}=\floor{t_b/(L_{ab}/b)}$, and similarly
+for the other lcms. Thus, invoking \eqref{eq:R} and, for $X_c$, the extra
+$\ge 3$ from Lemma~\ref{lem:parity}:
+\[
+\begin{aligned}
+X_a&=t_a-\floor{t_a/(L_{ab}/a)}-\floor{t_a/(L_{ac}/a)}, &&(\ge 3,\ \ge 3),\\
+X_b&=t_b-\floor{t_b/(L_{ab}/b)}-\floor{t_b/(L_{bc}/b)}, &&(\ge 2,\ \ge 3),\\
+X_c&=t_c-\floor{t_c/(L_{ac}/c)}-\floor{t_c/(L_{bc}/c)}, &&(\ge 2,\ \ge 3\text{ in some order, Lem.\ \ref{lem:parity}}).
+\end{aligned}
+\]
+By Lemma~\ref{lem:floor}(ii) (whose hypothesis is symmetric in $q,q'$) each of
+$X_a,X_b,X_c$ is $\ge 1$, so $s(n)-2P_2(n)=X_a+X_b+X_c\ge 3$.
+\end{proof}
+
+\begin{theorem}[Pointwise criterion]\label{thm:crit}
+Let $\{a,b,c\}$ be a primitive triple in the uncovered zone \eqref{eq:uncovered}.
+Then $2B(n)>nS$ for every integer $n\ge c$.
+\end{theorem}
+\begin{proof}
+From $2\floor x=x+\floor x-\{x\}$ (where $\{x\}=x-\floor x$ is the fractional
+part) applied to $x\in\{n/a,n/b,n/c\}$,
+\[
+  2s(n)=nS+s(n)-\bigl(\{n/a\}+\{n/b\}+\{n/c\}\bigr)>nS+s(n)-3,
+\]
+since each fractional part is $<1$. Combining with Lemmas~\ref{lem:bonf}
+and~\ref{lem:charge},
+\[
+  2B(n)\ge 2s(n)-2P_2(n)>nS+\bigl(s(n)-2P_2(n)\bigr)-3\ge nS. \qedhere
+\]
+\end{proof}
+
+\begin{corollary}\label{cor:orderfree}
+For a primitive triple in the uncovered zone and all integers $m\ge 1$,
+$n\ge c$,
+\[
+  \frac{B(m)}{m}\le S<\frac{2B(n)}{n}.
+\]
+In particular (EP488) holds for the triple.
+\end{corollary}
+\begin{proof}
+$B(m)\le s(m)\le mS$ (union bound and $\floor x\le x$), while $S<2B(n)/n$ is
+Theorem~\ref{thm:crit}.
+\end{proof}
+
+The mechanism above is not special to three generators. Writing, for a finite
+primitive $P$ and $e\in P$, the \emph{charge}
+$X_e(n)=\floor{n/e}-\sum_{f\in P\setminus\{e\}}\floor{n/L_{ef}}$, the same
+computation yields the following criterion for sets of any size.
+
+\begin{proposition}[Charge-positive sets]\label{prop:chargepos}
+Let $P\subset\{2,3,\dots\}$ be finite and primitive, with $S=\sum_{d\in P}1/d$,
+and suppose that for every $e\in P$
+\begin{equation}\label{eq:chargepos}
+  \sum_{f\in P\setminus\{e\}}\frac{\gcd(e,f)}{f}<1.
+\end{equation}
+Then $2B(n)>nS$ for all $n\ge\max P$, and hence $B(m)/m\le S<2B(n)/n$ for all
+$m\ge 1$ and $n\ge\max P$.
+\end{proposition}
+\begin{proof}
+Fix $n\ge\max P$ and $e\in P$; put $t_e=\floor{n/e}\ge 1$. By
+Lemma~\ref{lem:floor}(i), $X_e(n)=t_e-\sum_{f\ne e}\floor{t_e/(L_{ef}/e)}$, and
+since $L_{ef}/e=f/\gcd(e,f)$,
+\[
+  X_e(n)\ge t_e\Bigl(1-\sum_{f\ne e}\frac{\gcd(e,f)}{f}\Bigr)>0
+\]
+by \eqref{eq:chargepos}; being an integer, $X_e(n)\ge 1$. Each pairwise-lcm floor
+lies in exactly two charges, so $\sum_{e\in P}X_e(n)=s_P(n)-2\Pi(n)\ge|P|$, where
+$s_P(n)=\sum_{d\in P}\floor{n/d}$ and $\Pi(n)=\sum_{\{d,e\}}\floor{n/L_{de}}$.
+Bonferroni gives $B(n)\ge s_P(n)-\Pi(n)$, and $2\floor x=x+\floor x-\{x\}$ with
+each $\{n/d\}<1$ gives $2s_P(n)>nS+s_P(n)-|P|$; combining,
+\[
+  2B(n)\ge 2s_P(n)-2\Pi(n)>nS+\bigl(s_P(n)-2\Pi(n)\bigr)-|P|\ge nS.\qedhere
+\]
+\end{proof}
+
+For a primitive triple in the uncovered zone, Lemma~\ref{lem:parity} is exactly
+what makes \eqref{eq:chargepos} hold: the charge sums for $a,b,c$ are at most
+$\tfrac13+\tfrac13$, $\tfrac12+\tfrac13$, and (by Lemma~\ref{lem:parity})
+$\tfrac12+\tfrac13$, all $<1$. Thus Theorem~\ref{thm:crit} is the triple case of
+Proposition~\ref{prop:chargepos}, and Corollary~\ref{cor:orderfree} follows from
+it. Proposition~\ref{prop:chargepos} also proves (EP488) for many larger primitive
+sets---for instance every pairwise-coprime set the reciprocals of whose three
+smallest elements sum to $<1$, such as $\{2,5,7,9\}$ or $\{3,4,5,7\}$ (the binding
+constraint \eqref{eq:chargepos} is at $e=\max P$)---though it does \emph{not} close
+$|P|=4$ (see Remark~\ref{rem:four}).
+
+\begin{theorem}\label{thm:main}
+(EP488) holds for every finite set $A\subset\{2,3,4,\dots\}$ whose primitive core
+$P$ has $|P|\le 3$. In particular it holds whenever $|A|\le 3$.
+\end{theorem}
+\begin{proof}
+Since $B_A=B_P$ and $\max P\le\max A$, it suffices to prove the inequality for
+$P$ and all $m>n\ge\max P$.
+If $|P|=1$, this is Proposition~\ref{prop:singleton}.
+If $|P|=2$, then $\tfrac1a+\tfrac1b<\tfrac2a$, so Proposition~\ref{prop:sparse}
+applies.
+If $P=\{a,b,c\}$: when $\tfrac1b+\tfrac1c\le\tfrac1a$,
+Proposition~\ref{prop:sparse} applies; otherwise Corollary~\ref{cor:orderfree}
+applies.
+\end{proof}
+
+\section{Remarks}\label{sec:remarks}
+
+\begin{remark}[The statement typo]\label{rem:typo}
+The printed source~\cite{Erdos61} defines $B$ as the integers ``no one of which is
+a multiple of any $a$'' (the \emph{non-multiples}). That reading is inconsistent
+with Erd\H{o}s's own sharpness witness $A=\{a\}$, $n=2a-1$, $m=2a$, which yields a
+ratio tending to $2$ only under the \emph{multiples} reading (for non-multiples
+the same witness gives a ratio $<1$). The multiples version is confirmed by
+Erd\H{o}s's 1966 restatement and by Guy's~\cite{Guy} E5; this is the version above.
+The literal non-multiples version is false (e.g.\ $A=\{2,3,5,7\}$, $n=9$, $m=13$
+gives $\tfrac3{13}>2\cdot\tfrac19$).
+\end{remark}
+
+\begin{remark}[The backbone is classical: Heilbronn--Rohrbach]\label{rem:HR}
+Lemma~\ref{lem:bonf} is the finite-$n$, two-term Bonferroni bound for a set of
+multiples; at the level of natural density it is the inequality of
+Heilbronn~\cite{Heilbronn37} and Rohrbach~\cite{Rohrbach37},
+$\dens(B)\ge\sum_d\frac1d-\sum_{d<e}\frac1{L_{de}}$, the foundational inequality of
+the theory of sets of multiples (see Halberstam--Roth~\cite{HalberstamRoth} Ch.~V,
+Hall~\cite{Hall}; generalized by Behrend and by Ahlswede--Khachatrian). We claim
+\emph{no} novelty for this bound or for ``truncated inclusion--exclusion on
+$\floor{n/d}$''. The only element we did not locate in that literature is the
+packaging used here: keeping the bound finitary and using the integrality of each
+per-generator charge $X_e$ to gain the \emph{second} subtraction
+$s(n)-2P_2(n)\ge|P|$, which upgrades the density bound to the sharp constant~$2$
+for $|P|\le 3$. This is an elementary refinement of a $1937$ result, not a new
+method.
+\end{remark}
+
+\begin{remark}[Comparison with the transport proof]
+For the three-generator statement, Chojecki~\cite{Chojecki} decomposes
+$B_{\{g_1,g_2,g_3\}}=(B_{\{g_1,g_2\}}\setminus B_{\{g_3\}})\sqcup g_3\N$ and
+applies a two-generator theorem to $g_3\N$ and a ``pair against one forbidden
+modulus'' theorem to the first block. The latter introduces a restricted counting
+function $F_{a,b\mid\{c\}}$, splits on the size of $n$, and reduces to a lemma
+asserting the existence of at least four ``exact-one'' points, proved by a nested
+divisibility case analysis ($2b=ka$, then $k\ge 4$ vs.\ $k=3$, etc.). That lemma
+is left as \texttt{sorry} in the accompanying Lean files, and Tao (April 2026)
+gave a family showing the underlying reduction fails for $\min A\ge 3$---so this is
+not a cosmetic gap. By contrast, the proof above uses only $B$ itself, no split on
+$n$, and no auxiliary two-generator theorem; its single non-routine step is the
+parity dichotomy of Lemma~\ref{lem:parity}. It is in this sense simpler
+\emph{for this statement}, with the honest caveat of Remark~\ref{rem:four}: it is
+not a simpler road to a more general theorem, and it does not extend.
+\end{remark}
+
+\begin{remark}[Why the method stops at three generators]\label{rem:four}
+The pointwise criterion of Theorem~\ref{thm:crit} is \emph{false} for larger
+primitive sets, so no direct generalization can succeed. Take
+$A=\{2p: p\ \text{prime},\ p\le 100\}$ (primitive, since $2p\mid 2q\iff p\mid q$;
+here $|A|=25$, $\max A=194$). Then $\dens(B)=\tfrac12\bigl(1-\prod_{p\le 100}
+(1-\tfrac1p)\bigr)$ and $S=\tfrac12\sum_{p\le 100}\tfrac1p$ satisfy
+$S>2\dens(B)$ ($0.901>0.880$), so $2B(n)/n\to 2\dens(B)<S$: the criterion
+$2B(n)>nS$ \emph{fails} for all large $n$ (a direct check: for every $n>381$).
+Nonetheless (EP488) holds here, because every element of $B$ is even, so
+$B(x)\le\floor{x/2}$ gives $\sup_x B(x)/x\le\tfrac12$, while a short computation via
+the scaling recursion $B_{2A'}(x)=B_{A'}(\floor{x/2})$ (with $A'=\{p\le 100\}$)
+gives $\inf_{n\ge\max A}B(n)/n>\tfrac14$. Structurally, for $|P|=4$ each charge
+$X_i$ carries \emph{three} lcm-ratios, and the guaranteed values $(2,3,3)$ already
+give $1-\tfrac12-\tfrac13-\tfrac13<0$; the charge can be negative. A four-generator
+argument therefore needs at least three regimes---a charge/union bound where
+lcm-ratios are large, the ``dense half'' $B(n)\ge n/2$, and a shared-factor
+recursion---rather than a single pointwise inequality. Chojecki's transport
+machinery, though longer, is aimed at this general case (his Conjecture~4.8 on
+pair-vs-tail split doubling implies (EP488) for all $A$); the present argument is
+deliberately specialized to three generators.
+\end{remark}
+
+\begin{remark}[Formalization]
+Every step above is finitary and combinatorial. The load-bearing inputs are
+Lemma~\ref{lem:floor}(ii) (a positive integer bounded below by $t/6$ is $\ge 1$)
+and Lemma~\ref{lem:parity} (a parity/\texttt{gcd} dichotomy); both are routinely
+formalizable, and the whole argument can be phrased over $\mathbb Z$ (no reals or
+rationals). In particular it avoids the nested case analysis that the existing
+formalization leaves unproved, so a \texttt{sorry}-free Lean proof of the
+$|P|\le 3$ case along these lines appears realistic---which, given that this case
+is the current stuck point of the public program, seems the most useful thing this
+note offers.
+\end{remark}
+
+\paragraph{Acknowledgement of priority.} The \emph{statement} of
+Theorem~\ref{thm:main} is Corollary~4.7 of~\cite{Chojecki} (there proved by other
+means, modulo the \texttt{sorry} noted above); the two-generator and ``dense''
+facts underlying Propositions~\ref{prop:singleton}--\ref{prop:sparse} are also
+present there and in the discussion thread of \texttt{erdosproblems.com/488}. The
+Bonferroni backbone is the classical Heilbronn--Rohrbach inequality
+(Remark~\ref{rem:HR}). We claim only a correct, elementary, and formally clean
+proof of the $|P|\le 3$ case; a determined referee should still check the finite-$n$
+Heilbronn--Rohrbach form and the integrality refinement against
+Hall~\cite{Hall} and Halberstam--Roth~\cite{HalberstamRoth} before any novelty
+claim.
+
+\begin{thebibliography}{9}
+\bibitem{Erdos61} P.~Erd\H{o}s, \emph{Some unsolved problems}, Magyar Tud.\ Akad.\
+Mat.\ Kutat\'o Int.\ K\"ozl.\ \textbf{6} (1961), 221--254; Problem~27, p.~236.
+\bibitem{Chojecki} P.~Chojecki, \emph{Signed transport, pair--tail reduction, and
+low layers in an Erd\H{o}s density-doubling problem}, note and Lean development
+linked from \texttt{erdosproblems.com/488} (20 March 2026).
+\bibitem{Heilbronn37} H.~Heilbronn, \emph{On an inequality in the elementary theory
+of numbers}, Proc.\ Cambridge Philos.\ Soc.\ \textbf{33} (1937), 207--209.
+\bibitem{Rohrbach37} H.~Rohrbach, \emph{Beweis einer zahlentheoretischen
+Ungleichung}, J.\ Reine Angew.\ Math.\ \textbf{177} (1937), 193--196.
+\bibitem{HalberstamRoth} H.~Halberstam and K.~F.~Roth, \emph{Sequences},
+Oxford Univ.\ Press, 1966 (Ch.~V).
+\bibitem{Hall} R.~R.~Hall, \emph{Sets of Multiples}, Cambridge Tracts in
+Mathematics \textbf{118}, Cambridge Univ.\ Press, 1996.
+\bibitem{Guy} R.~K.~Guy, \emph{Unsolved Problems in Number Theory}, 3rd ed.,
+Springer, 2004 (problem E5).
+\end{thebibliography}
+
+\end{document}
