@@ -22,8 +22,9 @@ Seven fresh blind agents audited the |P|≤3 proof. Net:
   element is the finitary + charge-integrality refinement giving the sharp
   constant 2 for |P|≤3 (a low-weight refinement of a 1937 result).
 - **Result is still open publicly.** #488 is OPEN as of 2026-07-08; the |A|≤3
-  case is Chojecki's *claimed* Cor 4.7, still `sorry`-gated — and **Tao (Apr 2026)
-  showed Chojecki's reduction fails for min(A)≥3**, so his gap is not cosmetic.
+  case is Chojecki's *claimed* Cor 4.7, still `sorry`-gated — and **MalekZ
+  (31 Mar 2026) showed Chojecki's fixed-threshold reduction fails for min(A)≥3**,
+  so his gap is not cosmetic.
   Our charge route sidesteps that broken mechanism entirely.
 - **Significance: REAL-BUT-MODEST.** Not a journal paper; a correct, sorry-free-
   formalizable proof of the exact case the frontier is stuck on. Highest-value

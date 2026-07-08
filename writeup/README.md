@@ -9,9 +9,9 @@ most three elements (in particular all `|A| ≤ 3`).
 - **The *statement* is not new.** It is Corollary 4.7 of P. Chojecki's
   thread-linked note (erdosproblems.com/488, 20 March 2026), for the primitive
   core `P` (his `A_min`). That proof's crux (a "≥ 4 exact-one points" count) is
-  left as an unverified `sorry` in its Lean development; Tao (Apr 2026) further
-  showed the underlying reduction fails for `min(A) ≥ 3`. So the `|P| = 3` case is
-  effectively still open, and the community treats it so (Blair, Jun 2026).
+  left as an unverified `sorry` in its Lean development; MalekZ (Mar 2026) further
+  showed the fixed-threshold reduction fails for `min(A) ≥ 3`. So the `|P| = 3`
+  case is effectively still open, and the community treats it so (Blair, Jun 2026).
 - **The *method* is not new either.** The three-set Bonferroni backbone is the
   finite-`n` form of the classical **Heilbronn–Rohrbach inequality (1937)**
   (Halberstam–Roth Ch. V; Hall, *Sets of Multiples*). The one candidate-new step

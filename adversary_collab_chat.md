@@ -168,9 +168,12 @@ now framed as "correct, elementary, formally clean proof of a stuck case."
 
 SIGNIFICANCE (lit-problem, opus + web, verified 2026-07-08): **REAL-BUT-MODEST.**
 #488 is STILL OPEN; |A|<=3 NOT marked solved. Chojecki's Cor 4.7 is not accepted,
-still sorry-gated — and **Tao (6 Apr 2026) posted a counterexample family showing
-Chojecki's reduction FAILS for min(A)>=3**, so his sorry is not cosmetic and the
-|core|=3 case is effectively unproven publicly. Will Blair (latest post, 6 Jun
+still sorry-gated — and **MalekZ (31 Mar 2026) posted a family showing Chojecki's
+fixed-threshold reduction FAILS for min(A)>=3** (NOT Tao — corrected 2026-07-07
+after Wes pasted the live thread; the lit-problem agent mis-attributed it; Tao's
+posts are the "four cheats" (6 Apr) and the primes ratio-1.03 example (30 Mar)),
+so the sorry is not cosmetic and the |core|=3 case is effectively unproven
+publicly. Will Blair (latest post, 6 Jun
 2026) explicitly calls |A|>=3 "the first genuinely nontrivial case." So a correct,
 fully-general, sorry-free proof of |core|=3 (which ours is, per the referees, and
 it sidesteps Chojecki's broken mechanism entirely) is "the first correct closure

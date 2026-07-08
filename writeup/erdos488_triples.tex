@@ -75,9 +75,10 @@ core} has at most three elements. That proof proceeds through a signed-lcm
 ``transport'' identity, a two-block decomposition, and a
 ``pair-against-one-forbidden-modulus'' theorem whose crux is a combinatorial
 lemma (``there are at least four exact-one points'') that is left as an unverified
-\texttt{sorry} in the accompanying Lean development; moreover Tao (April 2026)
-exhibited a family showing the reduction underlying that step \emph{fails} once
-$\min A\ge 3$. So the three-generator case is, in practice, still open.
+\texttt{sorry} in the accompanying Lean development; moreover MalekZ (March 2026)
+exhibited a family showing the fixed-threshold reduction underlying that step
+\emph{fails} once $\min A\ge 3$. So the three-generator case is, in practice,
+still open.
 
 Our contribution is a proof of the three-generator statement that is elementary,
 self-contained, and---we argue---formally clean. We prove the stronger
@@ -375,9 +376,9 @@ modulus'' theorem to the first block. The latter introduces a restricted countin
 function $F_{a,b\mid\{c\}}$, splits on the size of $n$, and reduces to a lemma
 asserting the existence of at least four ``exact-one'' points, proved by a nested
 divisibility case analysis ($2b=ka$, then $k\ge 4$ vs.\ $k=3$, etc.). That lemma
-is left as \texttt{sorry} in the accompanying Lean files, and Tao (April 2026)
-gave a family showing the underlying reduction fails for $\min A\ge 3$---so this is
-not a cosmetic gap. By contrast, the proof above uses only $B$ itself, no split on
+is left as \texttt{sorry} in the accompanying Lean files, and MalekZ (March 2026)
+gave a family showing the fixed-threshold reduction fails for $\min A\ge 3$---so
+this is not a cosmetic gap. By contrast, the proof above uses only $B$ itself, no split on
 $n$, and no auxiliary two-generator theorem; its single non-routine step is the
 parity dichotomy of Lemma~\ref{lem:parity}. It is in this sense simpler
 \emph{for this statement}, with the honest caveat of Remark~\ref{rem:four}: it is

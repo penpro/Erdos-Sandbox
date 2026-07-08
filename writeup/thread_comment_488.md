@@ -10,9 +10,9 @@ The result here is the same as Chojecki's Corollary 4.7 (that (★) holds whenev
 the primitive core of $A$ has at most three elements), so I claim no priority for
 the statement. I'm posting because the proof is short, uses nothing beyond the
 counting function $B$ itself, and — unlike the transport route — has no step of
-the "≥4 exact-one points" type. Given that the reduction underlying that step was
-shown (Tao, above) to fail for $\min A\ge 3$, an independent elementary route to
-the same case may be worth recording.
+the "≥4 exact-one points" type. Given MalekZ's observation (31 Mar) that the
+fixed-threshold reduction fails for $\min A\ge 3$, an independent elementary route
+to the same case may be worth recording.
 
 Reduce to the primitive core $P$ (this only widens the range to $n\ge\max P$).
 Write $S=\sum_{d\in P}1/d$. For a primitive triple $a<b<c$, if
