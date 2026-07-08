@@ -248,4 +248,80 @@ theorem ep488_uncovered_triple {a b c n m : ℕ}
       _ = 2 * m * (Bset a b c n).card * (a * b * c) := by ring
   exact lt_of_mul_lt_mul_right key (Nat.zero_le _)
 
+/-- In the covered zone the multiples of `a` plus the extra element `b` already
+give `B(n) ≥ ⌊n/a⌋ + 1`. -/
+lemma B_ge_floor_add_one {a b c n : ℕ}
+    (ha : 0 < a) (hab : a < b) (hbc : b < c) (hcn : c ≤ n) (hnab : ¬ a ∣ b) :
+    n / a + 1 ≤ (Bset a b c n).card := by
+  have hbpos : 0 < b := ha.trans hab
+  have hsub : mult a n ⊆ Bset a b c n := by
+    intro k hk
+    rw [mem_mult] at hk
+    simp only [Bset, mem_filter, mem_Ioc]
+    exact ⟨hk.1, Or.inl hk.2⟩
+  have hbmem : b ∈ Bset a b c n := by
+    simp only [Bset, mem_filter, mem_Ioc]
+    exact ⟨⟨hbpos, by omega⟩, Or.inr (Or.inl dvd_rfl)⟩
+  have hbnot : b ∉ mult a n := by
+    rw [mem_mult]; rintro ⟨_, h⟩; exact hnab h
+  have hins : insert b (mult a n) ⊆ Bset a b c n := Finset.insert_subset hbmem hsub
+  calc n / a + 1 = (mult a n).card + 1 := by rw [mult_card]
+    _ = (insert b (mult a n)).card := by rw [Finset.card_insert_of_notMem hbnot]
+    _ ≤ (Bset a b c n).card := Finset.card_le_card hins
+
+/-- **EP488 for a covered primitive triple** (`a*b + a*c ≤ b*c`). -/
+theorem ep488_covered_triple {a b c n m : ℕ}
+    (ha : 0 < a) (hab : a < b) (hbc : b < c)
+    (hnab : ¬ a ∣ b) (hcov : a * b + a * c ≤ b * c)
+    (hn : c ≤ n) (hm : n < m) :
+    n * (Bset a b c m).card < 2 * m * (Bset a b c n).card := by
+  have hb : 0 < b := ha.trans hab
+  have hc : 0 < c := hb.trans hbc
+  -- lower bound:  n < a * B(n)
+  have haBn : n < a * (Bset a b c n).card := by
+    have hbn := B_ge_floor_add_one ha hab hbc hn hnab
+    have hd := Nat.div_add_mod n a
+    have hmod := Nat.mod_lt n ha
+    have := Nat.mul_le_mul_left a hbn
+    nlinarith [this, hd, hmod]
+  -- upper bound:  a * B(m) ≤ 2 * m
+  have haBm : a * (Bset a b c m).card ≤ 2 * m := by
+    have hBs := B_le_s a b c m
+    have hs : sfun a b c m * (a * b * c) ≤ m * (b * c + a * c + a * b) := by
+      simp only [sfun]
+      have h1 := mul_le_mul_right' (Nat.div_mul_le_self m a) (b * c)
+      have h2 := mul_le_mul_right' (Nat.div_mul_le_self m b) (a * c)
+      have h3 := mul_le_mul_right' (Nat.div_mul_le_self m c) (a * b)
+      nlinarith [h1, h2, h3]
+    have hbc0 : 0 < b * c := Nat.mul_pos hb hc
+    have step : (Bset a b c m).card * (a * b * c) ≤ 2 * m * (b * c) := by
+      calc (Bset a b c m).card * (a * b * c)
+          ≤ sfun a b c m * (a * b * c) := Nat.mul_le_mul_right _ hBs
+        _ ≤ m * (b * c + a * c + a * b) := hs
+        _ ≤ m * (2 * (b * c)) := by nlinarith [hcov]
+        _ = 2 * m * (b * c) := by ring
+    have step2 : a * (Bset a b c m).card * (b * c) ≤ 2 * m * (b * c) := by
+      calc a * (Bset a b c m).card * (b * c) = (Bset a b c m).card * (a * b * c) := by ring
+        _ ≤ 2 * m * (b * c) := step
+    exact Nat.le_of_mul_le_mul_right step2 hbc0
+  -- combine (cancel a)
+  have final : a * (n * (Bset a b c m).card) < a * (2 * m * (Bset a b c n).card) := by
+    calc a * (n * (Bset a b c m).card) = n * (a * (Bset a b c m).card) := by ring
+      _ ≤ n * (2 * m) := Nat.mul_le_mul_left n haBm
+      _ = 2 * m * n := by ring
+      _ < 2 * m * (a * (Bset a b c n).card) := mul_lt_mul_of_pos_left haBn (by omega)
+      _ = a * (2 * m * (Bset a b c n).card) := by ring
+  exact Nat.lt_of_mul_lt_mul_left final
+
+/-- **EP488 for every primitive triple** (both zones), sorry-free. -/
+theorem ep488_triple {a b c n m : ℕ}
+    (ha : 0 < a) (hab : a < b) (hbc : b < c)
+    (hnab : ¬ a ∣ b) (hnac : ¬ a ∣ c) (hnbc : ¬ b ∣ c)
+    (hn : c ≤ n) (hm : n < m) :
+    n * (Bset a b c m).card < 2 * m * (Bset a b c n).card := by
+  by_cases hz : b * c < a * (b + c)
+  · exact ep488_uncovered_triple ha hab hbc hnab hnac hnbc hz hn hm
+  · push_neg at hz
+    exact ep488_covered_triple ha hab hbc hnab (by nlinarith [hz]) hn hm
+
 end Erdos488

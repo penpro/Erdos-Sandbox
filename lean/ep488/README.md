@@ -33,11 +33,11 @@ lake build Ep488.Basic  # compiles clean
 
 ## What is NOT yet formalized (honest)
 
-### The counting half is now formalized too (`Ep488/Counting.lean`, sorry-free)
+### The full primitive-triple case is now formalized (`Ep488/Counting.lean`, sorry-free)
 
-The hard case — **EP488 for an uncovered primitive triple** — is now fully
-machine-verified (axiom audit in `counting-axioms.txt`: only
-`propext, Classical.choice, Quot.sound`):
+**EP488 for every ordered primitive triple `a<b<c` — both zones — is now fully
+machine-verified** (axiom audit in `counting-axioms.txt`: every lemma depends
+only on `propext, Classical.choice, Quot.sound`; no `sorryAx`):
 
 - **`bonferroni`** (Lemma 2): `s(n) ≤ B(n) + P₂(n)` — the finite-`n` two-term
   inclusion–exclusion (density-level = classical Heilbronn–Rohrbach 1937), via
@@ -46,16 +46,22 @@ machine-verified (axiom audit in `counting-axioms.txt`: only
 - **`charge`** (Lemma 5): `2·P₂(n) + 3 ≤ s(n)` for `n ≥ c` — the charge
   decomposition, using `floor_bound`, `ratio_bounds`, and `parity_dichotomy`.
 - **`two_B_gt_nS`** (Theorem 8): `n·(bc+ac+ab) < 2·B(n)·abc`, i.e. `2B(n)/n > S`.
-- **`ep488_uncovered_triple`**: `n·B(m) < 2·m·B(n)` for all `m > n ≥ c`.
+- **`ep488_uncovered_triple`**: the **uncovered** zone `b·c < a·(b+c)` —
+  `n·B(m) < 2·m·B(n)` for all `m > n ≥ c`.
+- **`B_ge_floor_add_one`** + **`ep488_covered_triple`**: the **covered** zone
+  `a·b + a·c ≤ b·c` — union bound `B(n) ≥ ⌊n/a⌋+1 > n/a` and `a·B(m) ≤ 2m`,
+  giving `n·B(m) < 2·m·B(n)`. No charge/parity machinery, just `B_le_s`.
+- **`ep488_triple`**: the two zones combined by `by_cases` on `b·c < a·(b+c)` —
+  **EP488 for every primitive triple**, sorry-free.
 
 ### What still remains (all elementary)
 
-Only the *easy* cases are left before the full `|P| ≤ 3` theorem: the covered
-zone `1/b+1/c ≤ 1/a` (union bound `B(n) ≥ ⌊n/a⌋+1 > n/a`, `B(m) ≤ 2m/a`), the
-singleton and pair cases, and the primitive-core reduction to a general finite
-set `A`. These need no charge/parity machinery — just the union bound already in
-`B_le_s`. The mathematically substantive content (the parity dichotomy + charge +
-Bonferroni) is done.
+Before the full `|P| ≤ 3` theorem: only the singleton and pair cases (same union
+bound, strictly easier) and the primitive-core reduction from a general finite
+set `A` to its `⊆`-minimal elements (a `Finset` bookkeeping step — `B` is
+unchanged by adding a multiple of an existing element). The mathematically
+substantive content (parity dichotomy + charge + Bonferroni) **and** the entire
+triple statement are done.
 
 ## Provenance
 
