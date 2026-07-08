@@ -47,7 +47,11 @@ in Lean 4 / Mathlib — including the parity dichotomy above (the single
 substantive step), verified `#print axioms`-clean:
 https://github.com/penpro/Erdos-Sandbox/tree/main/lean/ep488 . The remaining
 piece is the counting half (the finite-$n$ Heilbronn–Rohrbach / two-term
-Bonferroni bound) and the mechanical assembly; I'll follow up when that compiles.
+Bonferroni bound) and the mechanical assembly; help finishing it is welcome.
+
+Full disclosure: this was produced in an AI-assisted sandbox (Claude + Codex) and
+independently cross-checked, but a second human eye on both the note and the Lean
+would be very welcome. Provenance is documented in the repo.
 
 —[your name/handle]
 

@@ -4,6 +4,26 @@ An elementary, self-contained, exact-arithmetic-verified proof that **Erdős
 Problem 488** holds whenever the *primitive core* of `A` has at most three
 elements (in particular for every `|A| ≤ 3`).
 
+> **If you came from the erdosproblems.com/488 thread — start here.**
+> - **Paper (7 pp):** [`writeup/erdos488_triples.pdf`](writeup/erdos488_triples.pdf).
+> - **Verify the math in ~2 min:** `python attack_triples.py` → `RESULT: PASS`
+>   (exact integer arithmetic; all uncovered primitive triples `a ≤ 25` over full
+>   periods + ~1.2·10⁹ direct `(n,m)` pairs).
+> - **Lean:** the arithmetic core — including the parity dichotomy that is the
+>   single substantive step — is formalized **sorry-free** against Mathlib
+>   v4.31.0: [`lean/ep488`](lean/ep488). See its README for the `#print axioms`
+>   check.
+> - **⚑ Help wanted (open):** the Lean proof is *not* complete. The remaining
+>   piece is the counting half — the finite-`n` Heilbronn–Rohrbach / two-term
+>   Bonferroni bound `B(n) ≥ s(n) − P₂(n)` — plus mechanical assembly (~300–500
+>   Lean lines, no new mathematics). Details in
+>   [`lean/ep488/README.md`](lean/ep488/README.md). PRs / issues very welcome.
+> - **Honesty:** the *result* is Chojecki's claimed Cor 4.7 (still `sorry`-gated
+>   on the thread); the *method* backbone is the classical Heilbronn–Rohrbach
+>   inequality (1937). We claim neither a new result nor a new method — only a
+>   correct, elementary, formally-clean proof of the case the frontier is stuck on.
+>   Produced in an AI-assisted sandbox (see `PROVENANCE.md`).
+
 For a finite set `A ⊂ {2,3,…}`, let `B = {k ≥ 1 : a | k for some a ∈ A}` and
 `B(x) = |B ∩ [1,x]|`. EP488 asks whether
 
