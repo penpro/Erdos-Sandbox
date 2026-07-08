@@ -213,9 +213,24 @@ lemma charge_ge_one_int {e f1 f2 f3 n : ℕ}
              + (Nat.lcm e f1 / e) * (Nat.lcm e f3 / e)
              + (Nat.lcm e f1 / e) * (Nat.lcm e f2 / e)
              < (Nat.lcm e f1 / e) * (Nat.lcm e f2 / e) * (Nat.lcm e f3 / e)) :
-    1 ≤ (n / e : ℤ) - (n / Nat.lcm e f1 : ℤ) - (n / Nat.lcm e f2 : ℤ)
-        - (n / Nat.lcm e f3 : ℤ) := by
+    1 ≤ ((n / e : ℕ) : ℤ) - ((n / Nat.lcm e f1 : ℕ) : ℤ) - ((n / Nat.lcm e f2 : ℕ) : ℤ)
+        - ((n / Nat.lcm e f3 : ℕ) : ℤ) := by
   have h := charge_ge_one he hf1 hf2 hf3 hn hcharge
   omega
+
+/-- **Charge-sum identity.** The four charges sum to `s − 2P₂` (each pairwise
+`lcm` term is subtracted by both of its endpoints). -/
+lemma charge_sum4 (a b c d n : ℕ) :
+    (((n / a : ℕ) : ℤ) - ((n / Nat.lcm a b : ℕ) : ℤ) - ((n / Nat.lcm a c : ℕ) : ℤ)
+        - ((n / Nat.lcm a d : ℕ) : ℤ))
+      + (((n / b : ℕ) : ℤ) - ((n / Nat.lcm a b : ℕ) : ℤ) - ((n / Nat.lcm b c : ℕ) : ℤ)
+        - ((n / Nat.lcm b d : ℕ) : ℤ))
+      + (((n / c : ℕ) : ℤ) - ((n / Nat.lcm a c : ℕ) : ℤ) - ((n / Nat.lcm b c : ℕ) : ℤ)
+        - ((n / Nat.lcm c d : ℕ) : ℤ))
+      + (((n / d : ℕ) : ℤ) - ((n / Nat.lcm a d : ℕ) : ℤ) - ((n / Nat.lcm b d : ℕ) : ℤ)
+        - ((n / Nat.lcm c d : ℕ) : ℤ))
+      = (sfun4 a b c d n : ℤ) - 2 * (p2fun4 a b c d n : ℤ) := by
+  simp only [sfun4, p2fun4, Nat.cast_add]
+  ring
 
 end Erdos488
