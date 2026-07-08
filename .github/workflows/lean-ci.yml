@@ -1,0 +1,85 @@
+name: Lean CI (Erdős #488, |primitive core| ≤ 3)
+
+# Authoritative CI for the Lean development in `lean/ep488`.
+#
+# NOTE: the `lean/ep488/.github/workflows/*.yml` files are the default scaffolding
+# emitted by `lake new`; GitHub Actions only runs workflows under the REPO-ROOT
+# `.github/workflows/`, so THIS file is the one that actually re-verifies the proof.
+#
+# It (1) builds the whole `Ep488` library against Mathlib v4.31.0, (2) fails if the
+# build log contains Lean's `declaration uses 'sorry'` warning anywhere, and
+# (3) runs the `#print axioms` audits and fails if any checked theorem depends on
+# `sorryAx`. Passing this run means the |primitive core| ≤ 3 case of #488 is
+# machine-verified with no `sorry`.
+
+on:
+  push:
+    paths:
+      - 'lean/ep488/**'
+      - '.github/workflows/lean-ci.yml'
+  pull_request:
+    paths:
+      - 'lean/ep488/**'
+      - '.github/workflows/lean-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: lean/ep488
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install elan (Lean toolchain manager)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh
+          bash elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Toolchain versions
+        run: |
+          lean --version
+          lake --version
+
+      - name: Fetch prebuilt Mathlib cache
+        run: lake exe cache get
+
+      - name: Build the whole development (capture log)
+        run: |
+          set -o pipefail
+          lake build Ep488 2>&1 | tee build.log
+
+      - name: Fail on any `sorry` in the build
+        run: |
+          if grep -q "declaration uses 'sorry'" build.log; then
+            echo "::error::Lean reported 'declaration uses sorry' — the proof is not complete."
+            grep -n "declaration uses 'sorry'" build.log || true
+            exit 1
+          fi
+          echo "OK: no 'declaration uses sorry' warning in the build."
+
+      - name: Axiom audit — fail on `sorryAx`
+        run: |
+          set -euo pipefail
+          : > axioms_out.txt
+          for f in Ep488/Check.lean Ep488/CountingCheck.lean Ep488/ReductionCheck.lean; do
+            echo "### $f" | tee -a axioms_out.txt
+            lake env lean "$f" 2>&1 | tee -a axioms_out.txt
+          done
+          if ! grep -q 'depends on axioms' axioms_out.txt; then
+            echo "::error::axiom audit produced no output — check files did not elaborate."
+            exit 1
+          fi
+          if grep -q 'sorryAx' axioms_out.txt; then
+            echo "::error::a checked theorem depends on sorryAx."
+            grep -n 'sorryAx' axioms_out.txt || true
+            exit 1
+          fi
+          echo "OK: every checked theorem depends only on standard axioms (no sorryAx)."
