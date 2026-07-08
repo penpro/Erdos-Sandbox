@@ -20,6 +20,11 @@ sorry-free (each lemma is `#print axioms`-clean: depends only on
   Lean `sorry`. Here it is a ~40-line elementary `gcd`/parity argument, fully
   verified.
 
+The `#print axioms` audit (each lemma depends only on
+`propext, Classical.choice, Quot.sound` — no `sorryAx`) is committed as
+[`axioms-check.txt`](axioms-check.txt); regenerate it with
+`lake build Ep488.Check`.
+
 Build & check:
 ```
 lake exe cache get      # once: downloads prebuilt Mathlib oleans

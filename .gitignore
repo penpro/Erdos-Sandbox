@@ -30,3 +30,4 @@ b1.log
 b2.log
 build*.log
 f.log
+build_check.txt

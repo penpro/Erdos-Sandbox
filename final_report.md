@@ -27,7 +27,9 @@ Seven fresh blind agents audited the |P|≤3 proof. Net:
   so his gap is not cosmetic.
   Our charge route sidesteps that broken mechanism entirely.
 - **Significance: REAL-BUT-MODEST.** Not a journal paper; a correct, sorry-free-
-  formalizable proof of the exact case the frontier is stuck on. Highest-value
+  formalizable proof of the case whose only existing proof is `sorry`-gated
+  (|P|≤3 is Chojecki's *claimed* Cor 4.7; genuinely open is |P|≥4 and full #488).
+  Highest-value
   asset = a full **sorry-free Lean formalization** of |P|≤3. Postable to the
   #488 thread / Formal-Conjectures repo — but that outward step is Wes's call.
 
@@ -63,7 +65,10 @@ version.
 2. The dense half is proved: if `B(n) >= n/2`, then the desired inequality holds
    for that `n` and every `m>n`.
 3. The case `2 in A` is covered.
-4. New partial result: if `P` is the primitive core of `A`, `a=min(P)`, and
+**[Items 4–6 below are SUPERSEDED — see "CORRECTED FRAMING" further down: they are
+PUBLIC, thin-novelty, or subsumed by Chojecki's claimed Cor 4.7. Not new.]**
+
+4. [superseded] Partial result: if `P` is the primitive core of `A`, `a=min(P)`, and
 
 ```text
 sum_{d in P} 1/d <= 2/a,
@@ -127,7 +132,8 @@ uncovered triples with `a ≤ 25`; 1.2·10⁹ end-to-end `(n,m)` pairs; independ
 re-run + independent criterion sweep of 71,003 triples and 42,769 4-sets).
 This subsumes the min-3 certificates and every consecutive-triple lead.
 Positioning: independent sorry-free proof of Chojecki's claimed Cor 4.7,
-by a different and simpler method. Posting to the #488 thread is Wes's call.
+by a different, elementary route that is simpler *for this statement only* (it
+does not generalize past |P|=3). Posting to the #488 thread is Wes's call.
 
 Also recorded: the natural |P| ≥ 4 conjecture (`2B(n) > nS` universally) is
 **FALSE** — `A = {2p : p prime ≤ 100}` (25 elements) fails it at every large

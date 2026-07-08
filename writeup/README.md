@@ -35,7 +35,8 @@ form against Hall / Halberstam–Roth before any refinement-novelty claim.
 
 ## Verification
 
-The proof is machine-verified at scale by `../attack_triples.py` (exact integer
+The proof's claims are checked at scale (finite instance verification, **not** a
+proof — "machine-verified" is reserved for the Lean) by `../attack_triples.py` (exact integer
 arithmetic): all 14,802 uncovered primitive triples with `min ≤ 25` over full
 periods (≈5.2·10⁸ values of `n`), plus 1.2·10⁹ direct end-to-end `(n,m)` pairs;
 `RESULT: PASS`. Independently re-run and cross-checked (see

@@ -1,7 +1,10 @@
 # Erdős #488 for all primitive triples — complete proof
 
-**Status: PROVED (all three-element primitive cores, any least element ≥ 2).**
-Verification code: `attack_triples.py` (exact integer arithmetic; scope listed in §8).
+**Status: PROVED — an elementary proof of an ALREADY-CLAIMED case (Chojecki's
+Cor 4.7); not a new result or method. See the priority note below.** Covers all
+three-element primitive cores, any least element ≥ 2.
+Computational checks: `attack_triples.py` (exact integer arithmetic, finite
+instance checks — not a substitute for the proof; scope in §8).
 
 > **Priority & novelty (read first).** The *result* is Chojecki's Corollary 4.7
 > (erdosproblems.com/488 thread, 20 Mar 2026), proved there by other means but

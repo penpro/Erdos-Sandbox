@@ -1,0 +1,11 @@
+Axiom audit for Ep488/Basic.lean  (Lean v4.31.0 / Mathlib v4.31.0)
+Reproduce:  lake build Ep488.Check   (Ep488/Check.lean runs these #print axioms)
+
+'Erdos488.floor_bound'       depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.ratio_bounds'      depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.odd_cofactor'      depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.parity_dichotomy'  depends on axioms: [propext, Classical.choice, Quot.sound]
+
+Each lemma depends ONLY on the three standard Lean/Mathlib axioms and NOT on
+`sorryAx` — i.e. these lemmas are sorry-free. (This audits only the arithmetic
+core; the counting half + assembly are not yet formalized. See README.md.)

@@ -1,5 +1,12 @@
 # DRAFT comment for erdosproblems.com/488  (for Wes to post)
 
+> **Recommended: post [`thread_comment_488_cautious.md`](thread_comment_488_cautious.md)
+> instead of this one.** That version (written by Codex, math-checked) spells out
+> the full short proof inline so a reviewer can verify it on the spot, and it is
+> more heavily hedged — better for surviving scrutiny. This shorter, links-only
+> version is kept as an alternative.
+
+
 Copy everything between the two `=====` lines into the comment box, replace
 `—[your name]`, and post. The box supports LaTeX (`$...$`) and `<a>` HTML links;
 `\lt \gt \le \ge` are used instead of `< > <= >=` so nothing is mistaken for HTML.

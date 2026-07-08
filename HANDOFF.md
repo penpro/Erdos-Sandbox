@@ -5,19 +5,20 @@ job, in order.
 
 ## What you actually have (in one paragraph)
 
-We wrote a short, correct proof of one case of a famous open problem (Erdős #488),
-verified it by computer five different ways, and started a machine-checked ("Lean")
-version — the hard mathematical core of which is done and verified, with a
-well-defined mechanical remainder left to finish. It's all public at
-**https://github.com/penpro/Erdos-Sandbox**. It's an honest, modest contribution:
-we are **not** claiming a new theorem or a new method — just a clean, correct,
+We wrote a short, correct proof of one (already-known) case of a famous open
+problem (Erdős #488), checked it by computer on many cases and by several AI
+review passes, and started a machine-checked ("Lean") version — the substantive
+arithmetic step is done and verified, but the counting half is *not yet*
+formalized. It's all public at **https://github.com/penpro/Erdos-Sandbox**. It's
+an honest, modest contribution: we are **not** claiming a new theorem, a new
+method, or a solution to #488 — just a clean, correct,
 computer-checkable proof of a case where the experts are currently stuck.
 
 ## What "handing off" means
 
 The people who can finish the Lean and vet the math are already gathered in one
 place: the discussion thread for problem 488 on erdosproblems.com (this includes
-Terence Tao and a few others). "Handing off" = posting a short comment there that
+an active thread with several number theorists). "Handing off" = posting a short comment there that
 points them to the repo. That's it. They take it from there.
 
 ## The steps (about 5 minutes)
@@ -49,7 +50,8 @@ points them to the repo. That's it. They take it from there.
   your response — you don't have to answer math yourself.
 - Nobody may reply for a while. That's normal and fine; the repo stands on its own.
 - If someone points out a genuine error, that's a good outcome — bring it to me and
-  we fix it. (Five independent checks found none, but that's how this works.)
+  we fix it. (Several independent AI checks found none, but a human hasn't
+  refereed it, so a real error is still possible — that's how this works.)
 
 ## If you'd rather not post publicly yet
 
