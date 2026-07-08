@@ -324,4 +324,70 @@ lemma two_B_ge_s4 {a b c d n : ℕ}
   simp only [sfun4, p2fun4, Nat.cast_add] at h2B hcs ⊢
   linarith [h2B, hcs, hYH, hXc, hXd]
 
+/-- **Floor/mod bound.** `n·(bcd+acd+abd+abc) < (s+4)·abcd`, because
+`s·abcd = n·(triples) − Σ(n%e)·(others)` and each `(n%e)·(others) < abcd`. -/
+lemma s4_gt (a b c d n : ℕ) (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d) :
+    (n : ℤ) * ((b : ℤ) * c * d + (a : ℤ) * c * d + (a : ℤ) * b * d + (a : ℤ) * b * c)
+      < ((sfun4 a b c d n : ℤ) + 4) * ((a : ℤ) * b * c * d) := by
+  have da : (a : ℤ) * ((n / a : ℕ) : ℤ) = (n : ℤ) - ((n % a : ℕ) : ℤ) := by
+    have h := Nat.div_add_mod n a; omega
+  have db : (b : ℤ) * ((n / b : ℕ) : ℤ) = (n : ℤ) - ((n % b : ℕ) : ℤ) := by
+    have h := Nat.div_add_mod n b; omega
+  have dc : (c : ℤ) * ((n / c : ℕ) : ℤ) = (n : ℤ) - ((n % c : ℕ) : ℤ) := by
+    have h := Nat.div_add_mod n c; omega
+  have dd : (d : ℤ) * ((n / d : ℕ) : ℤ) = (n : ℤ) - ((n % d : ℕ) : ℤ) := by
+    have h := Nat.div_add_mod n d; omega
+  have ma : ((n % a : ℕ) : ℤ) < a := by exact_mod_cast Nat.mod_lt n ha
+  have mb : ((n % b : ℕ) : ℤ) < b := by exact_mod_cast Nat.mod_lt n hb
+  have mc : ((n % c : ℕ) : ℤ) < c := by exact_mod_cast Nat.mod_lt n hc
+  have md : ((n % d : ℕ) : ℤ) < d := by exact_mod_cast Nat.mod_lt n hd
+  have ha' : (0 : ℤ) < a := by exact_mod_cast ha
+  have hb' : (0 : ℤ) < b := by exact_mod_cast hb
+  have hc' : (0 : ℤ) < c := by exact_mod_cast hc
+  have hd' : (0 : ℤ) < d := by exact_mod_cast hd
+  have key : (sfun4 a b c d n : ℤ) * ((a : ℤ) * b * c * d)
+      = (n : ℤ) * ((b : ℤ) * c * d + (a : ℤ) * c * d + (a : ℤ) * b * d + (a : ℤ) * b * c)
+        - (((n % a : ℕ) : ℤ) * ((b : ℤ) * c * d) + ((n % b : ℕ) : ℤ) * ((a : ℤ) * c * d)
+          + ((n % c : ℕ) : ℤ) * ((a : ℤ) * b * d) + ((n % d : ℕ) : ℤ) * ((a : ℤ) * b * c)) := by
+    simp only [sfun4, Nat.cast_add]
+    linear_combination ((b : ℤ) * c * d) * da + ((a : ℤ) * c * d) * db
+      + ((a : ℤ) * b * d) * dc + ((a : ℤ) * b * c) * dd
+  have hpa : ((n % a : ℕ) : ℤ) * ((b : ℤ) * c * d) < (a : ℤ) * b * c * d := by
+    nlinarith [ma, mul_pos (mul_pos hb' hc') hd']
+  have hpb : ((n % b : ℕ) : ℤ) * ((a : ℤ) * c * d) < (a : ℤ) * b * c * d := by
+    nlinarith [mb, mul_pos (mul_pos ha' hc') hd']
+  have hpc : ((n % c : ℕ) : ℤ) * ((a : ℤ) * b * d) < (a : ℤ) * b * c * d := by
+    nlinarith [mc, mul_pos (mul_pos ha' hb') hd']
+  have hpd : ((n % d : ℕ) : ℤ) * ((a : ℤ) * b * c) < (a : ℤ) * b * c * d := by
+    nlinarith [md, mul_pos (mul_pos ha' hb') hc']
+  have hexp : ((sfun4 a b c d n : ℤ) + 4) * ((a : ℤ) * b * c * d)
+      = (sfun4 a b c d n : ℤ) * ((a : ℤ) * b * c * d) + 4 * ((a : ℤ) * b * c * d) := by ring
+  rw [hexp, key]
+  linarith [hpa, hpb, hpc, hpd]
+
+/-- **Two-good-charge proposition: `2B(n) > nS`** (integer form) for a primitive
+quadruple with two good charges (here `c,d`; `a,b` the H-pair). -/
+lemma two_good_charge_2BnS {a b c d n : ℕ}
+    (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (han : a ≤ n) (hbn : b ≤ n) (hcn : c ≤ n) (hdn : d ≤ n) (hab : a ≠ b)
+    (hba : ¬ b ∣ a) (hca : ¬ c ∣ a) (hda : ¬ d ∣ a)
+    (hab2 : ¬ a ∣ b) (hcb : ¬ c ∣ b) (hdb : ¬ d ∣ b)
+    (hc_good : (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+             + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+             < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c))
+    (hd_good : (Nat.lcm d b / d) * (Nat.lcm d c / d) + (Nat.lcm d a / d) * (Nat.lcm d c / d)
+             + (Nat.lcm d a / d) * (Nat.lcm d b / d)
+             < (Nat.lcm d a / d) * (Nat.lcm d b / d) * (Nat.lcm d c / d)) :
+    (n : ℤ) * ((b : ℤ) * c * d + (a : ℤ) * c * d + (a : ℤ) * b * d + (a : ℤ) * b * c)
+      < 2 * ((Bgen {a, b, c, d} n).card : ℤ) * ((a : ℤ) * b * c * d) := by
+  have hs4 := two_B_ge_s4 ha hb hc hd han hbn hcn hdn hab hba hca hda hab2 hcb hdb hc_good hd_good
+  have hgt := s4_gt a b c d n ha hb hc hd
+  have ha' : (0 : ℤ) < a := by exact_mod_cast ha
+  have hb' : (0 : ℤ) < b := by exact_mod_cast hb
+  have hc' : (0 : ℤ) < c := by exact_mod_cast hc
+  have hd' : (0 : ℤ) < d := by exact_mod_cast hd
+  have habcd : (0 : ℤ) ≤ (a : ℤ) * b * c * d := le_of_lt (by positivity)
+  have hmul := mul_le_mul_of_nonneg_right hs4 habcd
+  linarith [hgt, hmul]
+
 end Erdos488
