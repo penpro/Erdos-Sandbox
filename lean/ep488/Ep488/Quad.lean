@@ -390,4 +390,77 @@ lemma two_good_charge_2BnS {a b c d n : ℕ}
   have hmul := mul_le_mul_of_nonneg_right hs4 habcd
   linarith [hgt, hmul]
 
+/-- Union bound for the quadruple: `B(m) ≤ s(m)`. -/
+lemma Bgen_card_le_sfun4 {a b c d m : ℕ}
+    (hab : a ≠ b) (hac : a ≠ c) (had : a ≠ d) (hbc : b ≠ c) (hbd : b ≠ d) (hcd : c ≠ d) :
+    (Bgen {a, b, c, d} m).card ≤ sfun4 a b c d m := by
+  refine le_trans (Finset.card_biUnion_le) ?_
+  rw [Finset.sum_insert (by simp [hab, hac, had]), Finset.sum_insert (by simp [hbc, hbd]),
+    Finset.sum_insert (by simp [hcd]), Finset.sum_singleton]
+  simp only [mult_card, sfun4]
+  omega
+
+/-- **EP488 for a primitive quadruple with two good charges.** `n·B(m) < 2·m·B(n)`
+for all `m > n ≥ max`. -/
+theorem ep488_quad_two_good {a b c d n m : ℕ}
+    (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (han : a ≤ n) (hbn : b ≤ n) (hcn : c ≤ n) (hdn : d ≤ n) (hm : n < m)
+    (hab : a ≠ b) (hac : a ≠ c) (had : a ≠ d) (hbc : b ≠ c) (hbd : b ≠ d) (hcd : c ≠ d)
+    (hba : ¬ b ∣ a) (hca : ¬ c ∣ a) (hda : ¬ d ∣ a)
+    (hab2 : ¬ a ∣ b) (hcb : ¬ c ∣ b) (hdb : ¬ d ∣ b)
+    (hc_good : (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+             + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+             < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c))
+    (hd_good : (Nat.lcm d b / d) * (Nat.lcm d c / d) + (Nat.lcm d a / d) * (Nat.lcm d c / d)
+             + (Nat.lcm d a / d) * (Nat.lcm d b / d)
+             < (Nat.lcm d a / d) * (Nat.lcm d b / d) * (Nat.lcm d c / d)) :
+    n * (Bgen {a, b, c, d} m).card < 2 * m * (Bgen {a, b, c, d} n).card := by
+  -- two-good-charge lower bound at n:  n·(triples) < 2·B(n)·abcd
+  have hlow := two_good_charge_2BnS ha hb hc hd han hbn hcn hdn hab hba hca hda hab2 hcb hdb
+    hc_good hd_good
+  -- union bound at m:  B(m) ≤ s(m), and s(m)·abcd ≤ m·(triples)
+  have hBm := Bgen_card_le_sfun4 (a := a) (b := b) (c := c) (d := d) (m := m) hab hac had hbc hbd hcd
+  have habcd : 0 < a * b * c * d := by positivity
+  -- s(m)·abcd ≤ m·(triples), in ℕ
+  have hsm : sfun4 a b c d m * (a * b * c * d) ≤ m * (b * c * d + a * c * d + a * b * d + a * b * c) := by
+    have p1 : m / a * (a * b * c * d) ≤ m * (b * c * d) := by
+      calc m / a * (a * b * c * d) = m / a * a * (b * c * d) := by ring
+        _ ≤ m * (b * c * d) := mul_le_mul_right' (Nat.div_mul_le_self m a) (b * c * d)
+    have p2 : m / b * (a * b * c * d) ≤ m * (a * c * d) := by
+      calc m / b * (a * b * c * d) = m / b * b * (a * c * d) := by ring
+        _ ≤ m * (a * c * d) := mul_le_mul_right' (Nat.div_mul_le_self m b) (a * c * d)
+    have p3 : m / c * (a * b * c * d) ≤ m * (a * b * d) := by
+      calc m / c * (a * b * c * d) = m / c * c * (a * b * d) := by ring
+        _ ≤ m * (a * b * d) := mul_le_mul_right' (Nat.div_mul_le_self m c) (a * b * d)
+    have p4 : m / d * (a * b * c * d) ≤ m * (a * b * c) := by
+      calc m / d * (a * b * c * d) = m / d * d * (a * b * c) := by ring
+        _ ≤ m * (a * b * c) := mul_le_mul_right' (Nat.div_mul_le_self m d) (a * b * c)
+    simp only [sfun4]
+    calc (m / a + m / b + m / c + m / d) * (a * b * c * d)
+        = m / a * (a * b * c * d) + m / b * (a * b * c * d) + m / c * (a * b * c * d)
+          + m / d * (a * b * c * d) := by ring
+      _ ≤ m * (b * c * d) + m * (a * c * d) + m * (a * b * d) + m * (a * b * c) := by
+          linarith [p1, p2, p3, p4]
+      _ = m * (b * c * d + a * c * d + a * b * d + a * b * c) := by ring
+  -- ℕ combination (mirror Counting.lean): B(m)·abcd ≤ m·triples, cancel abcd
+  have hub : (Bgen {a, b, c, d} m).card * (a * b * c * d)
+      ≤ m * (b * c * d + a * c * d + a * b * d + a * b * c) :=
+    le_trans (mul_le_mul_right' hBm (a * b * c * d)) hsm
+  have hlow_nat : n * (b * c * d + a * c * d + a * b * d + a * b * c)
+      < 2 * (Bgen {a, b, c, d} n).card * (a * b * c * d) := by exact_mod_cast hlow
+  have hm0 : 0 < m := lt_of_le_of_lt (Nat.zero_le n) hm
+  have s1 : n * ((Bgen {a, b, c, d} m).card * (a * b * c * d))
+      ≤ n * (m * (b * c * d + a * c * d + a * b * d + a * b * c)) := Nat.mul_le_mul_left n hub
+  have s2 : m * (n * (b * c * d + a * c * d + a * b * d + a * b * c))
+      < m * (2 * (Bgen {a, b, c, d} n).card * (a * b * c * d)) := mul_lt_mul_of_pos_left hlow_nat hm0
+  have keyN : n * (Bgen {a, b, c, d} m).card * (a * b * c * d)
+      < 2 * m * (Bgen {a, b, c, d} n).card * (a * b * c * d) := by
+    calc n * (Bgen {a, b, c, d} m).card * (a * b * c * d)
+        = n * ((Bgen {a, b, c, d} m).card * (a * b * c * d)) := by ring
+      _ ≤ n * (m * (b * c * d + a * c * d + a * b * d + a * b * c)) := s1
+      _ = m * (n * (b * c * d + a * c * d + a * b * d + a * b * c)) := by ring
+      _ < m * (2 * (Bgen {a, b, c, d} n).card * (a * b * c * d)) := s2
+      _ = 2 * m * (Bgen {a, b, c, d} n).card * (a * b * c * d) := by ring
+  exact lt_of_mul_lt_mul_right keyN (Nat.zero_le _)
+
 end Erdos488
