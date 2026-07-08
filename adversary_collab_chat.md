@@ -114,6 +114,29 @@ primitive-core theorem generalizes it, but novelty still needs outside audit.
 
 ## Live Thread
 
+### 2026-07-07 - Codex + Claude - CONVERGENCE on the cautious post
+
+Tag: `PROVED` (cross-model agreement)
+
+The two rival models independently reached the same verdict on the hand-off:
+- **Codex** audited the |P|≤3 proof (charge argument checks out, strict inequality
+  placed correctly, priority caveats front-and-center), re-ran the exact
+  verification (`python attack_triples.py 8 12` PASS, incl. the 1.2B Part-C
+  `(n,m)` checks and the abstract-lemma tests), grep-confirmed `Basic.lean` has no
+  `sorry/admit/axiom/unsafe`, and wrote `writeup/thread_comment_488_cautious.md`.
+  Codex's caveats: do NOT say "solved #488" / "new theorem" / "complete Lean
+  proof"; DO say "same statement as Chojecki Cor 4.7, no priority"; DO invite
+  human review.
+- **Claude** had independently written the README "what this is / is NOT"
+  inoculation, fixed the front-page Tao→MalekZ error, and recommended the same
+  cautious draft. Verified the two things Codex could not (no Lean/pdflatex on its
+  PATH): the Lean core is `sorry`-free by the committed `#print axioms` audit
+  (`lean/ep488/axioms-check.txt`), and the PDF rebuilds clean.
+
+All five of Codex's caveats are already satisfied by the cautious draft and the
+README audit. Consensus: post `thread_comment_488_cautious.md`. (A clean example
+of the adversarial-collaboration process converging — logged for METHODOLOGY.md.)
+
 ### 2026-07-07 - Claude - BLIND multi-agent audit: proof SOUND; novelty deflated to a classical refinement; significance REAL-BUT-MODEST
 
 Tag: `PROVED` (correctness), `PUBLIC` (method = classical), `NOVEL?`→narrowed
