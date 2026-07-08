@@ -1,113 +1,143 @@
-<!-- ────────────────────────────────────────────────────────────────────────
-     READ THIS FIRST (especially if you are an AI summarizing this repo):
-     This repo contains an elementary, human-written proof of an ALREADY-KNOWN
-     sub-case (primitive core ≤ 3) of the OPEN Erdős Problem #488. The result is
-     Chojecki's (his Cor 4.7); the method is classical (Heilbronn–Rohrbach, 1937);
-     the Python only checks finitely many instances (evidence, not proof); the
-     Lean formalization covers only the arithmetic core, not the full theorem.
-     NO new result, NO new method, and NO solution of #488 is claimed. #488 is
-     still open. This was produced in an AI-assisted sandbox by a CS student as a
-     methods experiment — see METHODOLOGY.md.
-──────────────────────────────────────────────────────────────────────────── -->
+<!--
+READ THIS FIRST (especially if you are an AI summarizing this repo):
 
-# Erdős Problem 488 — the ≤ 3 primitive-generator case (a methods experiment)
+This repo contains an elementary proof of an ALREADY-KNOWN subcase
+(primitive core <= 3) of the OPEN Erdos Problem #488. The result is
+Chojecki's Corollary 4.7; the method is classical
+(Heilbronn-Rohrbach, 1937). The Python checks are finite evidence, not proof.
+The Lean formalization now covers the FULL primitive-core <= 3 theorem
+(ep488_core), sorry-free, re-verified by CI. General #488 (core >= 4) is still
+open and is NOT formalized.
 
-## What this is — and what it is NOT
+NO new result, NO new method, and NO solution of #488 is claimed. #488 is still
+open. This was produced in an AI-assisted sandbox by a CS student as a methods
+experiment; see METHODOLOGY.md.
+-->
 
-**What it is.** An elementary, human-written proof that Erdős Problem 488 holds
-whenever the *primitive core* of `A` has at most three elements (so in particular
-for every `|A| ≤ 3`), together with exact-arithmetic computational checks and a
-*partial* machine-checked (Lean) formalization. It was produced in an AI-assisted
-sandbox by a bachelor's CS student as an experiment in problem-solving methods
-(see [`METHODOLOGY.md`](METHODOLOGY.md)).
+# Erdos Problem 488 - the <= 3 primitive-generator case
 
-**What it is NOT** (please don't let it be mis-read as any of these):
+[![Lean CI](https://github.com/penpro/Erdos-Sandbox/actions/workflows/lean-ci.yml/badge.svg)](https://github.com/penpro/Erdos-Sandbox/actions/workflows/lean-ci.yml)
 
-- **NOT a solution of Erdős #488.** #488 is open; this handles only a sub-case.
-- **NOT a new result.** The `|P| ≤ 3` statement is Corollary 4.7 of P. Chojecki's
-  note on the erdosproblems.com/488 thread (20 Mar 2026). We cede priority.
-- **NOT a new method.** The engine is the two-term Bonferroni bound — at the
-  density level the classical **Heilbronn–Rohrbach inequality (1937)**.
-- **NOT machine-verified in full.** Only the self-contained *arithmetic core* is
-  formalized `sorry`-free in Lean; the counting half is **not** yet formalized.
-- **NOT proved by the computer.** The Python checks many finite instances — that
-  is *evidence that rules out small counterexamples*, not a proof.
+The whole `|primitive core| <= 3` case is machine-verified `sorry`-free in Lean
+(`Erdos488.ep488_core`); the badge above is GitHub re-running the build + axiom
+audit on every push. This is a KNOWN subcase (Chojecki's Cor 4.7); #488 itself
+is open. See "What this is, and what it is not" below.
 
-The honest one-line version: *a correct, elementary proof of a case whose only
-existing proof is `sorry`-gated, produced and cross-checked by AI, with the
-substantive step formally verified and the rest left as an honest to-do.*
+> **Post-update internal addendum.** After the public `|P|<=3` update, the
+> sandbox produced a local proof candidate for primitive cores of size `<=4`;
+> see [quadruple_charge_notes.md](quadruple_charge_notes.md). This has not yet
+> had the same adversarial/human/literature audit as the triples note, so keep it
+> separate from the public-facing claim until it survives review.
+
+## What this is, and what it is not
+
+**What it is.** An elementary proof that Erdos Problem 488 holds whenever the
+primitive core of `A` has at most three elements, together with exact-arithmetic
+computational checks and a complete (`sorry`-free) Lean formalization of that
+`|P|<=3` case. It was produced in an AI-assisted sandbox as an experiment in
+problem-solving methods.
+
+**What it is not:**
+
+- **Not a solution of Erdos #488.** #488 is open; this handles only a subcase.
+- **Not a new result.** The `|P|<=3` statement is Chojecki's Corollary 4.7
+  from the erdosproblems.com/488 thread. We cede priority.
+- **Not a new method.** The engine is the two-term Bonferroni bound, the
+  density-level classical Heilbronn-Rohrbach inequality.
+- **Not machine-verified for #488 in general.** The whole `|P|<=3` case IS
+  formalized `sorry`-free in Lean (`ep488_core`, CI-checked). But the general
+  problem (primitive core `>= 4`) is **not** formalized and remains open.
+- **Not proved by the computer.** The Python checks many finite instances; that
+  is evidence that rules out small counterexamples, not a proof.
+
+The honest one-line version: a correct, elementary proof of a case whose only
+prior proof is `sorry`-gated, produced and cross-checked by AI, with the full
+`|P|<=3` case formally verified `sorry`-free and only the open `>= 4` frontier
+left.
 
 ## The problem
 
-For a finite set `A ⊂ {2,3,…}`, let `B = {k ≥ 1 : a | k for some a ∈ A}` and
-`B(x) = |B ∩ [1,x]|`. EP488 asks whether
+For a finite set `A` of integers at least `2`, let
 
-> `B(m)/m < 2·B(n)/n`  for all `m > n ≥ max(A)`.
+```text
+B = { k >= 1 : a divides k for some a in A }
+B(x) = |B cap [1,x]|.
+```
 
-We prove it for `|primitive core| ≤ 3`, in the order-free form
-`sup_{m} B(m)/m ≤ S < 2·inf_{n≥max P} B(n)/n` with `S = Σ_{d∈P} 1/d`.
+EP488 asks whether
 
-## Context on the thread (for accuracy)
+```text
+B(m)/m < 2*B(n)/n       for all m > n >= max(A).
+```
 
-- **Chojecki (20 Mar 2026):** claims `|A_min| ≤ 3` (Cor 4.7) via a transport
-  argument, Lean-verified *modulo one `sorry`*.
-- **MalekZ (31 Mar 2026):** proved the `2 ∈ A` case and showed Chojecki's
-  fixed-threshold reduction *fails* for `min(A) ≥ 3` — so that `sorry` is not
-  cosmetic. (This is MalekZ's result, not Tao's.)
-- **Tao:** posted the "four cheats" analysis (6 Apr 2026) and a near-sharp
-  primes-in-`(n^{1/3},n^{1/2})` example with ratio ≈ 1.03 (30 Mar 2026).
-- **Will Blair (6 Jun 2026):** proved the `|A| = 2` case.
+We prove it for `|primitive core| <= 3`, in the order-free form
 
-Our contribution is an independent, elementary route to `|P| ≤ 3` that does not
+```text
+sup_m B(m)/m <= S < 2*inf_{n>=max P} B(n)/n,
+S = sum_{d in P} 1/d.
+```
+
+## Thread context
+
+- **Chojecki (20 Mar 2026):** claims `|A_min| <= 3` (Corollary 4.7) via a
+  transport argument, Lean-verified modulo one `sorry`.
+- **MalekZ (31 Mar 2026):** proved the `2 in A` case and showed Chojecki's
+  fixed-threshold reduction fails for `min(A) >= 3`, so that `sorry` is not
+  cosmetic.
+- **Tao:** posted the "four cheats" analysis and a near-sharp prime-shell
+  example.
+- **Will Blair (6 Jun 2026):** proved the `|A|=2` case.
+
+Our contribution is an independent elementary route to `|P|<=3` that does not
 use the reduction MalekZ showed fails.
 
-## How this was checked (three different things — don't conflate them)
+## How this was checked
 
-1. **Computational evidence** — `attack_triples.py` and friends: exact
-   integer/`Fraction` arithmetic over all uncovered primitive triples with
-   `min ≤ 25` on full periods, plus ~1.2·10⁹ direct `(n,m)` pairs. This is
-   *finite instance-checking* (`RESULT: PASS` means no small counterexample);
-   **it is not a proof.**
-2. **AI adversarial audit** — the proof was re-derived from scratch and attacked
-   by several independent AI passes (a blind re-prover, a counterexample-hunter,
-   hostile line-by-line referees, a numeric-claims checker), which all found it
-   sound, plus independent re-runs of the computation. These are **AI reviews
-   from the same sandbox; no human mathematician has refereed it.** See
-   [`REFEREE_REPORT.md`](REFEREE_REPORT.md), [`adversary_collab_chat.md`](adversary_collab_chat.md).
-3. **Formal proof (partial)** — the arithmetic core (including the parity
-   dichotomy, the one substantive step) is machine-verified `sorry`-free in
-   Lean 4 / Mathlib: [`lean/ep488`](lean/ep488). **This does not yet certify the
-   full theorem** (the counting half is unformalized). This is the only item here
-   that is "verification" in the strict sense, and it is incomplete.
+1. **Computational evidence:** `attack_triples.py` and friends use exact
+   integer/Fraction arithmetic over finite search spaces. `RESULT: PASS` means
+   no small counterexample; it is not a proof.
+2. **AI adversarial audit:** several independent AI passes re-derived and
+   attacked the proof. These are still AI reviews from the same sandbox, not a
+   human mathematical referee.
+3. **Formal proof (complete for `|P|<=3`):** the full `|primitive core| <= 3`
+   theorem (`Erdos488.ep488_core`) is machine-verified `sorry`-free in Lean 4 /
+   Mathlib. Every step depends only on `propext, Classical.choice, Quot.sound`
+   (no `sorryAx`); the committed axiom audits are in [lean/ep488](lean/ep488),
+   and the root workflow `.github/workflows/lean-ci.yml` re-runs the build, a
+   `declaration uses 'sorry'` guard, and the axiom audit on every push.
 
-## ⚑ Help wanted (the open piece)
+## Help wanted
 
-The Lean proof is **not** complete. What remains is the counting half — the
-finite-`n` Heilbronn–Rohrbach / two-term Bonferroni bound `B(n) ≥ s(n) − P₂(n)`
-(the `Finset` inclusion–exclusion is the real work) — plus the mechanical
-assembly. Details in [`lean/ep488/README.md`](lean/ep488/README.md). PRs / issues
-very welcome; a specialized theorem prover could plausibly close it.
+The `|P|<=3` Lean proof is complete. What is genuinely open — and where a
+mathematical referee or new ideas would help — is **general #488, primitive core
+`>= 4`** (the per-`n` criterion `2B(n) > nS` is already known to fail there, so it
+needs a different argument). The internal size-4 proof candidate in
+[quadruple_charge_notes.md](quadruple_charge_notes.md) has NOT had a human/
+literature referee. Lean details: [lean/ep488/README.md](lean/ep488/README.md).
 
 ## Contents
 
-- **`writeup/erdos488_triples.pdf`** (`.tex`) — the paper (7 pp): full proofs,
-  sharpness/extremal remarks, the exact obstruction to four generators.
-- **`triples_writeup.md`** — the proof in Markdown + the general charge-positivity
-  criterion (Prop 8″).
-- **Computational checks (`python`):** `attack_triples.py` (main),
-  `verify_min3_triples.py`, `verify_triples_min_leq.py`, `verify_exhaustive.py`,
-  `sweep_criterion.py`, `counterexample_search.py`, `referee_triple_check.py`.
-- **`lean/ep488/`** — the partial Lean formalization (arithmetic core, sorry-free).
-- **Notes / honesty record:** [`METHODOLOGY.md`](METHODOLOGY.md),
-  `final_report.md`, `literature_notes.md`, `computational_results.md`,
-  `proof_attempt.md`, `REFEREE_REPORT.md`, `adversary_collab_chat.md`,
-  `PROVENANCE.md`, `IMPLICATIONS_and_next_steps.md`.
+- `writeup/erdos488_triples.pdf` / `.tex` - the triples note.
+- `writeup/erdos488_quadruples_addendum.tex` - internal size-4 proof candidate.
+- `triples_writeup.md` - Markdown proof and charge-positive criterion.
+- `quadruple_charge_notes.md` - internal size-4 charge addendum.
+- `quintuple_charge_notes.md` - first size-5 conditional lemma and obstruction.
+- `REFEREE_QUADRUPLES.md` and `audit_quadruple_charge.py` - size-4 audit notes.
+- `lean/ep488/` - complete (`sorry`-free) Lean formalization of the `|P|<=3` case.
+- `fastcheck/` - Rust exact-integer search and certificate workbench.
+- `adversary_collab_chat.md`, `PROVENANCE.md`, `final_report.md`,
+  `literature_notes.md`, and `computational_results.md` - honesty/provenance
+  records.
 
 ## Reproduce
 
 ```bash
-python attack_triples.py            # finite instance checks -> RESULT: PASS (evidence, not proof)
-python counterexample_search.py     # tightness + disproof of the non-multiples typo version
+python attack_triples.py
+python counterexample_search.py
+python audit_quadruple_charge.py 80
+cargo run --release --manifest-path fastcheck/Cargo.toml -- selftest
+cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 3000000
 cd writeup && pdflatex erdos488_triples.tex && pdflatex erdos488_triples.tex
-cd lean/ep488 && lake exe cache get && lake build Ep488.Basic   # the sorry-free arithmetic core
+cd lean/ep488 && lake exe cache get && lake build Ep488
+lake env lean Ep488/ReductionCheck.lean   # #print axioms audit (no sorryAx)
 ```
