@@ -44,4 +44,27 @@ lemma floor_bound3 {t k1 k2 k3 : ℕ} (ht : 1 ≤ t)
     exact Nat.lt_of_mul_lt_mul_left hchain
   omega
 
+/-- Helper: `1 ≤ lcm(e,f)/e` when `e, f ≥ 1`. -/
+private lemma one_le_lcm_div {e f : ℕ} (he : 1 ≤ e) (hf : 1 ≤ f) :
+    1 ≤ Nat.lcm e f / e := by
+  rw [Nat.one_le_div_iff (by omega)]
+  exact Nat.le_of_dvd (Nat.pos_of_ne_zero (by
+    simp only [ne_eq, Nat.lcm_eq_zero_iff]; omega)) (Nat.dvd_lcm_left e f)
+
+/-- **Prop 8″ (quadruple charge, `good ⟹ X_e ≥ 1`).** For an element `e` with the
+three other generators `f₁,f₂,f₃`, if `e` is good — the integer charge condition
+on the cofactors `kᵢ = lcm(e,fᵢ)/e` (i.e. `1/k₁+1/k₂+1/k₃ < 1`) — then the charge
+`X_e(n) = ⌊n/e⌋ − Σ⌊n/lcm(e,fᵢ)⌋ ≥ 1` for every `n ≥ e`. -/
+lemma charge_ge_one {e f1 f2 f3 n : ℕ}
+    (he : 1 ≤ e) (hf1 : 1 ≤ f1) (hf2 : 1 ≤ f2) (hf3 : 1 ≤ f3) (hn : e ≤ n)
+    (hcharge : (Nat.lcm e f2 / e) * (Nat.lcm e f3 / e)
+             + (Nat.lcm e f1 / e) * (Nat.lcm e f3 / e)
+             + (Nat.lcm e f1 / e) * (Nat.lcm e f2 / e)
+             < (Nat.lcm e f1 / e) * (Nat.lcm e f2 / e) * (Nat.lcm e f3 / e)) :
+    1 ≤ n / e - n / Nat.lcm e f1 - n / Nat.lcm e f2 - n / Nat.lcm e f3 := by
+  rw [div_lcm_eq n e f1, div_lcm_eq n e f2, div_lcm_eq n e f3]
+  have ht : 1 ≤ n / e := (Nat.one_le_div_iff (by omega)).2 hn
+  exact floor_bound3 ht (one_le_lcm_div he hf1) (one_le_lcm_div he hf2)
+    (one_le_lcm_div he hf3) hcharge
+
 end Erdos488
