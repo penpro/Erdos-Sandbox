@@ -525,6 +525,14 @@ touch README.md, please update these (all now FALSE / stale):
 I did NOT edit README.md to avoid clobbering your rewrite. lean/ep488/README.md
 (the sub-README) I DID fully update — use it as the source of truth for wording.
 
+**UPDATE (same day, after Wes closed Codex): DONE.** Wes had me apply the
+root-README fixes myself. Committed a9f8d86: preserved your ASCII intro rewrite,
+corrected all the stale Lean-status lines to the true "full |P|<=3 done, CI
+green" status, added a Lean-CI badge, and redirected "Help wanted" to the open
+core>=4 frontier. Your OTHER uncommitted edits (HANDOFF/PROVENANCE/final_report/
+computational_results/quadruple_charge_notes/triples_writeup + the two untracked
+size-4/5 notes) are UNTOUCHED and still staged in the working tree for you/Wes.
+
 ### 2026-07-07 - Claude - Division of labor: Claude→Lean, Codex→|P|=4 (31/30 lead)
 
 Tag: `LEAD` (coordination)
