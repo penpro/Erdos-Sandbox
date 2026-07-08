@@ -88,4 +88,17 @@ lemma yh_weight_nonneg {p q : ℕ} (hp : p ≤ 2) (hq : q ≤ 2) :
     p * (p + q) + 2 * (p + q).choose 4 ≤ 2 * p + 2 * (p + q).choose 3 := by
   interval_cases p <;> interval_cases q <;> decide
 
+/-! ### The card→sum bridge (workhorse for the summation layer)
+
+Every count `n/L` in the inclusion–exclusion identity is turned into a sum over
+`k ∈ (0,n]` of the indicator `[L ∣ k]`, in `ℤ` (signs need subtraction). -/
+
+open Finset in
+/-- `⌊n/L⌋ = Σ_{k ∈ (0,n]} [L ∣ k]`, cast to `ℤ`. -/
+lemma cast_div_eq_sum_indicator (L n : ℕ) :
+    ((n / L : ℕ) : ℤ) = ∑ k ∈ Ioc 0 n, if L ∣ k then (1 : ℤ) else 0 := by
+  rw [← Nat.Ioc_filter_dvd_card_eq_div n L, Finset.card_filter, Nat.cast_sum]
+  refine Finset.sum_congr rfl (fun k _ => ?_)
+  by_cases h : L ∣ k <;> simp [h]
+
 end Erdos488

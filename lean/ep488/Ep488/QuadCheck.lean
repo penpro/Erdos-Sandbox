@@ -4,3 +4,4 @@ open Erdos488
 #print axioms charge_ge_one
 #print axioms ie4_pointwise
 #print axioms yh_weight_nonneg
+#print axioms cast_div_eq_sum_indicator
