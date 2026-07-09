@@ -62,13 +62,36 @@ covers the high-overlap candidates that could possibly be residual) also returns
 `2δ − S > 0`). With Move 1, `2δ > S` for **every** primitive quintuple. ∎ — *modulo
 the one remaining lemma below.*
 
-## The Boundedness Lemma — now with an explicit `max` bound (near-proof)
+## The Boundedness Lemma — status: STRONGLY EVIDENCED, proof OPEN
 
-> **Boundedness Lemma.** Every `gcd=1` primitive quintuple with `S ≤ 2P₂` has
-> `max ≤ 180`. Hence the residual is finite; exhaustive + smooth search gives the
-> three sets above.
+> **Boundedness (conjecture).** The `gcd=1` primitive quintuples with `S ≤ 2P₂` are
+> exactly the three above. Evidence: exhaustive over entries ≤ 58 (~2M sets) and all
+> `{2,3,5,7}`-smooth quintuples with max ≤ 210 — nothing else appears.
 
-**Proof (rigorous modulo the size-4 lower bound `m₁` below).** Write `P = Q ∪ {e}`,
+**⚠ A clean proof is NOT in hand — the natural one fails.** The tempting argument
+(below) bounds `max` using a positive lower bound `m₁` on `S−2P₂` over gcd=1
+quadruples. **But `m₁ = 0`:** `min(S−2P₂)` over gcd=1 quads *decreases without
+bound* — 1/30, 11/360, 1/42, 2/105, … — minimized by the "product-of-3-of-4-primes"
+family `{60,70,84,105}, …`, whose `S−2P₂ → 0`. So `e ≤ 3/m₁` gives no bound. The
+finiteness of the residual is therefore **empirical, not proved.**
+
+Reassurance that it is nonetheless plausibly finite: the analogous
+"product-of-4-of-5-primes" quintuples `{210,330,462,770,1155}` (primes 2,3,5,7,11),
+`{1155,1365,2145,3003,5005}` (3,5,7,11,13), … — the natural candidates for an
+*infinite* residual family — all have `S−2P₂ > 0` (they sit just inside the **sparse**
+regime: +0.0035 → +0.0004) and `2δ−S > 0` (+0.0087 → +0.0005). So they are covered by
+Bonferroni and are **not** residuals; the residual `S ≤ 2P₂` seems to require the
+"extra-clustered" balance only small sets achieve. A real finiteness proof needs a
+sharper argument than the `m₁` bound.
+
+**Corollary for the density inequality:** `2δ > S` is asymptotically **tight on two
+different families** — consecutive runs `{a,…,a+4}` and the product-of-primes
+quintuples — both with margin `→ 0`, both in the sparse regime. Any eventual proof
+must survive both.
+
+<details><summary>The failed bound (kept for the record)</summary>
+
+Write `P = Q ∪ {e}`,
 `e = max(P)`, `Q` the four smaller elements (a primitive quadruple). Splitting off
 `e`'s contribution to `S − 2P₂`:
 
@@ -93,30 +116,30 @@ Two cases.
   `S(Q) − 2P₂(Q) = (1/g)(S(Q/g) − 2P₂(Q/g)) ≥ m₁/g`. Residual then forces
   `m₁/g ≤ (1/e)(2·charge_Q(e) − 1) ≤ (1/e)(4/g − 1) ≤ 4/(g·e)`, i.e. `e ≤ 4/m₁ ≤ 168`.
 
-Either way `max(P) = e` is bounded by an explicit constant (`≤ 168`). ∎
+Either way `max(P)` would be bounded. **The flaw:** the step "`m₁ > 0` and bounded
+below" is FALSE — `m₁ = 0` (min gcd=1 quad `S−2P₂` decreases to 0 along
+`{60,70,84,105},…`), so `3/m₁` is not a real bound. Kept only to show the natural
+approach and where it breaks.
 
-So the residual lives in a **finite box** `{gcd=1 primitive quintuple, max ≤ 168}`.
-Exhaustive search (entries ≤ 58) and the `{2,3,5,7}`-smooth search (max ≤ 210 — a
-residual's heavy overlap forces small-prime-smoothness) return **exactly the three**.
-Finishing the non-smooth part of the box `59 ≤ max ≤ 168` is a bounded computation,
-sharply constrained (a residual's quad `Q` must have `S(Q)−2P₂(Q) ≤ 3/e ≤ 3/59` — one
-of the few near-extremal quadruples). *(Not yet exhaustively machine-checked here.)*
+</details>
 
-**Open dependency = size-4 gcd=1 positivity** `m₁ > 0`: `S(Q) − 2P₂(Q) > 0` for every
-**gcd=1** primitive quadruple, with a proven positive lower bound. This is the exact
-analogue one dimension down and likely has its OWN "sparse + finite residual"
-reduction (verified `m₁ = 1/42`; the minimizer `{56,63,72,84}` is itself a clustered
-gcd=1 quad). The pattern: `S − 2P₂ > 0` holds for all primitive `k`-sets with `k ≤ 4`
-and fails (finitely) at `k = 5` — the size where the two-term Bonferroni bound alone
-stops sufficing, recovered by the `+2T₃` correction.
+**The real open problem** is a correct proof that `S ≤ 2P₂` forces a gcd=1 primitive
+quintuple to have `max ≤ 45` (equivalently: the residual is finite). Strongly
+evidenced; mechanism not yet identified. The subtlety it must respect: `min(S−2P₂)`
+over gcd=1 `k`-sets has **infimum 0** already for `k = 4` (product-of-3-of-4-primes),
+yet `S−2P₂` is never `≤ 0` for `k ≤ 4`; at `k = 5` it does dip `≤ 0`, but (apparently)
+only for finitely many small sets. So a proof cannot be a crude "`min > 0` ⟹ bounded"
+argument — it must use the sign, not the size, of the deficit.
 
 ## What this does and does not give
 
-- **Gives:** a near-complete, essentially finite proof of the *density* inequality
-  `2δ > S` for size 5 — the large-`n` half of #488. It also explains *why* the flat
-  pointwise charge proof (the `Y_H` weight table) fails for `≤2`-good sets: the
-  deficit `S − 2P₂ < 0` on the residual must be repaid by `T₃`, which the flat
-  first-/second-order accounting can't see.
+- **Gives:** a clean *reduction* of the size-5 density inequality `2δ > S` (the
+  large-`n` half of #488) to **one** open lemma — that the `S ≤ 2P₂` residual is
+  finite (empirically = 3 sets). The sparse regime (`S > 2P₂ ⟹ 2δ > S`) is a
+  theorem; the 3-set check is arithmetic. It also explains *why* the flat pointwise
+  charge proof (the `Y_H` weight table) fails for `≤2`-good sets: the deficit
+  `S − 2P₂ < 0` on the residual must be repaid by `T₃`, invisible to first-/second-
+  order accounting.
 - **Does not give (yet):** (i) the Boundedness Lemma (finiteness of the residual);
   (ii) the small-`n` bridge — `2δ > S` is large-`n`; full `2B(n) > nS` for all
   `n ≥ max` still needs a finite per-set (or uniform) small-`n` argument. The margin
