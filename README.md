@@ -18,6 +18,12 @@ CS student as a methods experiment; see METHODOLOGY.md.
 
 [![Lean CI](https://github.com/penpro/Erdos-Sandbox/actions/workflows/lean-ci.yml/badge.svg)](https://github.com/penpro/Erdos-Sandbox/actions/workflows/lean-ci.yml)
 
+**Plain-language write-up: [penpro.github.io/Erdos-Sandbox](https://penpro.github.io/Erdos-Sandbox/)**
+— what is (and is not) proven, a
+[step-by-step guide for mathematicians to check it themselves](https://penpro.github.io/Erdos-Sandbox/verify)
+(no Lean experience needed), and
+[how to set up your own adversarial-AI sandbox](https://penpro.github.io/Erdos-Sandbox/sandbox-setup).
+
 The `|primitive core| <= 4` case is machine-verified `sorry`-free in Lean: the
 `<= 3` case (`Erdos488.ep488_core`) and the `= 4` case
 (`Erdos488.ep488_core_le_four`) both pass the build + axiom audit the badge above

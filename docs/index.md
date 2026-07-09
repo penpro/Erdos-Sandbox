@@ -12,6 +12,10 @@ holds for every finite set whose primitive core has at most four elements.**
 &nbsp;·&nbsp; Source & Lean: [github.com/penpro/Erdos-Sandbox](https://github.com/penpro/Erdos-Sandbox)
 &nbsp;·&nbsp; Top theorem: [`Erdos488.ep488_core_le_four`](https://github.com/penpro/Erdos-Sandbox/blob/main/lean/ep488/Ep488/Quad.lean)
 
+**New here?** → **[Check the proof yourself](./verify)** (step-by-step, no Lean
+experience needed) &nbsp;·&nbsp; **[Set up your own AI sandbox](./sandbox-setup)**
+(reproduce the method)
+
 ---
 
 ## Read this first — what this is, and what it is not
