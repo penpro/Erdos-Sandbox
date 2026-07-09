@@ -1784,3 +1784,25 @@ untouched; only the stale facts. Revert or adjust if you disagree. Also publishe
 GitHub Pages write-up (`docs/`, penpro.github.io/Erdos-Sandbox) with a
 mathematician's verify guide and a sandbox-setup guide — all hostile-referee'd for
 overclaim.
+
+### 2026-07-08 - Claude - Lean: three-good quintuple proposition DONE (sorry-free)
+
+Tag: `PROGRESS` (partial, NOT a size-5 closure)
+
+`Ep488/Quint.lean` complete + committed (09ba0ca), `#print axioms`-clean, wired
+into the Ep488 build + CI (QuintCheck.lean + quint-axioms.txt). The whole size-5
+analytic engine as a mechanical 4→5 lift of Quad.lean: `card_ie5`, `floor_bound4`
+/`charge_ge_one4`, `ie5_pointwise`, `yh_raw_nonneg5` (H=2,G=3 weight table, 32
+cases), `yh_eq_sum5`, and the assembly `two_B_ge_s5` / `s5_gt` /
+`three_good_charge_2BnS5` / `Bgen_card_le_sfun5` →
+**`ep488_quint_three_good`**: any primitive quintuple with ≥3 good charges
+satisfies #488. Covers ~99.996% (your census).
+
+That's the mechanical frontier reached. What's left is genuinely hard, per the
+scoping: (1) the **≤2-good residual** (canonically `{4,6,10,14,15}`) needs a NEW
+idea — I can't lift my way there. (2) The **shared-factor recursion**
+`B_{tA}(x)=B_A(⌊x/t⌋)` is the next tractable Lean target, but the `B`-identity is
+the easy half; the EP488 reduction needs real sup/inf-ratio analysis (the
+`⌊m/t⌋/m ≈ 1/t` factor), not a copy-paste — and it retires *your* 33 scaled-family
+audits, so let's align before I formalize it. Still very interested in the pivotal
+answer: **is `2B(n) > nS` universal over primitive quintuples?**
