@@ -96,7 +96,7 @@ theorem sum_terms_eq_Q (a b c d e : ℕ) :
   unfold brA brB brC brD brE Q; ring
 
 /-- If `157/300 ≤ x·br` and `x > 0`, then the term `2·br − 1/x ≥ 7/(150 x) > 0`. -/
-theorem term_pos {x : ℕ} (hx : 0 < x) {br : ℚ} (h : (157 : ℚ)/300 ≤ (x : ℚ) * br) :
+theorem term_pos {x : ℕ} (hx : 0 < x) {br : ℚ} (h : (157 : ℚ) / 300 ≤ (x : ℚ) * br) :
     0 < 2 * br - inv x := by
   have hxq : (0 : ℚ) < (x : ℚ) := by exact_mod_cast hx
   have hxne : (x : ℚ) ≠ 0 := ne_of_gt hxq
@@ -110,11 +110,11 @@ theorem term_pos {x : ℕ} (hx : 0 < x) {br : ℚ} (h : (157 : ℚ)/300 ≤ (x :
 The hypotheses are exactly the four-modulus finite lemma applied at each element. -/
 theorem Q_pos_of_E4_bounds (a b c d e : ℕ)
     (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d) (he : 0 < e)
-    (hA : (157 : ℚ)/300 ≤ (a : ℚ) * brA a b c d e)
-    (hB : (157 : ℚ)/300 ≤ (b : ℚ) * brB a b c d e)
-    (hC : (157 : ℚ)/300 ≤ (c : ℚ) * brC a b c d e)
-    (hD : (157 : ℚ)/300 ≤ (d : ℚ) * brD a b c d e)
-    (hE : (157 : ℚ)/300 ≤ (e : ℚ) * brE a b c d e) :
+    (hA : (157 : ℚ) / 300 ≤ (a : ℚ) * brA a b c d e)
+    (hB : (157 : ℚ) / 300 ≤ (b : ℚ) * brB a b c d e)
+    (hC : (157 : ℚ) / 300 ≤ (c : ℚ) * brC a b c d e)
+    (hD : (157 : ℚ) / 300 ≤ (d : ℚ) * brD a b c d e)
+    (hE : (157 : ℚ) / 300 ≤ (e : ℚ) * brE a b c d e) :
     0 < Q a b c d e := by
   have tA := term_pos ha hA
   have tB := term_pos hb hB

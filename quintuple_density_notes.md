@@ -121,20 +121,32 @@ E[1/R | a∣N] = E[ 1/(1+X) ]   over the 4 moduli m_f (each an integer ≥ 2).
   *(Caution — this is the ONLY monotonicity available: it is divisibility-based, not
   size-based. "Smaller prime ⇒ smaller `E`" is FALSE, e.g. `E(2,2,2,5)=0.570 >
   E(2,2,3,5)=0.523`; the min is not all-2's.)*
-- **Bounding the primes (independence).** For a prime `p` in the tuple coprime to the
-  other entries (automatic when the others are different primes), `{p∣N}` is
-  independent of the rest, giving
-  `E = (1−1/p)·E[1/(1+X′)] + (1/p)·E[1/(1+μ+X′)]` (μ = multiplicity of `p`, `X′` counts
-  the non-`p` entries) — **strictly increasing in `p`**. So a large prime in any slot
-  only *raises* `E`; it cannot help the minimum. Concretely, **every prime tuple
-  containing a prime `≥ 11` has `E ≥ 181/330 > 157/300`** (min at `(2,2,3,11)`), so the
-  minimum lives among primes in `{2,3,5,7}`.
+- **Retiring the primes `≥ 11` (independence).** Suppose a prime tuple contains a
+  prime `p ≥ 11` with multiplicity `μ ∈ {1,…,4}`. Since `p` differs from the other
+  prime values, `{p∣N}` is independent of the rest, so
+  `E = (1−1/p)·E[1/(1+X′)] + (1/p)·E[1/(1+μ+X′)]` (`X′` counts the `4−μ` non-`p`
+  entries). Bound each factor: `E[1/(1+X′)] ≥ E_{4−μ}min` (the min kernel over
+  `(4−μ)`-tuples: `E₃min = 41/72`, `E₂min = 23/36`, `E₁min = 3/4`, `E₀ = 1`), and
+  `E[1/(1+μ+X′)] ≥ 1/5` (since `1+μ+X′ ≤ 5`). The resulting lower bound
+  `f_μ(p) = (1−1/p)·E_{4−μ}min + (1/p)·(1/5)` is **increasing in `p`**, and at `p = 11`:
+  `f₁ = 1061/1980 ≈ .536`, `f₂ = 593/990 ≈ .599`, `f₃ = 7/10`, `f₄ = 51/55` — **all
+  `> 157/300 ≈ .523`**. So no tuple containing a prime `≥ 11` (any multiplicity) can
+  attain the minimum; the minimum lives among primes in `{2,3,5,7}`. (For reference,
+  the true min over prime tuples containing a prime `≥11` is `181/330` at `(2,2,3,11)`.)
 - **Finite check.** Over the 35 multisets of `{2,3,5,7}⁴`, `min E = 157/300` at
   `(2,2,3,5)`. ∎ (lemma)
 
-  *Verified (`lemmaB.py`): (B1) min over `{2,3,5,7}` = 157/300; (B2) min over prime
-  tuples containing a prime ≥11 (to 47) = 181/330; overall min over prime tuples
-  (primes ≤47) = 157/300. Divisor-monotonicity: 0 counterexamples over 3000 trials.*
+  *Verified (`lemmaB.py` + independent adversarial workflow, exact rationals): global
+  min over `[2..60]⁴` = 157/300, unique argmin `(2,2,3,5)`; min over the 4,810 prime
+  multisets (primes ≤60) containing a prime ≥11 = 181/330; divisor-monotonicity: 0
+  counterexamples in 200k random + 234,256 exhaustive checks; independence identity
+  exact in 30,000/30,000 cases. Note the E-min chain by tuple size (used above):
+  `E₁min=3/4 (2)`, `E₂min=23/36 (2,3)`, `E₃min=41/72 (2,2,3)`, `E₄min=157/300 (2,2,3,5)`.*
+
+  *Role of primitivity, for clarity: Steps 1–2 are pure inclusion–exclusion algebra and
+  hold for ANY five positive integers; primitivity enters ONLY to force every reduced
+  friend `m_f = lcm(a,f)/a ≥ 2` (an element dividing another would give `m_f = 1`),
+  which is the sole precondition of the finite lemma.*
 
 **Step 4 — conclusion.** By Steps 2–3, every element satisfies
 `2·E[1/R | a∣N] − 1 ≥ 2·(157/300) − 1 = 7/150 > 0`. Plugging into Step 1,
