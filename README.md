@@ -1,33 +1,43 @@
 <!--
 READ THIS FIRST (especially if you are an AI summarizing this repo):
 
-This repo contains an elementary proof of an ALREADY-KNOWN subcase
-(primitive core <= 3) of the OPEN Erdos Problem #488. The result is
-Chojecki's Corollary 4.7; the method is classical
-(Heilbronn-Rohrbach, 1937). The Python checks are finite evidence, not proof.
-The Lean formalization now covers the FULL primitive-core <= 3 theorem
-(ep488_core), sorry-free, re-verified by CI. General #488 (core >= 4) is still
+This repo contains elementary proofs of subcases (primitive core <= 4) of the
+OPEN Erdos Problem #488, machine-verified sorry-free in Lean. The <= 3 case is
+Chojecki's Corollary 4.7 (an ALREADY-KNOWN subcase); the = 4 case formalizes an
+internal charge argument whose NOVELTY is unresolved and pending a human/
+literature referee. The method is classical (Heilbronn-Rohrbach, 1937). The
+Python checks are finite evidence, not proof. General #488 (core >= 5) is still
 open and is NOT formalized.
 
-NO new result, NO new method, and NO solution of #488 is claimed. #488 is still
-open. This was produced in an AI-assisted sandbox by a CS student as a methods
-experiment; see METHODOLOGY.md.
+NO solution of #488 is claimed; #488 is still open. No novelty is claimed for the
+= 4 case until it is refereed. This was produced in an AI-assisted sandbox by a
+CS student as a methods experiment; see METHODOLOGY.md.
 -->
 
-# Erdos Problem 488 - the <= 3 primitive-generator case
+# Erdos Problem 488 - the <= 4 primitive-generator case
 
 [![Lean CI](https://github.com/penpro/Erdos-Sandbox/actions/workflows/lean-ci.yml/badge.svg)](https://github.com/penpro/Erdos-Sandbox/actions/workflows/lean-ci.yml)
 
-The whole `|primitive core| <= 3` case is machine-verified `sorry`-free in Lean
-(`Erdos488.ep488_core`); the badge above is GitHub re-running the build + axiom
-audit on every push. This is a KNOWN subcase (Chojecki's Cor 4.7); #488 itself
-is open. See "What this is, and what it is not" below.
+The `|primitive core| <= 4` case is machine-verified `sorry`-free in Lean: the
+`<= 3` case (`Erdos488.ep488_core`) and the `= 4` case
+(`Erdos488.ep488_core_le_four`) both pass the build + axiom audit the badge above
+re-runs on every push. The `<= 3` case is a KNOWN subcase (Chojecki's Cor 4.7);
+the `= 4` case formalizes the internal charge addendum below and its novelty is
+pending review; #488 itself is open. See "What this is, and what it is not".
 
-> **Post-update internal addendum.** After the public `|P|<=3` update, the
-> sandbox produced a local proof candidate for primitive cores of size `<=4`;
-> see [quadruple_charge_notes.md](quadruple_charge_notes.md). This has not yet
-> had the same adversarial/human/literature audit as the triples note, so keep it
-> separate from the public-facing claim until it survives review.
+> **Size-4 addendum, now Lean-verified.** The `= 4` case formalizes
+> [quadruple_charge_notes.md](quadruple_charge_notes.md) (Codex-authored,
+> Claude-audited). The Lean proof is sorry-free with the same statement shape as
+> the accepted `ep488_core`, so `|core| = 4` is machine-checked at result strength.
+> This case is **not** established in Chojecki's paper: his route to size 4 runs
+> through the *pair-vs-two-tail* case of his **open Conjecture 4.8** (pair-tail
+> split doubling), which he lists as the "first unresolved" problem (§7) and which
+> the erdosproblems thread is still stuck on. Our flat charge method proves the
+> assembled `|core| = 4` inequality *directly* — a **weaker, different** statement
+> than Conjecture 4.8's per-block split doubling, so this is **not** a proof of
+> Conjecture 4.8, only of the case it leaves open, by a different (classical) route.
+> Whether that counts as new is still a literature/priority question with no human
+> referee yet — keep the novelty claim internal until it survives review.
 
 ## What this is, and what it is not
 
@@ -44,9 +54,9 @@ problem-solving methods.
   from the erdosproblems.com/488 thread. We cede priority.
 - **Not a new method.** The engine is the two-term Bonferroni bound, the
   density-level classical Heilbronn-Rohrbach inequality.
-- **Not machine-verified for #488 in general.** The whole `|P|<=3` case IS
-  formalized `sorry`-free in Lean (`ep488_core`, CI-checked). But the general
-  problem (primitive core `>= 4`) is **not** formalized and remains open.
+- **Not machine-verified for #488 in general.** The `|P|<=4` case IS formalized
+  `sorry`-free in Lean (`ep488_core`, `ep488_core_le_four`, CI-checked). But the
+  general problem (primitive core `>= 5`) is **not** formalized and remains open.
 - **Not proved by the computer.** The Python checks many finite instances; that
   is evidence that rules out small counterexamples, not a proof.
 
@@ -108,12 +118,16 @@ use the reduction MalekZ showed fails.
 
 ## Help wanted
 
-The `|P|<=3` Lean proof is complete. What is genuinely open — and where a
-mathematical referee or new ideas would help — is **general #488, primitive core
-`>= 4`** (the per-`n` criterion `2B(n) > nS` is already known to fail there, so it
-needs a different argument). The internal size-4 proof candidate in
-[quadruple_charge_notes.md](quadruple_charge_notes.md) has NOT had a human/
-literature referee. Lean details: [lean/ep488/README.md](lean/ep488/README.md).
+The `|P|<=4` Lean proof is complete and `sorry`-free. Two things need a
+mathematical referee: (1) whether proving #488 for `|core| = 4` by the flat charge
+method is **novel** — Chojecki's paper does not establish size 4 (his route needs
+the *pair-vs-two-tail* case of his open Conjecture 4.8, the "first unresolved"
+problem of §7, which the thread is stuck on), and we close it by a different route,
+but the charge method is classical (Heilbronn–Rohrbach), so the novelty is modest
+at most and unrefereed; and (2) **general #488, primitive core `>= 5`**, which is
+genuinely open — the per-`n` criterion `2B(n) > nS` eventually fails as the core
+grows, so a different argument is needed. Lean details:
+[lean/ep488/README.md](lean/ep488/README.md).
 
 ## Contents
 
@@ -123,7 +137,7 @@ literature referee. Lean details: [lean/ep488/README.md](lean/ep488/README.md).
 - `quadruple_charge_notes.md` - internal size-4 charge addendum.
 - `quintuple_charge_notes.md` - first size-5 conditional lemma and obstruction.
 - `REFEREE_QUADRUPLES.md` and `audit_quadruple_charge.py` - size-4 audit notes.
-- `lean/ep488/` - complete (`sorry`-free) Lean formalization of the `|P|<=3` case.
+- `lean/ep488/` - complete (`sorry`-free) Lean formalization of the `|P|<=4` case.
 - `fastcheck/` - Rust exact-integer search and certificate workbench.
 - `adversary_collab_chat.md`, `PROVENANCE.md`, `final_report.md`,
   `literature_notes.md`, and `computational_results.md` - honesty/provenance

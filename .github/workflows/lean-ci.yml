@@ -1,4 +1,4 @@
-name: Lean CI (Erdős #488, |primitive core| ≤ 3)
+name: Lean CI (Erdős #488, |primitive core| ≤ 4)
 
 # Authoritative CI for the Lean development in `lean/ep488`.
 #
@@ -9,8 +9,9 @@ name: Lean CI (Erdős #488, |primitive core| ≤ 3)
 # It (1) builds the whole `Ep488` library against Mathlib v4.31.0, (2) fails if the
 # build log contains Lean's `declaration uses 'sorry'` warning anywhere, and
 # (3) runs the `#print axioms` audits and fails if any checked theorem depends on
-# `sorryAx`. Passing this run means the |primitive core| ≤ 3 case of #488 is
-# machine-verified with no `sorry`.
+# `sorryAx`. Passing this run means the |primitive core| ≤ 4 case of #488 is
+# machine-verified with no `sorry` (the ≤ 3 case is Chojecki's Cor 4.7; the = 4
+# case formalizes the internal charge addendum, novelty pending literature review).
 
 on:
   push:
@@ -65,7 +66,7 @@ jobs:
           fi
           echo "OK: no 'declaration uses sorry' warning in the build."
 
-      - name: Axiom audit — fail on `sorryAx`
+      - name: Axiom audit — no sorryAx, positive allowlist {propext, Classical.choice, Quot.sound}
         run: |
           set -euo pipefail
           : > axioms_out.txt
@@ -82,4 +83,20 @@ jobs:
             grep -n 'sorryAx' axioms_out.txt || true
             exit 1
           fi
-          echo "OK: every checked theorem depends only on standard axioms (no sorryAx)."
+          # Positive allowlist: every axiom named in any `depends on axioms: [...]`
+          # line must be one of the three standard Mathlib axioms. This catches a
+          # stray non-standard axiom (e.g. `Lean.ofReduceBool` from `native_decide`)
+          # that the `sorryAx` grep above would NOT — a stronger guarantee than
+          # "no sorry".
+          UNEXPECTED=$(grep 'depends on axioms' axioms_out.txt \
+            | sed 's/.*: \[\(.*\)\]/\1/' \
+            | tr ',' '\n' \
+            | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+            | grep -v '^$' \
+            | grep -vxE 'propext|Classical\.choice|Quot\.sound' | sort -u || true)
+          if [ -n "$UNEXPECTED" ]; then
+            echo "::error::a checked theorem depends on a non-standard axiom:"
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+          echo "OK: every checked theorem depends only on {propext, Classical.choice, Quot.sound} (no sorryAx, no other axioms)."

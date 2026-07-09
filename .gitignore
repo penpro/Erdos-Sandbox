@@ -2,8 +2,16 @@
 # NB: several scratch_*.pdf are third-party papers (Erdős 1961, Chojecki, MalekZ)
 # and must NOT be re-hosted on a public repo. Blanket-ignore all scratch.
 scratch_*
+scratch488*
+# third-party papers dropped into the repo root during literature checks
+# (Tenenbaum survey, Ahlswede–Khachatrian, ScienceDirect downloads) — do NOT re-host
+Erdos-100.pdf
+1-s2.0-*.pdf
+ak_density.*
+reg*.txt
 tmp/
 .agents/
+.claude/
 __pycache__/
 *.pyc
 

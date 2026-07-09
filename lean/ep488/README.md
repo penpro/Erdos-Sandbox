@@ -1,12 +1,14 @@
-# Lean formalization of Erdős #488 (|primitive core| ≤ 3) — COMPLETE, sorry-free
+# Lean formalization of Erdős #488 (|primitive core| ≤ 4) — COMPLETE, sorry-free
 
 Lean 4 + Mathlib project. Toolchain: `leanprover/lean4:v4.31.0`, Mathlib
 `v4.31.0` (see `lean-toolchain`, `lakefile.toml`).
 
-**Status: the full `|primitive core| ≤ 3` case of Erdős #488 is machine-verified,
-sorry-free.** The top theorem is `Erdos488.ep488_core` in `Ep488/Reduction.lean`:
-for every finite set `A` of positive integers whose primitive core has ≤ 3
-elements, and all `m > n ≥ max A`,
+**Status: the full `|primitive core| ≤ 4` case of Erdős #488 is machine-verified,
+sorry-free.** The `≤ 3` case (`Erdos488.ep488_core`, Chojecki's Cor 4.7) and the
+`= 4` case (`Erdos488.ep488_core_le_four`, formalizing the internal charge
+addendum `../../quadruple_charge_notes.md` — novelty pending human/literature
+review) share the same statement shape: for every finite set `A` of positive
+integers whose primitive core has ≤ 4 elements, and all `m > n ≥ max A`,
 
 ```
 n * (Bgen A m).card < 2 * m * (Bgen A n).card      -- i.e. B_A(m)/m < 2·B_A(n)/n
@@ -19,7 +21,13 @@ Every lemma in the chain is `#print axioms`-clean — it depends only on
 `sorry`**. The audits are committed: [`axioms-check.txt`](axioms-check.txt)
 (Basic), [`counting-axioms.txt`](counting-axioms.txt) (Counting),
 [`reduction-axioms.txt`](reduction-axioms.txt) (Reduction),
-[`certificate-axioms.txt`](certificate-axioms.txt) (Certificate) — 21 theorems.
+[`certificate-axioms.txt`](certificate-axioms.txt) (Certificate), and
+[`quad-axioms.txt`](quad-axioms.txt) (Quad — incl. `ep488_core_le_four`,
+`ep488_quad_prim`, and the Lemma B chain). The root CI regenerates all of these
+on every push and enforces a **positive allowlist** — it fails if any checked
+theorem depends on *any* axiom outside `{propext, Classical.choice, Quot.sound}`
+(not just a `sorryAx` grep), which also rules out a stray `native_decide`
+(`Lean.ofReduceBool`).
 
 Build & check:
 ```
@@ -96,6 +104,25 @@ fixed `A` (including open `|core| ≥ 4` sets), a one-period computation feeding
 NOT prove the general `|core| ≥ 4` case (infinitely many sets, unbounded `L`) — it
 makes each individual set rigorously certifiable.
 
+### `Ep488/Quad.lean` — the `|primitive core| = 4` case (charge method)
+
+Formalizes the two-good-charge argument of `../../quadruple_charge_notes.md`
+(Codex-authored, Claude-audited) end-to-end, sorry-free:
+
+- **`card_ie4`** / **`two_B_eq`**: exact 4-set inclusion–exclusion in ℤ
+  (`2B = s − 2P₂ + 2T₃ − 2T₄` route), via a pointwise Boolean identity.
+- **`ep488_quad_two_good`**: if two of the four generators have good charge, the
+  pointwise weight table gives `Y_H ≥ 2`, hence `2B(n) > nS`, hence #488 for the
+  quadruple.
+- **`least_good`** (Lemma A): the least element is always good.
+- **`aterm_case32`**, **`b_bad_five_shapes`**, **`c_good_of_b_bad`** (Lemma B):
+  if `b` is bad then `q = 2`, the reduced ratios `c/b`, `d/b` fall into exactly
+  five shapes (`interval_cases` on the cofactors), and `c` is good in each — so
+  every primitive quadruple has ≥ 2 good charges.
+- **`ep488_quad_prim`**: EP488 for any sorted primitive quadruple `a<b<c<d`.
+- **`ep488_primitive_le_four`** / **`ep488_core_le_four`**: the size-≤4 antichain
+  and the general-`A` core reduction (the named theorem).
+
 ### `Ep488/Example.lean` — the engine, exercised
 
 - **`ep488_example_4_6_10_15`**: EP488 for `A = {4,6,10,15}` — a `∣`-antichain of
@@ -108,12 +135,40 @@ makes each individual set rigorously certifiable.
 
 ## Honest scope
 
-This formalizes the `|primitive core| ≤ 3` case only. The general Erdős #488
-(**arbitrary** finite `A`, i.e. `|core| ≥ 4`) **remains open** — it is not proved
-here or, to our knowledge, anywhere. The result is Chojecki's claimed Cor 4.7
-(his Lean bundle gates it behind one `sorry`); the method backbone is the
-classical **Heilbronn–Rohrbach inequality (1937)**. This development is an
-independent, sorry-free machine verification of that sub-case, not a new theorem
-and not a resolution of #488. See `../../literature_notes.md`,
-`../../triples_writeup.md`, `../../writeup/erdos488_triples.pdf`, and the novelty
-ledger in `../../adversary_collab_chat.md`.
+This formalizes the `|primitive core| ≤ 4` case. The general Erdős #488
+(**arbitrary** finite `A`, i.e. `|core| ≥ 5`) **remains open** — it is not proved
+here or, to our knowledge, anywhere.
+
+- The `≤ 3` result is Chojecki's claimed Cor 4.7 (his Lean bundle gates it behind
+  one `sorry`); the method backbone is the classical **Heilbronn–Rohrbach
+  inequality (1937)**. Our `≤ 3` development is an independent, sorry-free machine
+  verification of that sub-case — not a new theorem.
+- The `= 4` result formalizes the internal charge addendum
+  (`../../quadruple_charge_notes.md`, Codex-authored, Claude-audited). It is
+  **not** Chojecki's Conjecture 4.8 — that is the *pair-vs-tail split doubling*
+  (a stronger, per-block statement that, via his Prop 4.9, implies all of #488).
+  Chojecki's paper does **not** establish `|core| = 4`: his route to it needs the
+  *pair-vs-two-tail* case of the open Conjecture 4.8, which §7 calls the "first
+  unresolved" problem and which the erdosproblems thread is still stuck on. Our
+  flat charge method instead proves the assembled `|core| ≤ 4` inequality
+  *directly* — a weaker, different target reached by a different route. The Lean
+  proof is sorry-free with the same statement shape as the accepted `ep488_core`,
+  so the `= 4` case is machine-verified at result strength. It therefore closes a
+  case the public record leaves open, but the method is classical
+  (Heilbronn–Rohrbach) and the **novelty** is modest at most and unrefereed —
+  treat the `= 4` claim as internal until a human/literature review.
+- **Independent confirmation the target is open.** Google DeepMind's
+  [Formal Conjectures](https://github.com/google-deepmind/formal-conjectures)
+  project formalizes #488 (`FormalConjectures/ErdosProblems/488.lean`) with the
+  same inequality `B_A(m)/m < 2·B_A(n)/n` (no core-size restriction), tagged
+  `@[category research open]` and left as `sorry`. So a formal-methods group
+  independently records #488 as open with our exact statement — our sorry-free
+  `|core| ≤ 4` proof is a partial fill of that `sorry`, not a claim to have closed
+  their conjecture. A live-web literature sweep (Chojecki's note, the erdosproblems
+  thread, the classical density-of-multiples corpus incl. Ahlswede–Khachatrian read
+  in full) found no prior proof of the `|core| = 4` case.
+
+Neither is a resolution of #488. See `../../literature_notes.md`,
+`../../triples_writeup.md`, `../../quadruple_charge_notes.md`,
+`../../writeup/erdos488_triples.pdf`, and the novelty ledger in
+`../../adversary_collab_chat.md`.

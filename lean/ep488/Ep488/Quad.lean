@@ -600,4 +600,398 @@ lemma aterm_case32 {a b c : ℕ} (ha : 0 < a) (hb : 0 < b) (hnab : ¬ a ∣ b)
     rw [hco, Nat.mul_one]
   rw [hac, ha4, Nat.mul_div_cancel_left 4 hg1pos]
 
+/-- From `k*x = l*y` with `k,l` coprime and `0 < l`, extract the common scale
+`t` with `x = l*t`, `y = k*t`. (`t = gcd x y`.) -/
+lemma coprime_ratio {k l x y : ℕ} (hl : 0 < l) (hco : Nat.Coprime k l)
+    (h : k * x = l * y) : ∃ t, x = l * t ∧ y = k * t := by
+  have hlx : l ∣ x := Nat.Coprime.dvd_of_dvd_mul_left hco.symm ⟨y, h⟩
+  obtain ⟨t, rfl⟩ := hlx
+  have hy : k * t = y := Nat.eq_of_mul_eq_mul_left hl (by rw [← h]; ring)
+  exact ⟨t, rfl, hy.symm⟩
+
+/-- Reduced-ratio cofactors: if `k*x = l*y` with `k,l` coprime, `0 < l`, `0 < x`,
+then `x/gcd(x,y) = l` and `y/gcd(x,y) = k`. -/
+lemma cof_of_ratio {k l x y : ℕ} (hl : 0 < l) (hxpos : 0 < x)
+    (hco : Nat.Coprime k l) (h : k * x = l * y) :
+    x / Nat.gcd x y = l ∧ y / Nat.gcd x y = k := by
+  obtain ⟨t, hx, hy⟩ := coprime_ratio hl hco h
+  have ht : 0 < t := by
+    rcases Nat.eq_zero_or_pos t with h0 | h0
+    · rw [h0, Nat.mul_zero] at hx; omega
+    · exact h0
+  have hlk : Nat.gcd l k = 1 := hco.symm
+  have hg : Nat.gcd x y = t := by
+    rw [hx, hy, Nat.gcd_mul_right, hlk, Nat.one_mul]
+  refine ⟨?_, ?_⟩
+  · rw [hg, hx, Nat.mul_comm l t]; exact Nat.mul_div_cancel_left l ht
+  · rw [hg, hy, Nat.mul_comm k t]; exact Nat.mul_div_cancel_left k ht
+
+/-- `lcm(x,y)/x = y/gcd(x,y)` (equality form, for `0 < x`). -/
+lemma lcm_div_self {x y : ℕ} (hx : 0 < x) : Nat.lcm x y / x = y / Nat.gcd x y := by
+  have hgy : Nat.gcd x y ∣ y := Nat.gcd_dvd_right x y
+  have h : Nat.lcm x y = x * (y / Nat.gcd x y) := by
+    rw [Nat.lcm, Nat.mul_div_assoc x hgy]
+  rw [h, Nat.mul_div_cancel_left _ hx]
+
+/-- The `c`-cofactor against another element `z`, read off a reduced ratio
+`k*z = l*c` with `k,l` coprime: `lcm(c,z)/c = l`. -/
+lemma cof_c {c z k l : ℕ} (hc : 0 < c) (hz : 0 < z) (hl : 0 < l)
+    (hco : Nat.Coprime k l) (h : k * z = l * c) : Nat.lcm c z / c = l := by
+  rw [lcm_div_self hc, Nat.gcd_comm c z]
+  exact (cof_of_ratio hl hz hco h).1
+
+/-- **Case 1** (`c/b = 3/2`, `d/b = 5/3`): `charge(c) ≤ 1/4 + 1/2 + 1/10 < 1`. -/
+lemma c_good_case1 {a b c d : ℕ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (hnab : ¬ a ∣ b) (hq : a = 2 * Nat.gcd a b)
+    (h32 : 2 * c = 3 * b) (h53 : 3 * d = 5 * b) :
+    (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+      + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+      < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c) := by
+  have e1 : 3 * b = 2 * c := by omega
+  have hcb : Nat.lcm c b / c = 2 := cof_c hc hb (by norm_num) (by decide) e1
+  have e2 : 9 * d = 10 * c := by omega
+  have hcd : Nat.lcm c d / c = 10 := cof_c hc hd (by norm_num) (by decide) e2
+  have hca : Nat.lcm c a / c = 4 := by
+    rw [lcm_div_self hc, Nat.gcd_comm c a]; exact aterm_case32 ha hb hnab hq h32
+  rw [hcb, hcd, hca]; omega
+
+/-- **Case 2** (`c/b = 3/2`, `d/b = 5/2`): `charge(c) ≤ 1/4 + 1/2 + 1/5 < 1`. -/
+lemma c_good_case2 {a b c d : ℕ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (hnab : ¬ a ∣ b) (hq : a = 2 * Nat.gcd a b)
+    (h32 : 2 * c = 3 * b) (h52 : 2 * d = 5 * b) :
+    (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+      + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+      < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c) := by
+  have e1 : 3 * b = 2 * c := by omega
+  have hcb : Nat.lcm c b / c = 2 := cof_c hc hb (by norm_num) (by decide) e1
+  have e2 : 3 * d = 5 * c := by omega
+  have hcd : Nat.lcm c d / c = 5 := cof_c hc hd (by norm_num) (by decide) e2
+  have hca : Nat.lcm c a / c = 4 := by
+    rw [lcm_div_self hc, Nat.gcd_comm c a]; exact aterm_case32 ha hb hnab hq h32
+  rw [hcb, hcd, hca]; omega
+
+/-- **Case 3** (`c/b = 4/3`, `d/b = 3/2`): `charge(c) ≤ 1/2 + 1/3 + 1/9 < 1`
+(free `a`-term `p ≥ 2`). -/
+lemma c_good_case3 {a b c d : ℕ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (hac : a < c) (hnac : ¬ a ∣ c)
+    (h43 : 3 * c = 4 * b) (h32 : 2 * d = 3 * b) :
+    (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+      + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+      < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c) := by
+  have e1 : 4 * b = 3 * c := by omega
+  have hcb : Nat.lcm c b / c = 3 := cof_c hc hb (by norm_num) (by decide) e1
+  have e2 : 8 * d = 9 * c := by omega
+  have hcd : Nat.lcm c d / c = 9 := cof_c hc hd (by norm_num) (by decide) e2
+  have hP : 2 ≤ Nat.lcm c a / c := by rw [Nat.lcm_comm c a]; exact (lcm_ratio ha hc hac hnac).2
+  rw [hcb, hcd]; omega
+
+/-- **Case 4** (`c/b = 5/4`, `d/b = 3/2`): `charge(c) ≤ 1/2 + 1/4 + 1/6 < 1`. -/
+lemma c_good_case4 {a b c d : ℕ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (hac : a < c) (hnac : ¬ a ∣ c)
+    (h54 : 4 * c = 5 * b) (h32 : 2 * d = 3 * b) :
+    (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+      + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+      < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c) := by
+  have e1 : 5 * b = 4 * c := by omega
+  have hcb : Nat.lcm c b / c = 4 := cof_c hc hb (by norm_num) (by decide) e1
+  have e2 : 5 * d = 6 * c := by omega
+  have hcd : Nat.lcm c d / c = 6 := cof_c hc hd (by norm_num) (by decide) e2
+  have hP : 2 ≤ Nat.lcm c a / c := by rw [Nat.lcm_comm c a]; exact (lcm_ratio ha hc hac hnac).2
+  rw [hcb, hcd]; omega
+
+/-- **Case 5** (`c/b = 6/5`, `d/b = 3/2`): `charge(c) ≤ 1/2 + 1/5 + 1/5 < 1`. -/
+lemma c_good_case5 {a b c d : ℕ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (hac : a < c) (hnac : ¬ a ∣ c)
+    (h65 : 5 * c = 6 * b) (h32 : 2 * d = 3 * b) :
+    (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+      + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+      < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c) := by
+  have e1 : 6 * b = 5 * c := by omega
+  have hcb : Nat.lcm c b / c = 5 := cof_c hc hb (by norm_num) (by decide) e1
+  have e2 : 4 * d = 5 * c := by omega
+  have hcd : Nat.lcm c d / c = 5 := cof_c hc hd (by norm_num) (by decide) e2
+  have hP : 2 ≤ Nat.lcm c a / c := by rw [Nat.lcm_comm c a]; exact (lcm_ratio ha hc hac hnac).2
+  rw [hcb, hcd]; omega
+
+/-- **Five-shape enumeration under `b` bad** (with `q = 2` already used, so the
+charge condition is `uv ≤ 2u + 2v`, `u = c/gcd(b,c)`, `v = d/gcd(b,d)`). The
+reduced ratios `c/b`, `d/b` must be one of the five listed pairs. -/
+lemma b_bad_five_shapes {b c d : ℕ} (hb : 0 < b) (hbc : b < c) (hbd : b < d) (hcd : c < d)
+    (hnbc : ¬ b ∣ c) (hnbd : ¬ b ∣ d)
+    (hbad : (Nat.lcm b c / b) * (Nat.lcm b d / b)
+        ≤ 2 * (Nat.lcm b c / b) + 2 * (Nat.lcm b d / b)) :
+    (2 * c = 3 * b ∧ 3 * d = 5 * b) ∨ (2 * c = 3 * b ∧ 2 * d = 5 * b)
+      ∨ (3 * c = 4 * b ∧ 2 * d = 3 * b) ∨ (4 * c = 5 * b ∧ 2 * d = 3 * b)
+      ∨ (5 * c = 6 * b ∧ 2 * d = 3 * b) := by
+  have hc0 : 0 < c := hb.trans hbc
+  have hd0 : 0 < d := hb.trans hbd
+  have hg1 : 0 < Nat.gcd b c := Nat.gcd_pos_of_pos_left c hb
+  have hg2 : 0 < Nat.gcd b d := Nat.gcd_pos_of_pos_left d hb
+  obtain ⟨r, hbr⟩ : Nat.gcd b c ∣ b := Nat.gcd_dvd_left b c
+  obtain ⟨u, hcu⟩ : Nat.gcd b c ∣ c := Nat.gcd_dvd_right b c
+  obtain ⟨s, hbs⟩ : Nat.gcd b d ∣ b := Nat.gcd_dvd_left b d
+  obtain ⟨v, hdv⟩ : Nat.gcd b d ∣ d := Nat.gcd_dvd_right b d
+  have hbgr : b / Nat.gcd b c = r := Nat.div_eq_of_eq_mul_right hg1 hbr
+  have hcgu : c / Nat.gcd b c = u := Nat.div_eq_of_eq_mul_right hg1 hcu
+  have hbgs : b / Nat.gcd b d = s := Nat.div_eq_of_eq_mul_right hg2 hbs
+  have hdgv : d / Nat.gcd b d = v := Nat.div_eq_of_eq_mul_right hg2 hdv
+  have hUu : Nat.lcm b c / b = u := (lcm_div_self hb).trans hcgu
+  have hVv : Nat.lcm b d / b = v := (lcm_div_self hb).trans hdgv
+  have hlcmbc_c : Nat.lcm b c / c = r := by
+    have h1 : Nat.lcm b c / c = b / Nat.gcd b c := by
+      rw [Nat.lcm_comm b c, lcm_div_self hc0, Nat.gcd_comm c b]
+    rw [h1, hbgr]
+  have hlcmbd_d : Nat.lcm b d / d = s := by
+    have h1 : Nat.lcm b d / d = b / Nat.gcd b d := by
+      rw [Nat.lcm_comm b d, lcm_div_self hd0, Nat.gcd_comm d b]
+    rw [h1, hbgs]
+  have hu3 : 3 ≤ u := by have := (lcm_ratio hb hc0 hbc hnbc).1; rwa [hUu] at this
+  have hv3 : 3 ≤ v := by have := (lcm_ratio hb hd0 hbd hnbd).1; rwa [hVv] at this
+  have hr2 : 2 ≤ r := by have := (lcm_ratio hb hc0 hbc hnbc).2; rwa [hlcmbc_c] at this
+  have hs2 : 2 ≤ s := by have := (lcm_ratio hb hd0 hbd hnbd).2; rwa [hlcmbd_d] at this
+  rw [hUu, hVv] at hbad
+  have hu6 : u ≤ 6 := by nlinarith [hbad, hu3, hv3]
+  have hv6 : v ≤ 6 := by nlinarith [hbad, hu3, hv3]
+  have hru_lt : r < u := by
+    have h : Nat.gcd b c * r < Nat.gcd b c * u := by rw [← hbr, ← hcu]; exact hbc
+    exact Nat.lt_of_mul_lt_mul_left h
+  have hsv_lt : s < v := by
+    have h : Nat.gcd b d * s < Nat.gcd b d * v := by rw [← hbs, ← hdv]; exact hbd
+    exact Nat.lt_of_mul_lt_mul_left h
+  have hru : Nat.Coprime r u := by
+    have h := Nat.coprime_div_gcd_div_gcd hg1
+    rwa [hbgr, hcgu] at h
+  have hsv : Nat.Coprime s v := by
+    have h := Nat.coprime_div_gcd_div_gcd hg2
+    rwa [hbgs, hdgv] at h
+  have hord : u * s < v * r := by
+    have hcb_eq : c * b = u * s * (Nat.gcd b c * Nat.gcd b d) := by
+      rw [show u * s * (Nat.gcd b c * Nat.gcd b d)
+            = (Nat.gcd b c * u) * (Nat.gcd b d * s) from by ring, ← hcu, ← hbs]
+    have hdb_eq : d * b = v * r * (Nat.gcd b c * Nat.gcd b d) := by
+      rw [show v * r * (Nat.gcd b c * Nat.gcd b d)
+            = (Nat.gcd b d * v) * (Nat.gcd b c * r) from by ring, ← hdv, ← hbr]
+    have hlt : c * b < d * b := Nat.mul_lt_mul_of_pos_right hcd hb
+    rw [hcb_eq, hdb_eq] at hlt
+    exact Nat.lt_of_mul_lt_mul_right hlt
+  interval_cases u <;> interval_cases v <;> interval_cases r <;> interval_cases s <;>
+    first
+      | omega
+      | exact absurd hru (by decide)
+      | exact absurd hsv (by decide)
+
+/-- **`b` bad ⟹ `c` good.** In a primitive quadruple `a<b<c<d`, if `b` is bad
+(and `q = 2`, which `b_bad_forces_q_two` guarantees), then `c` has good charge. -/
+lemma c_good_of_b_bad {a b c d : ℕ}
+    (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d)
+    (hab : a < b) (hbc : b < c) (hbd : b < d) (hcd : c < d)
+    (hnab : ¬ a ∣ b) (hnac : ¬ a ∣ c) (hnbc : ¬ b ∣ c) (hnbd : ¬ b ∣ d)
+    (hq : a = 2 * Nat.gcd a b)
+    (hbad : (Nat.lcm b c / b) * (Nat.lcm b d / b)
+        ≤ 2 * (Nat.lcm b c / b) + 2 * (Nat.lcm b d / b)) :
+    (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+      + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+      < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c) := by
+  rcases b_bad_five_shapes hb hbc hbd hcd hnbc hnbd hbad with
+    ⟨h1, h2⟩ | ⟨h1, h2⟩ | ⟨h1, h2⟩ | ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · exact c_good_case1 ha hb hc hd hnab hq h1 h2
+  · exact c_good_case2 ha hb hc hd hnab hq h1 h2
+  · exact c_good_case3 ha hb hc hd (hab.trans hbc) hnac h1 h2
+  · exact c_good_case4 ha hb hc hd (hab.trans hbc) hnac h1 h2
+  · exact c_good_case5 ha hb hc hd (hab.trans hbc) hnac h1 h2
+
+/-- Bridge: `lcm(a,b)/b = 2` gives `a = 2·gcd(a,b)`. -/
+lemma q_eq_two_of_lcm {a b : ℕ} (ha : 0 < a) (hb : 0 < b)
+    (h : Nat.lcm a b / b = 2) : a = 2 * Nat.gcd a b := by
+  have hid : Nat.lcm a b / b = a / Nat.gcd a b := by
+    rw [Nat.lcm_comm, lcm_div_self hb, Nat.gcd_comm b a]
+  rw [hid] at h
+  have hg : 0 < Nat.gcd a b := Nat.gcd_pos_of_pos_left b ha
+  obtain ⟨k, hk⟩ : Nat.gcd a b ∣ a := Nat.gcd_dvd_left a b
+  have hk2 : k = 2 := by
+    have hkc : Nat.gcd a b * k / Nat.gcd a b = 2 := by rw [← hk]; exact h
+    rwa [Nat.mul_div_cancel_left k hg] at hkc
+  rw [hk2] at hk; omega
+
+/-- **`a` and `b` good ⟹ EP488 for the quadruple** (good pair relabelled into the
+`(c,d)` slots of `ep488_quad_two_good`). -/
+lemma ep488_quad_ab_good {a b c d n m : ℕ}
+    (ha : 0 < a) (hab : a < b) (hbc : b < c) (hcd : c < d)
+    (hnab : ¬ a ∣ b) (hnac : ¬ a ∣ c) (hnad : ¬ a ∣ d)
+    (hnbc : ¬ b ∣ c) (hnbd : ¬ b ∣ d) (hncd : ¬ c ∣ d)
+    (hn : d ≤ n) (hm : n < m)
+    (haG : (Nat.lcm a c / a) * (Nat.lcm a d / a) + (Nat.lcm a b / a) * (Nat.lcm a d / a)
+             + (Nat.lcm a b / a) * (Nat.lcm a c / a)
+           < (Nat.lcm a b / a) * (Nat.lcm a c / a) * (Nat.lcm a d / a))
+    (hbG : (Nat.lcm b c / b) * (Nat.lcm b d / b) + (Nat.lcm b a / b) * (Nat.lcm b d / b)
+             + (Nat.lcm b a / b) * (Nat.lcm b c / b)
+           < (Nat.lcm b a / b) * (Nat.lcm b c / b) * (Nat.lcm b d / b)) :
+    n * (Bgen {a, b, c, d} m).card < 2 * m * (Bgen {a, b, c, d} n).card := by
+  have hb : 0 < b := ha.trans hab
+  have hc : 0 < c := hb.trans hbc
+  have hd : 0 < d := hc.trans hcd
+  have hbd : b < d := hbc.trans hcd
+  have hac : a < c := hab.trans hbc
+  have had : a < d := hac.trans hcd
+  have hset : ({a, b, c, d} : Finset ℕ) = {c, d, a, b} := by
+    ext x; simp only [Finset.mem_insert, Finset.mem_singleton]; tauto
+  rw [hset]
+  have ndc : ¬ d ∣ c := fun h => absurd (Nat.le_of_dvd hc h) (not_le.mpr hcd)
+  exact ep488_quad_two_good (a := c) (b := d) (c := a) (d := b)
+    hc hd ha hb
+    (by omega) hn (by omega) (by omega) hm
+    (ne_of_lt hcd) (ne_of_lt hac).symm (ne_of_lt hbc).symm (ne_of_lt had).symm
+    (ne_of_lt hbd).symm (ne_of_lt hab)
+    ndc hnac hnbc hncd hnad hnbd
+    (by have h := haG; ring_nf at h ⊢; exact h)
+    (by have h := hbG; ring_nf at h ⊢; exact h)
+
+/-- **`a` and `c` good ⟹ EP488 for the quadruple** (good pair relabelled into the
+`(c,d)` slots of `ep488_quad_two_good`; here the H-pair is `b,d`). -/
+lemma ep488_quad_ac_good {a b c d n m : ℕ}
+    (ha : 0 < a) (hab : a < b) (hbc : b < c) (hcd : c < d)
+    (hnab : ¬ a ∣ b) (hnac : ¬ a ∣ c) (hnad : ¬ a ∣ d)
+    (hnbc : ¬ b ∣ c) (hnbd : ¬ b ∣ d) (hncd : ¬ c ∣ d)
+    (hn : d ≤ n) (hm : n < m)
+    (haG : (Nat.lcm a c / a) * (Nat.lcm a d / a) + (Nat.lcm a b / a) * (Nat.lcm a d / a)
+             + (Nat.lcm a b / a) * (Nat.lcm a c / a)
+           < (Nat.lcm a b / a) * (Nat.lcm a c / a) * (Nat.lcm a d / a))
+    (hcG : (Nat.lcm c b / c) * (Nat.lcm c d / c) + (Nat.lcm c a / c) * (Nat.lcm c d / c)
+             + (Nat.lcm c a / c) * (Nat.lcm c b / c)
+           < (Nat.lcm c a / c) * (Nat.lcm c b / c) * (Nat.lcm c d / c)) :
+    n * (Bgen {a, b, c, d} m).card < 2 * m * (Bgen {a, b, c, d} n).card := by
+  have hb : 0 < b := ha.trans hab
+  have hc : 0 < c := hb.trans hbc
+  have hd : 0 < d := hc.trans hcd
+  have hbd : b < d := hbc.trans hcd
+  have hac : a < c := hab.trans hbc
+  have had : a < d := hac.trans hcd
+  have hset : ({a, b, c, d} : Finset ℕ) = {b, d, a, c} := by
+    ext x; simp only [Finset.mem_insert, Finset.mem_singleton]; tauto
+  rw [hset]
+  have ndb : ¬ d ∣ b := fun h => absurd (Nat.le_of_dvd hb h) (not_le.mpr hbd)
+  have ncb : ¬ c ∣ b := fun h => absurd (Nat.le_of_dvd hb h) (not_le.mpr hbc)
+  exact ep488_quad_two_good (a := b) (b := d) (c := a) (d := c)
+    hb hd ha hc
+    (by omega) hn (by omega) (by omega) hm
+    (ne_of_lt hbd) (ne_of_lt hab).symm (ne_of_lt hbc) (ne_of_lt had).symm
+    (ne_of_lt hcd).symm (ne_of_lt hac)
+    ndb hnab ncb hnbd hnad hncd
+    (by have h := haG; ring_nf at h ⊢; exact h)
+    (by have h := hcG; ring_nf at h ⊢; exact h)
+
+/-- **EP488 for an explicitly sorted primitive quadruple** (`Bgen` form). Every
+primitive quadruple has at least two good charges (`a` always, plus `b` or `c`),
+which the two-good-charge proposition converts into `n·B(m) < 2·m·B(n)`. -/
+lemma ep488_quad_prim {a b c d n m : ℕ}
+    (ha : 0 < a) (hab : a < b) (hbc : b < c) (hcd : c < d)
+    (hnab : ¬ a ∣ b) (hnac : ¬ a ∣ c) (hnad : ¬ a ∣ d)
+    (hnbc : ¬ b ∣ c) (hnbd : ¬ b ∣ d) (hncd : ¬ c ∣ d)
+    (hn : d ≤ n) (hm : n < m) :
+    n * (Bgen {a, b, c, d} m).card < 2 * m * (Bgen {a, b, c, d} n).card := by
+  have hb : 0 < b := ha.trans hab
+  have hc : 0 < c := hb.trans hbc
+  have hd : 0 < d := hc.trans hcd
+  have hbd : b < d := hbc.trans hcd
+  have hac : a < c := hab.trans hbc
+  have had : a < d := hac.trans hcd
+  have haG := least_good ha hab hac had hnab hnac hnad (ne_of_lt hbc)
+  by_cases hGb : (Nat.lcm b c / b) * (Nat.lcm b d / b) + (Nat.lcm b a / b) * (Nat.lcm b d / b)
+             + (Nat.lcm b a / b) * (Nat.lcm b c / b)
+           < (Nat.lcm b a / b) * (Nat.lcm b c / b) * (Nat.lcm b d / b)
+  · exact ep488_quad_ab_good ha hab hbc hcd hnab hnac hnad hnbc hnbd hncd hn hm haG hGb
+  · push_neg at hGb
+    rw [Nat.lcm_comm b a] at hGb
+    have hQ2 := (lcm_ratio ha hb hab hnab).2
+    have hU3 := (lcm_ratio hb hc hbc hnbc).1
+    have hV3 := (lcm_ratio hb hd hbd hnbd).1
+    have hqeq := b_bad_forces_q_two hb hab hbc hbd (ne_of_lt hcd) hnbc hnbd hQ2 hU3 hV3 hGb
+    have hq_eq := q_eq_two_of_lcm ha hb hqeq
+    rw [hqeq] at hGb
+    have hbad2 : (Nat.lcm b c / b) * (Nat.lcm b d / b)
+        ≤ 2 * (Nat.lcm b c / b) + 2 * (Nat.lcm b d / b) := by nlinarith [hGb]
+    have hcG := c_good_of_b_bad ha hb hc hd hab hbc hbd hcd hnab hnac hnbc hnbd hq_eq hbad2
+    exact ep488_quad_ac_good ha hab hbc hcd hnab hnac hnad hnbc hnbd hncd hn hm haG hcG
+
+/-- **EP488 for any positive `∣`-antichain `P` of size ≤ 4.** Extends
+`ep488_primitive` (which covers `≤ 3`) with the quadruple case. -/
+theorem ep488_primitive_le_four {P : Finset ℕ} (hpos : ∀ a ∈ P, 0 < a)
+    (hanti : ∀ x ∈ P, ∀ y ∈ P, x ≠ y → ¬ x ∣ y)
+    (hcard : P.card ≤ 4) (hne : P.Nonempty)
+    {n m : ℕ} (hn : ∀ a ∈ P, a ≤ n) (hm : n < m) :
+    n * (Bgen P m).card < 2 * m * (Bgen P n).card := by
+  rcases (by omega : P.card ≤ 3 ∨ P.card = 4) with h3 | h4
+  · exact ep488_primitive hpos hanti h3 hne hn hm
+  · -- card = 4: extract a < b < c < d with {a,b,c,d} = P
+    set a := P.min' hne with ha_def
+    set d := P.max' hne with hd_def
+    have hamem : a ∈ P := P.min'_mem hne
+    have hdmem : d ∈ P := P.max'_mem hne
+    have had : a < d := Finset.min'_lt_max'_of_card P (by omega)
+    have hd_in1 : d ∈ P.erase a := Finset.mem_erase.mpr ⟨(ne_of_lt had).symm, hdmem⟩
+    have hcard2 : ((P.erase a).erase d).card = 2 := by
+      have e1 := Finset.card_erase_of_mem hd_in1
+      have e2 := Finset.card_erase_of_mem hamem
+      omega
+    have hP2ne : ((P.erase a).erase d).Nonempty := by rw [← Finset.card_pos]; omega
+    set b := ((P.erase a).erase d).min' hP2ne with hb_def
+    set c := ((P.erase a).erase d).max' hP2ne with hc_def
+    have hbmem2 : b ∈ (P.erase a).erase d := Finset.min'_mem _ hP2ne
+    have hcmem2 : c ∈ (P.erase a).erase d := Finset.max'_mem _ hP2ne
+    have hbc : b < c := Finset.min'_lt_max'_of_card _ (by omega)
+    have hb_in1 : b ∈ P.erase a := (Finset.mem_erase.mp hbmem2).2
+    have hbmem : b ∈ P := (Finset.mem_erase.mp hb_in1).2
+    have hba_ne : b ≠ a := (Finset.mem_erase.mp hb_in1).1
+    have hbd_ne : b ≠ d := (Finset.mem_erase.mp hbmem2).1
+    have hc_in1 : c ∈ P.erase a := (Finset.mem_erase.mp hcmem2).2
+    have hcmem : c ∈ P := (Finset.mem_erase.mp hc_in1).2
+    have hcd_ne : c ≠ d := (Finset.mem_erase.mp hcmem2).1
+    have hab : a < b := lt_of_le_of_ne (Finset.min'_le _ b hbmem) (fun h => hba_ne h.symm)
+    have hcd : c < d := lt_of_le_of_ne (Finset.le_max' _ c hcmem) hcd_ne
+    have hac : a < c := hab.trans hbc
+    have hbd : b < d := hbc.trans hcd
+    have hcard4' : ({a, b, c, d} : Finset ℕ).card = 4 :=
+      Finset.card_eq_four.2 ⟨a, b, c, d, ne_of_lt hab, ne_of_lt hac, ne_of_lt had,
+        ne_of_lt hbc, ne_of_lt hbd, ne_of_lt hcd, rfl⟩
+    have hsub : ({a, b, c, d} : Finset ℕ) ⊆ P := by
+      intro w hw
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hw
+      rcases hw with rfl | rfl | rfl | rfl
+      · exact hamem
+      · exact hbmem
+      · exact hcmem
+      · exact hdmem
+    have hset : ({a, b, c, d} : Finset ℕ) = P :=
+      Finset.eq_of_subset_of_card_le hsub (by rw [hcard4']; omega)
+    rw [← hset]
+    exact ep488_quad_prim (hpos a hamem) hab hbc hcd
+      (hanti a hamem b hbmem (ne_of_lt hab))
+      (hanti a hamem c hcmem (ne_of_lt hac))
+      (hanti a hamem d hdmem (ne_of_lt had))
+      (hanti b hbmem c hcmem (ne_of_lt hbc))
+      (hanti b hbmem d hdmem (ne_of_lt hbd))
+      (hanti c hcmem d hdmem (ne_of_lt hcd))
+      (hn d hdmem) hm
+
+/-- **EP488 for every finite `A` of positive integers whose primitive core has
+size ≤ 4.** The `|core| = 4` case is not established in Chojecki's paper: his route
+to size 4 runs through the pair-vs-two-tail case of his *open* Conjecture 4.8
+(pair-tail split doubling), which §7 lists as the "first unresolved" problem. This
+proves the assembled #488 inequality for `|core| ≤ 4` *directly* via the flat charge
+method — a weaker, different statement than Conjecture 4.8's per-block split
+doubling. So it closes a case the public record leaves open, but is NOT a proof of
+Conjecture 4.8. Method classical (Heilbronn–Rohrbach); novelty pending referee. -/
+theorem ep488_core_le_four {A : Finset ℕ} (hpos : ∀ a ∈ A, 0 < a)
+    (hAne : A.Nonempty) (hcore : (core A).card ≤ 4)
+    {n m : ℕ} (hn : ∀ a ∈ A, a ≤ n) (hm : n < m) :
+    n * (Bgen A m).card < 2 * m * (Bgen A n).card := by
+  rw [Bgen_core_eq hpos m, Bgen_core_eq hpos n]
+  have hcne : (core A).Nonempty := by
+    obtain ⟨a, ha⟩ := hAne
+    obtain ⟨b, hb, _⟩ := exists_core_dvd hpos ha
+    exact ⟨b, hb⟩
+  exact ep488_primitive_le_four (fun a ha => core_pos hpos ha)
+    (fun x hx y hy hxy => core_antichain hx hy hxy)
+    hcore hcne (fun a ha => hn a (core_subset A ha)) hm
+
 end Erdos488

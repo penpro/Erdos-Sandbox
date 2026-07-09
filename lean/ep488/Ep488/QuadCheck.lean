@@ -10,3 +10,12 @@ open Erdos488
 #print axioms lcm3_ind
 #print axioms lcm4_ind
 #print axioms card_ie4
+#print axioms two_good_charge_2BnS
+#print axioms ep488_quad_two_good
+#print axioms least_good
+#print axioms aterm_case32
+#print axioms b_bad_five_shapes
+#print axioms c_good_of_b_bad
+#print axioms ep488_quad_prim
+#print axioms ep488_primitive_le_four
+#print axioms ep488_core_le_four
