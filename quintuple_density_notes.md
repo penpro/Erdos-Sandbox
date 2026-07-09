@@ -7,6 +7,60 @@ density workflow, Claude-verified end-to-end); it gives `2δ − S ≥ (7/150)·
 every primitive quintuple. Companion to the size-≤4 charge development in
 `lean/ep488` and to Codex's separator census in `adversary_collab_chat.md`.
 
+## Codex audit addendum (2026-07-09)
+
+I rechecked the finite lemma driving the proof. The reduction to
+`(2,2,3,5)` should be read as:
+
+1. Replacing each modulus `m_i` by any prime divisor can only make the events
+   `{m_i | N}` larger, so it can only decrease `E[1/(1+X)]`. Thus a minimizer is
+   a 4-multiset of primes.
+2. For a fixed prime multiplicity pattern, assign multiplicities to primes by
+   pairing larger multiplicities with smaller primes. The exchange difference is
+   `(alpha-beta)(h(Z+c)-h(Z+d)) <= 0` for `h(t)=1/(1+t)`, `c>=d`, and
+   `alpha>=beta`.
+3. The only five multiplicity patterns then give:
+
+```text
+(4)         -> (2,2,2,2):   3/5
+(3,1)       -> (2,2,2,3):   8/15
+(2,2)       -> (2,2,3,3):   8/15
+(2,1,1)     -> (2,2,3,5):   157/300
+(1,1,1,1)   -> (2,3,5,7):   6967/12600
+```
+
+So the minimum is exactly `157/300`, at `(2,2,3,5)`. Independent audit script:
+`audit_quint_density_lemma.py`; `python audit_quint_density_lemma.py --brute 50`
+also brute-forces all arbitrary 4-tuples of moduli up to 50 and finds no lower
+value.
+
+There is also a useful finite-`n` consequence. The density proof gives
+`2delta-S >= (7/150)S`. Exact inclusion-exclusion for a quintuple has 16 positive
+terms and 15 negative terms, hence `B(n) >= delta*n - 16`, so
+
+```text
+2B(n)-nS >= n(2delta-S)-32 >= (7/150)nS - 32.
+```
+
+Since `S >= 5/M` for `M=max(P)`, the raw separator `2B(n)>nS` holds uniformly
+whenever `n >= 138M`. Thus the remaining size-5 separator work is confined to
+the bounded relative window `M <= n < 138M`. This is not a size-5 proof; that
+window still contains infinite families, including the consecutive-run
+obstruction near `n=2a-1`.
+
+The opposite end of the bounded window also has a simple proof. Let
+`a=min(P)`. If `max(P) <= n < 2a`, then no generator has a second multiple yet.
+Because `P` is primitive, the only counted multiples up to `n` are the five
+generators themselves, so `B(n)=5`. Also
+
+```text
+nS < 2a * sum_{x in P} 1/x <= 10,
+```
+
+with strict inequality from `n<2a`. Hence `2B(n)=10>nS`. The consecutive
+quintuples near `n=2a-1` are therefore the sharp model for this first window,
+but not a counterexample source.
+
 ## The claim
 
 For a primitive quintuple `P = {a,b,c,d,e}` (a `∣`-antichain of integers ≥ 2), let
@@ -56,15 +110,31 @@ E[1/R | a∣N] = E[ 1/(1+X) ]   over the 4 moduli m_f (each an integer ≥ 2).
 ```
 
 **Step 3 — the finite lemma.** *For any four integers `m₁,…,m₄ ≥ 2`,
-`E[1/(1+X)] ≥ 157/300`, where `X = #{i : mᵢ∣N}`.* Two facts make this a finite check:
+`E[1/(1+X)] ≥ 157/300`, where `X = #{i : mᵢ∣N}`.* Proof in four moves:
 - **Explicit formula** (from `1/(1+X) = ∫₀¹ t^X dt`):
-  `E[1/(1+X)] = Σ_{T ⊆ {1..4}} (−1)^{|T|} / ((|T|+1)·lcm(m_T))`.
-- **Monotonicity:** if `m ∣ m'` then `{m'∣N} ⊆ {m∣N}`, so replacing any `mᵢ` by a
-  *multiple* only shrinks `X` pointwise and hence *raises* `E[1/(1+X)]`. Therefore the
-  minimum is attained when each `mᵢ` is replaced by its smallest prime factor, and
-  (smaller prime = larger density = smaller `E`) only the smallest primes matter.
-  An exhaustive check over 4-multisets of `{2,3,5,7}` gives `min = 157/300`, attained
-  at `(2,2,3,5)`; adding `{11,13,…}` does not lower it. ∎ (lemma)
+  `E[1/(1+X)] = Σ_{T ⊆ {1..4}} (−1)^{|T|} / ((|T|+1)·lcm(m_T))`. In particular
+  `E ∈ [0,1]` and depends only on the divisibility structure.
+- **Divisor-monotonicity.** If `m ∣ m'` then over any common period `{m'∣N} ⊆ {m∣N}`,
+  so replacing `mᵢ` by a *multiple* only shrinks `X` pointwise and hence *raises* `E`.
+  Replacing each `mᵢ` by a prime factor (a divisor `≥2`) can only *lower* `E`, so it
+  suffices to prove the bound for **prime tuples**.
+  *(Caution — this is the ONLY monotonicity available: it is divisibility-based, not
+  size-based. "Smaller prime ⇒ smaller `E`" is FALSE, e.g. `E(2,2,2,5)=0.570 >
+  E(2,2,3,5)=0.523`; the min is not all-2's.)*
+- **Bounding the primes (independence).** For a prime `p` in the tuple coprime to the
+  other entries (automatic when the others are different primes), `{p∣N}` is
+  independent of the rest, giving
+  `E = (1−1/p)·E[1/(1+X′)] + (1/p)·E[1/(1+μ+X′)]` (μ = multiplicity of `p`, `X′` counts
+  the non-`p` entries) — **strictly increasing in `p`**. So a large prime in any slot
+  only *raises* `E`; it cannot help the minimum. Concretely, **every prime tuple
+  containing a prime `≥ 11` has `E ≥ 181/330 > 157/300`** (min at `(2,2,3,11)`), so the
+  minimum lives among primes in `{2,3,5,7}`.
+- **Finite check.** Over the 35 multisets of `{2,3,5,7}⁴`, `min E = 157/300` at
+  `(2,2,3,5)`. ∎ (lemma)
+
+  *Verified (`lemmaB.py`): (B1) min over `{2,3,5,7}` = 157/300; (B2) min over prime
+  tuples containing a prime ≥11 (to 47) = 181/330; overall min over prime tuples
+  (primes ≤47) = 157/300. Divisor-monotonicity: 0 counterexamples over 3000 trials.*
 
 **Step 4 — conclusion.** By Steps 2–3, every element satisfies
 `2·E[1/R | a∣N] − 1 ≥ 2·(157/300) − 1 = 7/150 > 0`. Plugging into Step 1,
