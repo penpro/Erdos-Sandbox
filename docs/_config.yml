@@ -1,0 +1,3 @@
+title: "Erdős #488 for primitive cores of size ≤ 4"
+description: "A sorry-free Lean 4 / Mathlib proof of a modest, open sub-case of Erdős Problem 488. Not a solution of #488; the method is classical (Heilbronn–Rohrbach 1937); novelty modest and unrefereed."
+theme: jekyll-theme-cayman
