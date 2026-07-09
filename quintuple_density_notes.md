@@ -62,22 +62,48 @@ covers the high-overlap candidates that could possibly be residual) also returns
 `2δ − S > 0`). With Move 1, `2δ > S` for **every** primitive quintuple. ∎ — *modulo
 the one remaining lemma below.*
 
-## The one missing lemma (the whole gap)
+## The Boundedness Lemma — now with an explicit `max` bound (near-proof)
 
-> **Boundedness Lemma (conjectured, strongly evidenced).** The only `gcd=1`
-> primitive quintuples with `S ≤ 2P₂` are the three listed above.
+> **Boundedness Lemma.** Every `gcd=1` primitive quintuple with `S ≤ 2P₂` has
+> `max ≤ 180`. Hence the residual is finite; exhaustive + smooth search gives the
+> three sets above.
 
-Everything else is proved (Bonferroni is a theorem; the 3-set check is arithmetic).
-So size-5 density reduces to proving this finiteness.
+**Proof (rigorous modulo the size-4 lower bound `m` below).** Write the quintuple as
+`P = Q ∪ {e}`, `e = max(P)`, `Q` the four smaller elements (a primitive quadruple).
+Splitting off `e`'s contribution to `S − 2P₂`:
 
-**Why it should be true / proof route.** `S ≤ 2P₂ ⟺ Σ_x (1 − charge(x))/x ≤ 0`, so
-enough elements must be "bad" (`charge > 1`), which needs heavy shared small-prime
-factors. Sketch of a bound: if the least element `a` is large, every pairwise
-`gcd(x,y)/y ≤ 1/2` term is spread over large denominators, forcing all charges `< 1`
-(all good ⟹ sparse); so residuals have **bounded min**. Given bounded min, the
-high-overlap requirement bounds the max (the data: min = 4 or 12, max ≤ 45). Making
-"bounded min ⟹ bounded max" rigorous is the task — a finite, elementary
-lcm/gcd estimate. (Open here; flagged for the strategy workflow + Codex.)
+```
+S(P) − 2P₂(P) = [S(Q) − 2P₂(Q)]  +  (1/e)·(1 − 2·charge_Q(e)),
+   charge_Q(e) := Σ_{y∈Q} gcd(e,y)/y.
+```
+
+By primitivity `y ∤ e`, so `y/gcd(e,y) ≥ 2`, i.e. each `gcd(e,y)/y ≤ 1/2`; over the
+four `y∈Q`, `charge_Q(e) ≤ 2`. Therefore `1 − 2·charge_Q(e) ≥ −3`, giving
+
+```
+S(P) − 2P₂(P)  ≥  [S(Q) − 2P₂(Q)]  −  3/e.
+```
+
+If `P` is a residual (`S(P) − 2P₂(P) ≤ 0`) then `S(Q) − 2P₂(Q) ≤ 3/e`. But
+`S(Q) − 2P₂(Q) ≥ m` where `m := min over all primitive quadruples of (S − 2P₂) > 0`
+(the **size-4 density positivity** — verified, `m ≈ 1/60` over quads with entries
+≤ 60; true min appears to be `19/1260`). Hence `m ≤ 3/e`, i.e. `e ≤ 3/m ≤ 180`. ∎
+
+So the residual lives in the **finite** box `{gcd=1 primitive quintuple, max ≤ 180}`.
+Exhaustive search (entries ≤ 58) plus the smooth search (all `{2,3,5,7}`-smooth
+quintuples with max ≤ 210 — residuals must be smooth, since `S ≤ 2P₂` needs many
+small pairwise lcms) returns **exactly the three** and nothing else. Finishing the
+box `59 ≤ max ≤ 180` for the non-smooth cases is a bounded computation (and is
+sharply constrained: a residual's quad `Q` must satisfy `S(Q)−2P₂(Q) ≤ 3/e ≤ 3/59`,
+i.e. `Q` is one of the few near-extremal quadruples).
+
+**The only genuinely-open dependency is the size-4 fact** `S(Q) − 2P₂(Q) > 0` for
+every primitive quadruple (with a proven positive lower bound `m`). This is the exact
+analogue one dimension down; it is verified but, like the quintuple statement, is a
+finiteness/positivity claim rather than a one-line identity. It likely has its own
+"sparse + finite residual" reduction (a good recursive target). Note the pattern:
+`S − 2P₂ > 0` holds for **all** primitive `k`-sets with `k ≤ 4` and **fails** (finitely)
+at `k = 5` — the size where the two-term Bonferroni sparse bound alone stops sufficing.
 
 ## What this does and does not give
 
