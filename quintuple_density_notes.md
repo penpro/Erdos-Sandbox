@@ -68,9 +68,9 @@ the one remaining lemma below.*
 > `max ≤ 180`. Hence the residual is finite; exhaustive + smooth search gives the
 > three sets above.
 
-**Proof (rigorous modulo the size-4 lower bound `m` below).** Write the quintuple as
-`P = Q ∪ {e}`, `e = max(P)`, `Q` the four smaller elements (a primitive quadruple).
-Splitting off `e`'s contribution to `S − 2P₂`:
+**Proof (rigorous modulo the size-4 lower bound `m₁` below).** Write `P = Q ∪ {e}`,
+`e = max(P)`, `Q` the four smaller elements (a primitive quadruple). Splitting off
+`e`'s contribution to `S − 2P₂`:
 
 ```
 S(P) − 2P₂(P) = [S(Q) − 2P₂(Q)]  +  (1/e)·(1 − 2·charge_Q(e)),
@@ -78,32 +78,37 @@ S(P) − 2P₂(P) = [S(Q) − 2P₂(Q)]  +  (1/e)·(1 − 2·charge_Q(e)),
 ```
 
 By primitivity `y ∤ e`, so `y/gcd(e,y) ≥ 2`, i.e. each `gcd(e,y)/y ≤ 1/2`; over the
-four `y∈Q`, `charge_Q(e) ≤ 2`. Therefore `1 − 2·charge_Q(e) ≥ −3`, giving
+four `y∈Q`, `charge_Q(e) ≤ 2`. Let **`m₁ := min over gcd=1 primitive quadruples of
+(S − 2P₂)`** — this is `> 0` and bounded below (only *clustered small* gcd=1 quads
+minimize it; large-entry gcd=1 quads are near-coprime with `S − 2P₂ ≈ S > 0`).
+Verified `m₁ = 1/42` over gcd=1 quads with entries ≤ 90.
+*(NB — earlier draft mistakenly used the min over ALL quads, which is 0 by scaling;
+the gcd=1 restriction is essential and is what makes the bound work.)*
 
-```
-S(P) − 2P₂(P)  ≥  [S(Q) − 2P₂(Q)]  −  3/e.
-```
+Two cases.
+- **`gcd(Q) = 1`.** Then `S(Q) − 2P₂(Q) ≥ m₁`, and `1 − 2·charge_Q(e) ≥ −3`, so a
+  residual (`S(P)−2P₂(P) ≤ 0`) forces `m₁ ≤ S(Q)−2P₂(Q) ≤ 3/e`, i.e. `e ≤ 3/m₁ ≤ 126`.
+- **`gcd(Q) = g ≥ 2`.** Since `gcd(P)=1`, necessarily `gcd(e,g)=1`; writing `y = g·y'`,
+  `gcd(e, g·y') = gcd(e, y')`, so `charge_Q(e) = (1/g)·Σ gcd(e,y')/y' ≤ 2/g ≤ 1`. Also
+  `S(Q) − 2P₂(Q) = (1/g)(S(Q/g) − 2P₂(Q/g)) ≥ m₁/g`. Residual then forces
+  `m₁/g ≤ (1/e)(2·charge_Q(e) − 1) ≤ (1/e)(4/g − 1) ≤ 4/(g·e)`, i.e. `e ≤ 4/m₁ ≤ 168`.
 
-If `P` is a residual (`S(P) − 2P₂(P) ≤ 0`) then `S(Q) − 2P₂(Q) ≤ 3/e`. But
-`S(Q) − 2P₂(Q) ≥ m` where `m := min over all primitive quadruples of (S − 2P₂) > 0`
-(the **size-4 density positivity** — verified, `m ≈ 1/60` over quads with entries
-≤ 60; true min appears to be `19/1260`). Hence `m ≤ 3/e`, i.e. `e ≤ 3/m ≤ 180`. ∎
+Either way `max(P) = e` is bounded by an explicit constant (`≤ 168`). ∎
 
-So the residual lives in the **finite** box `{gcd=1 primitive quintuple, max ≤ 180}`.
-Exhaustive search (entries ≤ 58) plus the smooth search (all `{2,3,5,7}`-smooth
-quintuples with max ≤ 210 — residuals must be smooth, since `S ≤ 2P₂` needs many
-small pairwise lcms) returns **exactly the three** and nothing else. Finishing the
-box `59 ≤ max ≤ 180` for the non-smooth cases is a bounded computation (and is
-sharply constrained: a residual's quad `Q` must satisfy `S(Q)−2P₂(Q) ≤ 3/e ≤ 3/59`,
-i.e. `Q` is one of the few near-extremal quadruples).
+So the residual lives in a **finite box** `{gcd=1 primitive quintuple, max ≤ 168}`.
+Exhaustive search (entries ≤ 58) and the `{2,3,5,7}`-smooth search (max ≤ 210 — a
+residual's heavy overlap forces small-prime-smoothness) return **exactly the three**.
+Finishing the non-smooth part of the box `59 ≤ max ≤ 168` is a bounded computation,
+sharply constrained (a residual's quad `Q` must have `S(Q)−2P₂(Q) ≤ 3/e ≤ 3/59` — one
+of the few near-extremal quadruples). *(Not yet exhaustively machine-checked here.)*
 
-**The only genuinely-open dependency is the size-4 fact** `S(Q) − 2P₂(Q) > 0` for
-every primitive quadruple (with a proven positive lower bound `m`). This is the exact
-analogue one dimension down; it is verified but, like the quintuple statement, is a
-finiteness/positivity claim rather than a one-line identity. It likely has its own
-"sparse + finite residual" reduction (a good recursive target). Note the pattern:
-`S − 2P₂ > 0` holds for **all** primitive `k`-sets with `k ≤ 4` and **fails** (finitely)
-at `k = 5` — the size where the two-term Bonferroni sparse bound alone stops sufficing.
+**Open dependency = size-4 gcd=1 positivity** `m₁ > 0`: `S(Q) − 2P₂(Q) > 0` for every
+**gcd=1** primitive quadruple, with a proven positive lower bound. This is the exact
+analogue one dimension down and likely has its OWN "sparse + finite residual"
+reduction (verified `m₁ = 1/42`; the minimizer `{56,63,72,84}` is itself a clustered
+gcd=1 quad). The pattern: `S − 2P₂ > 0` holds for all primitive `k`-sets with `k ≤ 4`
+and fails (finitely) at `k = 5` — the size where the two-term Bonferroni bound alone
+stops sufficing, recovered by the `+2T₃` correction.
 
 ## What this does and does not give
 
