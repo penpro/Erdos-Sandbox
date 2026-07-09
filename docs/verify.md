@@ -12,7 +12,7 @@ on trust.*
 
 Total time: about **15–30 minutes**, most of it waiting for downloads.
 
-[← back to the main write-up](./)
+[← back to the main write-up](https://penpro.github.io/Erdos-Sandbox/)
 
 ---
 
@@ -157,5 +157,5 @@ from non-programmers are welcome, and improving these instructions is useful.
 
 ---
 
-[← back to the main write-up](./) &nbsp;·&nbsp;
-[set up your own AI sandbox →](./sandbox-setup)
+[← back to the main write-up](https://penpro.github.io/Erdos-Sandbox/) &nbsp;·&nbsp;
+[set up your own AI sandbox →](https://penpro.github.io/Erdos-Sandbox/sandbox-setup)

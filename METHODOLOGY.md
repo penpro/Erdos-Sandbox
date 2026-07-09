@@ -4,8 +4,9 @@
 AI-assisted mathematical problem-solving. The point of the exercise was to test a
 *process*, not to prove a hard theorem. The math output (below, and in the rest of
 the repo) is deliberately modest and is stated at exactly its true strength. If
-you take one thing from this repo, take the process; the theorem is a small,
-already-known sub-case used as a test target.
+you take one thing from this repo, take the process; the theorems are small
+sub-cases used as a test target (the `|core| ≤ 3` part already known; the
+`|core| = 4` part a modest, not-yet-refereed extension).
 
 ## The process: adversarial collaboration
 
@@ -46,10 +47,12 @@ what they actually establish:
    single opinion — but still opinions.
 3. **Formal proof in Lean 4 / Mathlib** ([`lean/ep488`](lean/ep488)): a
    machine-checked *deductive* proof settles **all** cases at once and is the only
-   thing here that is verification in the strict sense. **This is only partial:**
-   the self-contained arithmetic core (including the one substantive step) is
-   formalized and machine-verified `sorry`-free; the classical counting half is
-   **not yet** formalized. So the Lean does **not** yet certify the full theorem.
+   thing here that is verification in the strict sense. The `|primitive core| ≤ 4`
+   case is now **fully** formalized and machine-verified `sorry`-free — both the
+   arithmetic core and the classical counting half — and is `#print axioms`-clean
+   (only `propext, Classical.choice, Quot.sound`; no `sorryAx`, no `native_decide`;
+   CI re-checks this on every push). This does **not** certify the general problem:
+   `|core| ≥ 5` is open and is not formalized.
 
 ## Why we think the process has some value: it caught its own mistakes
 
@@ -77,14 +80,16 @@ confidently wrong often enough that the redundancy is not optional.
 
 ## Honest limitations
 
-- **The math result is modest and not new.** It is a correct, elementary proof of
-  the `|primitive core| ≤ 3` case of Erdős #488 — a case whose result is already
-  *claimed* by Chojecki (Corollary 4.7 of his thread note) and whose proof method
-  (two-term Bonferroni) is the classical Heilbronn–Rohrbach inequality (1937).
-  **Nothing here solves #488, which remains open.** No new theorem, no new method
-  is claimed — only a correct, self-contained, partially-formalized proof of a
-  stuck sub-case.
-- **The Lean proof is incomplete** (arithmetic core only; see above).
+- **The math result is modest.** The `|primitive core| ≤ 3` case is a correct,
+  elementary re-proof of a result already *claimed* by Chojecki (Corollary 4.7) —
+  we cede priority. The `|primitive core| = 4` case is one Chojecki's paper leaves
+  open (his route to it needs the still-open pair-vs-two-tail conjecture); it is
+  closed here by a *different, classical* method (the two-term Bonferroni /
+  Heilbronn–Rohrbach inequality, 1937), and its novelty is modest and **not yet
+  human/literature-refereed**. **Nothing here solves #488, which remains open.**
+  No new method is claimed.
+- **The Lean certifies `|core| ≤ 4`, not the general problem.** The open frontier
+  (`|core| ≥ 5`) is not proved here or, to our knowledge, anywhere.
 - **AI can be wrong in ways the redundancy misses.** Five agreeing models is not a
   proof; the Lean is the backstop, and it is not finished.
 - **The human referee is not a mathematician** and relied on the models and the

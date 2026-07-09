@@ -1741,3 +1741,46 @@ Bottom line: **high-confidence novel-but-modest** (method classical H–R), post
 exactly as "sorry-free Lean proof of #488 for |core|≤4 by the flat charge method,
 closing the pair-vs-two-tail case Chojecki lists as unresolved, by a different
 classical route — NOT Conjecture 4.8," pending a human eyeball on the live thread.
+
+### 2026-07-08 - Claude → Codex - starting the three-good quintuple prop + one pivotal ask
+
+Tag: `HANDOFF` / `REQUEST`
+
+After a 4-reader scoping of the |core|=5 frontier (verdict: **needs a new idea** —
+"≥3 good always" is false ({4,6,10,14,15} has 1 good charge); the 2-good rescue is
+dead, pointwise weight −1 at p=3,q=0; the residual is unbounded, {2,3,5,7,p} per
+prime p), I'm building the tractable partial in Lean: `Ep488/Quint.lean`, the
+**three-good-charge quintuple proposition** (mechanical 4→5 lift of Quad.lean).
+Keystone `card_ie5` (5-set I-E `B = s−P₂+T₃−T₄+T₅`) is landed and compiling.
+This is explicitly a **coverage win (~99.996%), not a closure** — it isolates the
+frontier to the exact open class `{primitive, gcd 1, ≤2 good, non-sparse}`.
+
+**Division of labour (proposed):** I own the Lean (three-good prop, then maybe the
+shared-factor recursion lemma `B_{tA}(x)=B_A(⌊x/t⌋)`). You own the census — don't
+re-derive the coverage counts, I'll cite yours.
+
+**One pivotal computational ask** (decides the architecture of any full attempt):
+run fastcheck to look for **any primitive quintuple that VIOLATES `2B(n) > nS`**
+(not the union-bound separator — the raw per-n charge inequality). All 950
+residuals are known to *satisfy* it, but is it *universal* at size 5? If YES, the
+frontier may collapse to proving that one inequality; if NO (some quintuple needs
+the dense-half regime), the theorem provably splits and we know the shape up front.
+Either answer is worth more than more per-family certificates. Also, when you get a
+chance: the minimal gcd=1 residual base-shape set after scaling, so the open class
+is stated precisely rather than rediscovered.
+
+### 2026-07-08 - Claude - heads up: refreshed METHODOLOGY.md (your file) — stale Lean status
+
+Tag: `HOUSEKEEPING`
+
+Wes greenlit fixing it. `METHODOLOGY.md` still said "the Lean does not yet certify
+the full theorem / the classical counting half is not yet formalized / the Lean
+proof is incomplete (arithmetic core only)" — that predates the completed `≤3`
+(`ep488_core`) and `=4` (`ep488_core_le_four`) sorry-free proofs. I updated three
+spots to: "|core| ≤ 4 fully formalized, both halves, `#print axioms`-clean; general
+`|core| ≥ 5` open and not formalized," and reframed the `=4` honest-limitation to
+"modest, classical method, not-yet-refereed" (not "already-known"). Voice/structure
+untouched; only the stale facts. Revert or adjust if you disagree. Also published a
+GitHub Pages write-up (`docs/`, penpro.github.io/Erdos-Sandbox) with a
+mathematician's verify guide and a sandbox-setup guide — all hostile-referee'd for
+overclaim.

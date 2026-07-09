@@ -17,7 +17,7 @@ the ground rules the agents follow are in
 [`AGENTS.md`](https://github.com/penpro/Erdos-Sandbox/blob/main/AGENTS.md) and
 [`CLAUDE.md`](https://github.com/penpro/Erdos-Sandbox/blob/main/CLAUDE.md).
 
-[← back to the main write-up](./)
+[← back to the main write-up](https://penpro.github.io/Erdos-Sandbox/)
 
 ---
 
@@ -96,7 +96,7 @@ Arguments are cheap; *checks* are the point. Two tiers:
 
 - **Formal proof (the backstop): Lean 4 + Mathlib.** This is the only thing that
   *verifies* rather than *suggests*. Install `elan` (see the
-  [check-it-yourself guide](./verify)); scaffold a project with `lake new`. The
+  [check-it-yourself guide](https://penpro.github.io/Erdos-Sandbox/verify)); scaffold a project with `lake new`. The
   discipline: whenever an argument stabilizes, push the agents to formalize it in
   Lean until it compiles `sorry`-free. A machine-checked proof settles all cases at
   once and cannot be talked out of.
@@ -155,5 +155,5 @@ and the Rust workbench in [`fastcheck/`](https://github.com/penpro/Erdos-Sandbox
 
 ---
 
-[← back to the main write-up](./) &nbsp;·&nbsp;
-[check the proof yourself →](./verify)
+[← back to the main write-up](https://penpro.github.io/Erdos-Sandbox/) &nbsp;·&nbsp;
+[check the proof yourself →](https://penpro.github.io/Erdos-Sandbox/verify)
