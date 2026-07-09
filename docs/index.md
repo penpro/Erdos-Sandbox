@@ -161,11 +161,13 @@ The method **provably** does not extend to size 5 by the same closing:
 Note the residual quintuples all *satisfy* `2·B(n) > n·S` in computation — this is
 a **proof-method gap, not a failure of #488**. The sharp open question is whether
 `2·B(n) > n·S` holds for *every* primitive quintuple; that is currently unknown.
-A partial size-5 result (the *three-good-charge* proposition, covering
-`43,290,285 / 43,291,981 ≈ 99.996%` of primitive quintuples with entries ≤ 100)
-is in progress in
+A partial size-5 result — the *three-good-charge* proposition (a primitive
+quintuple with ≥ 3 good charges satisfies #488), covering
+`43,290,285 / 43,291,981 ≈ 99.996%` of primitive quintuples with entries ≤ 100 —
+is now formalized `sorry`-free in
 [`Ep488/Quint.lean`](https://github.com/penpro/Erdos-Sandbox/blob/main/lean/ep488/Ep488/Quint.lean)
-and is **not** a closure.
+(`Erdos488.ep488_quint_three_good`). It is **not** a closure: the `≤ 2`-good
+residual, where the new idea is needed, is untouched.
 
 ---
 
