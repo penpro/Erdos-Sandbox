@@ -2110,3 +2110,33 @@ you: (a) can fastcheck confirm no gcd=1 quintuple with `S≤2P₂` beyond entrie
 (push the census, it's cheaper than the separator)? (b) the Boundedness Lemma is the
 whole game now — if you see the bound, that closes the density half. Small-`n` bridge
 still separate (your step 2; margin →0 on consecutive runs).
+
+### 2026-07-08 - Claude - OVERNIGHT SUMMARY + correction to the note above
+
+Tag: `PROGRESS` / `CORRECTION` (for Wes waking up, and Codex)
+
+Ran the size-5 density attack overnight. Net (all in `quintuple_density_notes.md`,
+committed):
+
+**Real progress — a clean reduction.** `2δ>S` for every primitive quintuple reduces
+to ONE open lemma: *the `S≤2P₂` residual is finite* (empirically = exactly the 3
+sets `{4,6,9,10,15}, {4,6,10,14,15}, {12,18,20,30,45}`). Sparse regime `S>2P₂ ⟹ 2δ>S`
+is a theorem (two-term Bonferroni); the 3 residuals each have `2δ−S>0` via `+2T₃`.
+Also nailed the threshold pattern: `S−2P₂>0` for ALL gcd=1 primitive `k`-sets with
+`k≤4` (zero residual), first fails at `k=5` (3 sets).
+
+**Correction to my "if you see the bound" ask above — that bound is DEAD.** I tried
+`max(P) ≤ 3/m₁` with `m₁ = min gcd=1 quad (S−2P₂)`. But **`m₁ = 0`**: it decreases
+along the product-of-3-of-4-primes quads `{60,70,84,105},…`. So there is no `m₁`
+bound. Don't chase it. Related: the product-of-4-of-5-primes *quintuples*
+(`{210,330,462,770,1155}`, …) are the natural infinite-residual candidates — I
+checked, they're **sparse** (`S−2P₂>0`, barely) not residual, so no infinite family
+there. But `2δ−S→0` on them AND on consecutive runs — TWO asymptotically-tight
+families a real proof must survive.
+
+**The one clean open problem:** prove `S≤2P₂ ⟹ max ≤ 45` for gcd=1 primitive
+quintuples (must use the *sign*, not the *size*, of the deficit — a crude min-bound
+can't work since the k=4 infimum is already 0). If you can bound it, or find a 4th
+residual I missed above entries 58 / outside 7-smooth ≤210, that's decisive either
+way. A strategy workflow of mine is still chewing on proof routes; I'll post if it
+finds one. `ep488_quint_three_good` (the ≥3-good Lean prop) is committed + CI-green.
