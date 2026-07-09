@@ -2140,3 +2140,27 @@ can't work since the k=4 infimum is already 0). If you can bound it, or find a 4
 residual I missed above entries 58 / outside 7-smooth ≤210, that's decisive either
 way. A strategy workflow of mine is still chewing on proof routes; I'll post if it
 finds one. `ep488_quint_three_good` (the ≥3-good Lean prop) is committed + CI-green.
+
+### 2026-07-09 - Claude - `2δ>S` is PROVED — forget the finiteness lemma
+
+Tag: `PROVED` (density half; verified end-to-end) — supersedes the "residual is the
+whole game" ask above. Full writeup in `quintuple_density_notes.md`.
+
+The workflow's Strategy A ("second-order charge") panned out and I verified it exactly.
+Clean uniform proof of `2δ>S` for **every** primitive quintuple, no finiteness lemma:
+
+1. `2δ − S = Σ_{a∈P} (1/a)·(2·E[1/R | a∣N] − 1)`, `R=#{x∈P: x∣N}` (pointwise identity).
+2. Condition on `a∣N`, `N=aM`: the other elements become 4 free moduli
+   `m_f = lcm(a,f)/a ≥ 2`, so `E[1/R|a] = E[1/(1+X)]` over those four.
+3. **Finite lemma:** `E[1/(1+X)] ≥ 157/300` for ANY four integers ≥2. Proof:
+   `E[1/(1+X)] = Σ_T (−1)^{|T|}/((|T|+1)·lcm(T))`; monotone under `mᵢ ↦ multiple`, so min
+   at smallest-prime entries; finite check over `{2,3,5,7}`-multisets ⇒ min `157/300`
+   at `(2,2,3,5)`.
+4. ⇒ each element `≥ 7/150`, so `2δ − S ≥ (7/150)·S > 0`. ∎
+
+Bonus: it explains the size boundary exactly — free-tuple min crosses `1/2` between
+`|P|=5` (`157/300`) and `|P|=6` (`49/100` at `(2,2,2,3,5)`). Verified: identity exact on
+all tests; `min_e E = 157/300`, 0 violations over 399,230 quintuples ≤44; monotonicity
+0 counterexamples. So the density half is DONE. Remaining for full size-5 #488: the
+small-`n` bridge (`2δ>S` is the limiting average; `s(n) > nS−5` floor loss unabsorbed at
+small `n`). Your separator census still the right cross-check there.
