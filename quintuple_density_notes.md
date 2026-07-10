@@ -375,6 +375,38 @@ Honest tier: C-B theorem PROVED; census/bank COMPUTED (dual entries ≤ 120); C-
 **OPEN** (do not claim finiteness from the saturation — that is a range-limited signal,
 the exact trap that produced the G3 overclaim).
 
+### C4-canonical theorem + G3′ scope findings (2026-07-10, workflow + verified)
+
+**C4-canonical (PROVED, U2 tier — the one shape family with a full uniform theorem).**
+`P(m,p) = {8p, 72m, 4mp, 6mp, 9mp}`, valid iff `m` odd `≥ 3`, `gcd(p,6)=1`,
+`gcd(m,p)=1`, `p ≥ 5`. Exact collapse (verified):
+`B(n) = ⌊n/8p⌋ + ⌊n/72m⌋ + w̃(⌊n/mp⌋)` with
+`w̃(q) = ⌊q/4⌋+⌊q/6⌋+⌊q/9⌋−⌊q/8⌋−⌊q/12⌋−⌊q/18⌋−⌊q/72⌋ ≥ 5` for `q ≥ 18`
+(one-period check; `w̃(q+72) = w̃(q)+18`). Uniform margin `> 197/36` for every valid
+`(m,p)` except `(3,5), (3,7)` — closed by exact scans (raw minima `487/108` @ `n=239`,
+`71/21` @ `n=223`, both in the FD strip; verified to the digit). With FD, **every
+member closed for all `n ≥ max`**. *(In-workflow overclaim caught by its own verifier:
+the first "exact pin-down" missed the `v₃=2` riders — e.g. `P(5,7) = {56,140,210,315,360}`
+— and was extended before proving.)* Splice into C-B: the canonical members in the C-B
+residual are exactly `P(3,r₅)`, `r₅ ∈ {5,7,11,13,17,19}` (CRIT `12/5, 2, 9/4, 5/2, 3,
+13/4`; `r₅=23` exits at `15/4`) — **including the census saturation point
+`P(3,19) = {152,216,228,342,513}`**. These 6 are now theorem-covered, not just banked.
+CE1-shape (dual `{10,12,18,·,·}`): pinned sub-family proved, full class NOT — do not
+bank "shape retired". CE2 (`{9r} ∪ s·{4,6,9,15}`): reduced to finitely many C3
+one-parameter families (`r ≤ 20`, `s ≤ 19`), per-`r` closures not executed.
+
+**G3′ scope corrections (all verified):** the `min(D) ≤ 24` completeness boundary is
+**refuted** (irreducible dual cores up to `min(D)=210` = dual of `{2,3,5,7,11}`); the
+shape-canonicalizer is non-confluent, so all prior core *counts* are greedy artifacts;
+the core list is **not converged** — extending the smooth probe 1400→6000 produced new
+window-relevant exactly-2-good gcd=1 sets outside the old C1 bank, e.g.
+`{6,21,98,245,343}` and `{6,14,147,245,343}`. **No threat to the C-B frame:** both have
+`CRIT = 266/5, 301/5` (C-B-retired) and *empty* C-windows (`2max > N*`), so FD+bridge
+alone closes them — but they demonstrate again that only C-B's uniform coverage, not
+any enumerated inventory, is trustworthy. Supporting open lemma "(A)" for the anchor
+route: *no divisibility-antichain 4-set has ≥3 self-bad elements* (exhaustively
+verified for entries ≤ 650; universal case open).
+
 ---
 
 ## The drift theorem U2 and the `33·max` bridge (regime B)

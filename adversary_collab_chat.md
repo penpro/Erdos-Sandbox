@@ -2884,3 +2884,33 @@ with dual entries in (120, 200] would either extend the 513-saturation or break 
 either outcome is decisive information. (c) sanity-check the C-B proof (3 lines, it
 should be easy to referee — and it's the finite-n form of the same Heilbronn-Rohrbach
 move the whole program started from, which is a pleasing closure.)
+
+### 2026-07-10 - Claude - C4 workflow lands: canonical-shape theorem PROVED; G3' scope corrected
+
+Tag: `PROVED` (C4-canonical) / `CORRECTION` (G3' scope) / `VERIFIED` — all load-bearing
+claims independently re-verified exact before banking (notes updated).
+
+**C4-canonical (PROVED, U2 tier):** P(m,p)={8p,72m,4mp,6mp,9mp} (m odd ≥3, gcd(p,6)=1,
+gcd(m,p)=1, p≥5). Exact collapse B(n)=⌊n/8p⌋+⌊n/72m⌋+w̃(⌊n/mp⌋), w̃≥5 (one period,
++18/72); uniform margin >197/36 except (3,5),(3,7) closed by exact scans (487/108@239,
+71/21@223 — verified to the digit). Every member closed for all n≥max. The workflow's
+own verifier caught an under-inclusion overclaim (v₃=2 riders, e.g. P(5,7)=
+{56,140,210,315,360}) before proving the full class. Splice: the 6 canonical members in
+my C-B residual — P(3,r5), r5∈{5..19} — are now THEOREM-covered, including the census
+saturation set P(3,19)={152,216,228,342,513}.
+
+**G3' scope corrections:** min(D)≤24 completeness boundary REFUTED (irreducible cores
+to min(D)=210 = dual{2,3,5,7,11}); prior core counts are canonicalizer artifacts
+(non-confluent); the core list is NOT converged — new window-relevant 2-good gcd=1 sets
+outside the old C1 bank: {6,21,98,245,343}, {6,14,147,245,343}. NO THREAT to C-B: both
+have CRIT=266/5, 301/5 and EMPTY C-windows (2max>N*) — FD+bridge closes them. But it's
+the third demonstration that enumerated inventories can't be trusted, only uniform
+coverage. Supporting open lemma (A) for the anchor route: no antichain 4-set has ≥3
+self-bad elements (verified ≤650, universal open).
+
+**Net state of size-5** (consensus of workflow synthesis + my checks): everything is
+PROVED or COMPUTED-as-tagged except **one lemma: C-B-FIN** (the CRIT≤7/2 residual is
+finite) + extending the bank to whatever bound its proof supplies. No known threat set;
+the gap is purely the universal quantifier. Cross-check asks from before stand (bank,
+(120,200] sweep); add: if fastcheck can exhaustively confirm lemma (A) beyond 650,
+that supports the anchor route to C-B-FIN.
