@@ -223,16 +223,18 @@ fn dual(m: i128) {
 /// -- all small numbers. This sweep reports every <=2-good window-relevant dual core with
 /// CRIT <= 7/2 (the "C-B residual"): if that list saturates as M grows, regime C
 /// = C-B theorem + finite bank, and the rider-junk families are ALL retired uniformly.
-fn cb(m: i128) {
+/// Worker: enumerate residual/class over dual-min values `a` with `a % nthreads == tid`.
+/// Returns (class_count, residual_vec).
+fn cb_worker(m: i128, tid: i128, nthreads: i128) -> (u64, Vec<(i128, i128, [i128; 5])>) {
     let mut count: u64 = 0;
-    let mut resid: Vec<(i128, i128, [i128; 5])> = Vec::new(); // (crit_num, d_min, D) with crit = num/d_min <= 7/2
-    let mut min_crit_num: i128 = i128::MAX; // track min of num/d1 as fraction: compare a/b vs c/d by cross-mult
-    let mut min_crit: (i128, i128, [i128; 5]) = (0, 1, [0; 5]);
-
-    for a in 2..=m {
-        // window prune: 7*(a+b+c+d+e) <= 1135*a with a<b<c<d<e  =>  each of b..e < (1135-7)/7*a/4-ish;
-        // use exact caps at each level: 7*(partial + remaining_count*next) <= 1135*a.
-        let cap_e = |partial: i128| (1135 * a - 7 * partial) / 7; // e <= cap_e(a+b+c+d)
+    let mut resid: Vec<(i128, i128, [i128; 5])> = Vec::new();
+    let mut a = 2i128;
+    while a <= m {
+        if (a - 2) % nthreads != tid {
+            a += 1;
+            continue;
+        }
+        let cap_e = |partial: i128| (1135 * a - 7 * partial) / 7;
         for b in (a + 1)..=m.min((1135 * a - 7 * a) / (7 * 4)) {
             if b % a == 0 { continue; }
             let gab = gcd(a, b);
@@ -246,7 +248,6 @@ fn cb(m: i128) {
                         if e % a == 0 || e % b == 0 || e % c == 0 || e % d == 0 { continue; }
                         if gcd(gabcd, e) != 1 { continue; }
                         let dd = [a, b, c, d, e];
-                        // <=2-good on P side == <=2 co-good on D side (g_i < d_i)
                         let mut cogood = 0;
                         for i in 0..5 {
                             let mut s = 0i128;
@@ -254,28 +255,45 @@ fn cb(m: i128) {
                             if s < dd[i] { cogood += 1; }
                         }
                         if cogood > 2 { continue; }
-                        // window: 7*Sum(D) <= 1135*min(D)  (redundant after caps, kept for safety)
                         let sumd: i128 = dd.iter().sum();
                         if 7 * sumd > 1135 * dd[0] { continue; }
                         count += 1;
-                        // CRIT = (SumD - 2*sum_pairs gcd)/d1  vs 7/2
                         let mut sg = 0i128;
                         for i in 0..5 { for j in (i + 1)..5 { sg += gcd(dd[i], dd[j]); } }
                         let num = sumd - 2 * sg;
-                        // num/d1 <= 7/2  <=>  2*num <= 7*d1
                         if 2 * num <= 7 * dd[0] {
                             resid.push((num, dd[0], dd));
-                        }
-                        // track global min crit
-                        if (num as i128) * min_crit.1 < min_crit_num * dd[0] || min_crit_num == i128::MAX {
-                            if min_crit_num == i128::MAX || num * min_crit.1 < min_crit.0 * dd[0] {
-                                min_crit = (num, dd[0], dd);
-                                min_crit_num = num;
-                            }
                         }
                     }
                 }
             }
+        }
+        a += 1;
+    }
+    (count, resid)
+}
+
+fn cb(m: i128) {
+    let nthreads: i128 = std::thread::available_parallelism().map(|n| n.get() as i128).unwrap_or(4).max(1);
+    let (count, mut resid) = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads)
+            .map(|tid| s.spawn(move || cb_worker(m, tid, nthreads)))
+            .collect();
+        let mut count = 0u64;
+        let mut resid: Vec<(i128, i128, [i128; 5])> = Vec::new();
+        for h in handles {
+            let (c, mut r) = h.join().unwrap();
+            count += c;
+            resid.append(&mut r);
+        }
+        (count, resid)
+    });
+    // global min crit
+    let mut min_crit: (i128, i128, [i128; 5]) = (0, 1, [0; 5]);
+    let mut have_min = false;
+    for (num, d1, dd) in resid.iter() {
+        if !have_min || num * min_crit.1 < min_crit.0 * d1 {
+            min_crit = (*num, *d1, *dd); have_min = true;
         }
     }
     println!("=== C-B criterion sweep, dual cores in [2,{}] ===", m);
@@ -298,6 +316,45 @@ fn cb(m: i128) {
     println!("  residual cores with CO-GOOD dual-min (junk danger): {}{}", cogood_min,
              if cogood_min > 0 { format!("  e.g. {:?}", cogood_wit) } else { String::new() });
     println!("  largest primal max(P) in residual: {}", max_primal_max);
+    // BANK: exact tower-form window check 2B(m) > (m+1)S over every residual set (Rust,
+    // replaces the old Python bank). S = N/D, N = sum(prod others), D = prod. cap =
+    // largest m with 7(m+1)S < 1135. Report failures + worst margin (as float of 2B-(m+1)S).
+    let mut fails = 0u64;
+    let mut worst_num: i128 = i128::MAX; // track min of (2B*D - (m+1)N), and its D
+    let mut worst_den: i128 = 1;
+    let mut worst_m: i128 = 0;
+    let mut worst_p = [0i128; 5];
+    for (_num, _d1, dd) in resid.iter() {
+        let mut l = 1i128;
+        for &x in dd.iter() { l = lcm(l, x); }
+        let mut p: Vec<i128> = dd.iter().map(|&x| l / x).collect();
+        p.sort();
+        let prod: i128 = p.iter().product();
+        let nsum: i128 = p.iter().map(|&x| prod / x).sum(); // sum of products-of-others
+        let mx = p[4];
+        // cap: 7(m+1)N < 1135 D  =>  m+1 < 1135 D / (7 N)  => cap = 1135 D /(7 N) - 1
+        let cap = (1135 * prod) / (7 * nsum) - 1;
+        // incremental B over [1,cap]; check tower 2B(m)*D > (m+1)*N for m in [mx,cap]
+        let mut bc: i128 = 0;
+        for m in 1..=cap {
+            if p.iter().any(|&a| m % a == 0) { bc += 1; }
+            if m >= mx {
+                let lhs = 2 * bc * prod;
+                let rhs = (m + 1) * nsum;
+                let marg = lhs - rhs; // >0 means pass; value = (2B-(m+1)S)*D
+                if marg <= 0 { fails += 1; }
+                // compare marg/prod across sets: marg1/D1 < marg2/D2 <=> marg1*D2 < marg2*D1
+                if marg * worst_den < worst_num * prod || worst_num == i128::MAX {
+                    worst_num = marg; worst_den = prod; worst_m = m;
+                    for i in 0..5 { worst_p[i] = p[i]; }
+                }
+            }
+        }
+    }
+    println!("  BANK (tower form 2B(m) > (m+1)S over all {} residual sets):", resid.len());
+    println!("    failures = {}", fails);
+    println!("    worst margin = {}/{} ~ {:.4} at m={} P={:?}", worst_num, worst_den,
+             (worst_num as f64) / (worst_den as f64), worst_m, worst_p);
     // primal form of residual sets, sorted by crit
     resid.sort_by(|x, y| (x.0 * y.1).cmp(&(y.0 * x.1)));
     for (num, d1, dd) in resid.iter().take(400) {

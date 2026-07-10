@@ -349,17 +349,22 @@ flips it good (exits the class to regime A), junking anything else drives CRIT u
 is why C-B retires *every* rider-junk family uniformly (the G3-refutation sets have
 CRIT `= 4, 4.97, 4.5` — all covered), where G3′+C4 needed per-shape Master theorems.
 
-**Census (`census cb`, exact i128, dual cores ≤ M):**
+**Census (`census cb`, exact i128, `std::thread`-parallel, dual cores ≤ M; the whole
+enumerate + tower-form bank runs in one Rust pass):**
 
-| M | class | residual (CRIT ≤ 7/2) | largest primal max in residual | co-good-min cores |
+| M | class | residual (CRIT ≤ 7/2) | largest primal max in residual | bank fails / worst margin |
 |---|---|---|---|---|
-| 40 | 141 | 50 | 513 | 2 |
-| 60 | 549 | 125 | 513 | 5 |
-| 80 | 1220 | 154 | 513 | 5 |
-| 120 | 3244 | 195 | 513 | 5 |
+| 40 | 141 | 50 | 513 | 0 / — |
+| 60 | 549 | 125 | 513 | 0 / — |
+| 120 | 3244 | 195 | 513 | 0 / `22/9` |
+| 180 | — | 261 | 513 | 0 / `22/9` |
+| 240 | — | 276 | 513 | 0 / `22/9` |
 
-The **primal max saturates at 513 from M=40 through M=120** while rider maxes reach
-~2·10⁵ — the residual growth is entirely inside a bounded primal box. The negative-CRIT
+The **primal max saturates at 513 from M=40 through M=240** (a 6× range of dual
+entries) while rider maxes reach ~2·10⁵ — the residual growth is entirely inside a
+bounded primal box, and every residual set passes its tower-form window (worst margin
+`22/9` at `{104,156,216,234,351}`, `m=415`, stable). *(Rust; do NOT read saturation as
+proof — see C-B-FIN below.)* The negative-CRIT
 sublist is *exactly* the classic `S ≤ 2P₂` residual (`{4,6,9,10,15}`, `{12,18,20,30,45}`,
 `{4,6,10,14,15}` — the third visible only at `M ≥ 105`, a live demonstration of the
 range-trap this census is built to avoid).
