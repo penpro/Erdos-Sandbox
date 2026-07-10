@@ -90,8 +90,16 @@ With `2δ > S` proved, size-6 gets the same regime tree as size-5:
 - **Window + `G6`:** the residual `≤(k−2)`-good sets on the bounded window — the size-6
   analog of `G3`, OPEN.
 
-**Open pieces:** (i) `G3` (size-5 min-bound) — inherited via `FD′`, still the gate for
-size 5; (ii) `G6` (size-6 window cover); (iii) Lean for the size-6 identity + W-chains
-(not attempted; same shape as the size-5 files). Size 7: the 2-friend lemma is
-size-free and `a₁` stays 2-free, but with six reduced friends the payer minima drop and
-deficits grow — needs the `E₆` chains, not attempted.
+**Open pieces:** (i) `G3′ + C4` (size-5 inventory/cover — **NOT** a min-bound; the
+"min ≤ 54" form was refuted 2026-07-10, see `quintuple_density_notes.md`) — inherited
+via `FD′`, still the gate for size 5; (ii) `G6` (size-6 window cover, subject to the
+same "rider junk" scale-blindness, so also an inventory statement, not a min-bound);
+(iii) Lean for the size-6 identity + W-chains (not attempted; same shape as the size-5
+files). Size 7: the 2-friend lemma is size-free and `a₁` stays 2-free, but with six
+reduced friends the payer minima drop and deficits grow — needs the `E₆` chains, not
+attempted.
+
+**Note (2026-07-10):** the size-6 *density* result `2δ > S` above is UNAFFECTED by the
+size-5 G3 refutation — it is a standalone, independently-verified inequality (no
+min-bound, no cover). Only the *full* size-6 closure inherits the (now harder) size-5
+gate.

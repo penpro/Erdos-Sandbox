@@ -1,15 +1,19 @@
 # Size-5 density inequality `2δ > S` — PROVED (second-order charge)
 
 Status: density half `2δ > S` **PROVED** (reduction machine-checked in
-`lean/ep488/Ep488/Density.lean`, kernel banked). **Full size-5 `2B_P(n) > nS_P`
-reduced to ONE open lemma G3** (a min-bound) — every other regime proved at
-paper+exhaustive-computation tier, U2 now unconditional, zero counterexamples in
-~12.5M quintuples. See "Full size-5 #488: the regime decomposition" below. (Claude,
-2026-07-08/09; adversarially verified by four independent workflows + independent
-re-verify.) The proof is the second-order-charge argument; it gives
-`2δ − S ≥ (7/150)·S` for every primitive quintuple. Companion to the size-≤4 charge
-development in `lean/ep488` and to Codex's separator census in
-`adversary_collab_chat.md`.
+`lean/ep488/Ep488/Density.lean`, kernel banked; margin `2δ − S ≥ (7/150)·S`). Full
+size-5 `2B_P(n) > nS_P` is **NOT closed** — reduced to `G3′ + C4` (see the regime
+section), both open. **CORRECTION (2026-07-10):** an earlier claim here — "reduced to
+ONE lemma G3: min(P) ≤ 54, zero counterexamples in ~12.5M sets" — was **WRONG**, a
+census-range artifact (the enumeration stopped at entries ≤ 120). **G3 is FALSE:**
+there are window-relevant `≤2`-good gcd=1 quintuples with `min > 54` — confirmed
+`{108,140,210,315,378}` (min 108), `{216,232,348,522,783}` (min 216), and a family
+with `min` bounded only by the window (`≤ 4968`), *unbounded* without it. #488 itself
+**holds on all of them** (margins ≥ 5) — this refutes the proposed closing lemma, not
+the problem. (Claude, 2026-07-08/10; the refutation is adversarially verified +
+independently re-confirmed.) Companion to the size-≤4 charge development in
+`lean/ep488`, the size-6 result in `sextuple_density_notes.md`, and Codex's separator
+census in `adversary_collab_chat.md`.
 
 ## Codex audit addendum (2026-07-09)
 
@@ -265,16 +269,50 @@ margins reproduced exactly; no `min > 54` found). U2 is now **unconditionally pr
   - **C3 (Master e+tQ theorem, uniform, U2-free):** for `P_t = {e} ∪ t·Q₀`, closes all
     `t ≥ t₀` (exact rational threshold); flagship `{45} ∪ t·{4,6,9,10}` has `t₀ = 85/4`.
 
-**The one open lemma — G3 (cover-classification / min-bound).** *Every window-relevant
-(`7·max·S ≤ 1135`) `≤2`-good gcd=1 primitive quintuple lies in the C1/C2/C3 inventory.*
-Sharpest sufficient form: **`min(P) ≤ 54`** — then `S > 1/min` bounds
-`max < (1135/7)·min ≤ 8748`, the class is finite, and one structured enumeration
-closes it. All ~12.5M enumerated sets have `min ≤ 54` (extremal `{54,80,90,120,135}`);
-a search over `min ∈ [55,85]` found none. Proved assets for the attack: `min` is always
-good with `charge(min) ≤ 59/60` (sharp, cofactors `{3,4,5,5}`); two loosely-coupled
-goods are impossible; all entries `≤ (1135/7)·min`. **Until G3 is proved, size-5 is not
-a theorem** — but it is reduced to this single, explicitly-stated, finitely-approachable
-number-theory lemma, with no counterexample anywhere.
+**The open piece — `G3′ + C4` (NOT a min-bound).** *Every window-relevant
+(`7·max·S ≤ 1135`) `≤2`-good gcd=1 primitive quintuple lies in the inventory.* This is
+what size-5 still needs, and it is genuinely open.
+
+**⚠ CORRECTION (2026-07-10) — the min-bound form G3 is FALSE.** An earlier version here
+claimed the sufficient form "`min(P) ≤ 54`, all ~12.5M enumerated sets satisfy it,
+extremal `{54,80,90,120,135}`." That was a **census-range artifact** (the enumeration
+stopped at entries ≤ 120). Confirmed counterexamples (gcd=1, antichain, exactly-2-good,
+window-relevant, `min > 54`; #488 holds on each with margin ≥ 5):
+
+| `P` | `min` | `max·S` |
+|---|---|---|
+| `{108,140,210,315,378}` | 108 | 51/5 |
+| `{116,117,174,261,435}` | 116 | 657/52 |
+| `{216,232,348,522,783} = {216} ∪ 29·{8,12,18,27}` | 216 | 47/4 |
+| `{2376,2392,39468,59202,88803}` | 2376 | 317/4 |
+
+- **`min` is unbounded *without* the window** (e.g. `{60q,12p} ∪ qp·{6,10,15}` = dual of
+  `{4,6,10,5q,p}`, `min = 60q → ∞`). With the window it is bounded, sharpest candidate
+  **`≤ 4968`** — but that is `PROVED-MODULO-UNBOUNDED-REGION` (verified-complete only for
+  dual cores `min(D) ≤ 24`), and even if proved gives `max < (1135/7)·4968 ≈ 8·10⁵`, so
+  the "finite ⟹ one enumeration" pipeline is numerically dead. The claim "two
+  loosely-coupled goods are impossible" is also refuted (goods 216 & 232 in the table
+  have cross-terms `1/27, 1/29`).
+- **Root cause — "rider junk":** on the *dual* side (`P ↦ lcm(P)/P`), a coprime factor
+  `r` multiplies an element (hence `min(P) = lcm(D)/max(D)`) while changing **no charge**
+  and preserving gcd=1. Charge conditions are scale-blind on the dual side, so every
+  charge-based lemma bounds only *shapes*, never integer values — which is exactly why no
+  `min`-bound closes it.
+- **The C1/C2/C3 inventory is provably INCOMPLETE:** C1 excludes these (4th-smallest
+  `> 120`), and the two-junk-parameter shapes `{8r₅, 216r₄} ∪ r₄r₅·{12,18,27}` fit
+  neither C2 (needs 4 fixed elements) nor C3 (needs a fixed base quad).
+
+**Corrected open problem (both open):**
+- **G3′ (inventory, the hard core):** every window-relevant `≤2`-good gcd=1 quintuple is
+  `{scaled core} ∪ {rider w₄·r₄} ∪ {coupler w₅·r₅}` with `(core, w₄, w₅)` in a finite
+  explicit list and `r₄, r₅` free coprime junk. (Done only for dual cores `min(D) ≤ 24`.)
+- **C4 (a new 2-junk-parameter Master theorem):** `2B(n) > nS` uniform in coprime
+  `(r₄, r₅)` per listed shape — believed provable at U2 tier (worst observed window
+  margin `5.0495`, machinery is `n`-aware), the recommended next attack.
+
+*(Codex independently spotted early instances of this — the `{56,72,84,126,189}`,
+`{56,84,108,126,189}` C3-continuation candidates below — which the full refutation
+now subsumes.)*
 
 ---
 
