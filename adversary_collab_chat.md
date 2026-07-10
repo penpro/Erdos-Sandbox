@@ -2485,3 +2485,32 @@ continuation of the <=120 class. Find one => inventory incomplete / G3 constant 
 find none in a big sweep => strong support for min<=54. (3) LANDSCAPE agent's
 enumeration had bugs (claimed 4594 complete, actually 7327; claimed min<=44, actually
 <=54) — its counts are NOT authoritative; trust CLOSER's repaired 7327 + 22,693 bank.
+
+### 2026-07-09 - Claude - external-LLM appraisal (Gemini x2, Grok) — 2 correct tools, none advance us
+
+Tag: `REFERENCE` (Wes fed the open problem cold to Gemini + Grok; logging the useful
+residue so we don't re-derive it, and for anyone reviewing).
+
+- **Grok**: INVALID proof (self-admitted). Funnels to `D(n,m) >= 2m|A| - n*sum floor(m/a)`
+  then writes "it remains to show 2m|A| > n sum floor(m/a) ... is not necessarily true".
+  Verified dead: A={2,3,5,7,11}, n=11, m=100 -> bound = -386 while true D = +1131
+  (small-a chains blow up sum floor(m/a) — the overlap difficulty, untouched). Closes
+  with "computational verification confirms ... so it holds in all cases" = assuming the
+  conclusion. Nothing usable.
+- **Gemini**: honest elementary partials, stops at the real obstruction. Two CORRECT tools
+  we don't currently use, both from the trivial local-growth bound F(m)-F(n) <= m-n:
+  (T6) F(n) > n(m-n)/(2m-n)  =>  D(n,m)>0  [two-point sufficient condition];
+  (C8) m-n <= |A|  =>  D(n,m)>0. Plus the clean density shield Prop9: F(n)>n/2 => done.
+  Its "necessary conditions for a counterexample" (sparse F(n)<=n/2, some lcm<=m,
+  m-n>|A|, delayed de-overlap) is a decent DISPROOF-HUNT checklist if we pivot.
+
+**Verdict (do NOT adopt into the size-5 proof):** T6/C8 are TWO-POINT (in n,m); our whole
+program is ONE-POINT (prove 2B(n)>nS for all n>=max, then B(m)/m<=S). Grafting a two-point
+track alongside the one-point regimes = maintaining two formulations = net fragility, not
+simplification. They don't shrink the 22,693-set bank (a one-point per-set check) nor
+replace the drift bridge (large-n, different variable). T6 covers only m up to
+~(1-delta)/(1-2delta)*n, i.e. ~n for the small-delta dual sets — nothing where we're hard.
+Marginal-only overlap: C8 trivially kills jumps m-n<=5, already covered by FD/window.
+Keeping them logged as (a) a possible boundary shortcut IF we ever Lean the two-point form,
+and (b) the disproof-hunt template. Bottom line for the record: none of the 3 external
+attempts reaches even |core|<=4; our frontier (size-5 modulo G3) is well beyond them.
