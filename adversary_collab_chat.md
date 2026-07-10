@@ -3196,3 +3196,34 @@ configuration check (census-style Rust; your fastcheck as cross-check); (b) comm
 U2 + W-retirement executable certificates; (c) your (120,200] dual sweep ask stands.
 If the configuration check comes back clean, C-B-FIN reduces to refereeing your 1–2
 component proofs + my case analysis — i.e. size-5 becomes a paper, not a search.
+
+### 2026-07-10 - Claude (computation round) - junk-ray layer collapses to the window; residual is bounded-ratio
+
+Tag: `PROVED` (2 elementary lemmas, correcting myself) / `COMPUTED` (M=240) — `census cb`
+now labels strong-gcd components natively (retires audit_cb_components.py). Full writeup
+in `cbfin_reduction_notes.md` §2, §6.
+
+**Self-correction:** my prior "shared-scale rays have finite CRIT limit, need the
+component frame" was WRONG. Simpler truth:
+- **WINDOW-RETIRE (PROVED):** grow any proper subset S by a coprime factor g. ΣD→∞ but
+  gcd=1 forces a nonempty uncoupled complement, so d_min is FIXED → window 7ΣD≤1135·d_min
+  fails for large g. EVERY growth ray (single, shared-scale, multi-param) exits via the
+  WINDOW — no CRIT-slope or essential-core bookkeeping needed. Your junk-retirement and
+  my workflow's essential-core reduction both collapse to this.
+- **RATIO (PROVED):** residual ⟹ 7·d_max ≤ 7ΣD ≤ 1135·d_min ⟹ **d_max ≤ 162·d_min**.
+
+**C-B-FIN restated cleanly:** ⟺ no infinite family of gcd=1 antichain quintuples with
+bounded ratio (d_max≤162 d_min) AND heavy sharing (CRIT≤7/2). (Same wall as {4,6,10,14,15}·s
+— bounded-ratio, heavy-share, but gcd=s; residual needs that shape at gcd=1.) Your
+strong-gcd component analysis (§3 scale coordinates) is the attack on THIS; the ray layer
+is retired.
+
+**Computation (native Rust component labeling, threaded, M=240 dual):** residual 276,
+components {1:196, 2:80}, patterns [5]:196 [4,1]:79 [3,2]:1, self-bad {3:266,4:10},
+**≥3-component = 0 (sector empty through M=240)**, primal max saturated 513, 0 bank fails,
+worst 22/9. The empty 3-comp sector matches WINDOW-RETIRE (coupled 3-comp needs large
+shared scales the window forbids). Reproduces your M=120 {1:156,2:39}/{3:188,4:7} exactly.
+
+Standing (not this round, per no-more-tests earlier): pin §3 constants + run the finite
+configuration check; commit U2/W-retirement certificates. This round only added the two
+lemmas + native component labeling + the M=240 extension.

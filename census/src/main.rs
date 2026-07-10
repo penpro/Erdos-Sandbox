@@ -273,6 +273,43 @@ fn cb_worker(m: i128, tid: i128, nthreads: i128) -> (u64, Vec<(i128, i128, [i128
     (count, resid)
 }
 
+/// strong-gcd graph components of a 5-core: edge i~j iff 4*gcd(d_i,d_j) >= min(d_i,d_j).
+/// Returns (#components, component-size pattern sorted desc).
+fn strong_components(dd: &[i128; 5]) -> (usize, [usize; 5]) {
+    let mut parent = [0usize, 1, 2, 3, 4];
+    fn find(p: &mut [usize; 5], x: usize) -> usize {
+        let mut r = x;
+        while p[r] != r { r = p[r]; }
+        let mut c = x;
+        while p[c] != c { let n = p[c]; p[c] = r; c = n; }
+        r
+    }
+    for i in 0..5 {
+        for j in (i + 1)..5 {
+            if 4 * gcd(dd[i], dd[j]) >= dd[i].min(dd[j]) {
+                let (ri, rj) = (find(&mut parent, i), find(&mut parent, j));
+                if ri != rj { parent[ri] = rj; }
+            }
+        }
+    }
+    let mut sizes = [0usize; 5];
+    for i in 0..5 { let r = find(&mut parent, i); sizes[r] += 1; }
+    let ncomp = sizes.iter().filter(|&&s| s > 0).count();
+    let mut pat = sizes;
+    pat.sort_unstable_by(|a, b| b.cmp(a));
+    (ncomp, pat)
+}
+
+fn nselfbad(dd: &[i128; 5]) -> usize {
+    let mut n = 0;
+    for i in 0..5 {
+        let mut s = 0i128;
+        for j in 0..5 { if j != i { s += gcd(dd[i], dd[j]); } }
+        if s >= dd[i] { n += 1; }
+    }
+    n
+}
+
 fn cb(m: i128) {
     let nthreads: i128 = std::thread::available_parallelism().map(|n| n.get() as i128).unwrap_or(4).max(1);
     let (count, mut resid) = std::thread::scope(|s| {
@@ -299,6 +336,24 @@ fn cb(m: i128) {
     println!("=== C-B criterion sweep, dual cores in [2,{}] ===", m);
     println!("<=2-good window-relevant (via dual): {}", count);
     println!("C-B RESIDUAL (crit <= 7/2): {} dual cores", resid.len());
+    // strong-gcd component + self-bad distributions of the residual (Codex's C-B-3COMP frame).
+    let mut comp_hist: std::collections::BTreeMap<usize, u64> = std::collections::BTreeMap::new();
+    let mut pat_hist: std::collections::BTreeMap<[usize; 5], u64> = std::collections::BTreeMap::new();
+    let mut sb_hist: std::collections::BTreeMap<usize, u64> = std::collections::BTreeMap::new();
+    let mut threecomp_wit: Vec<[i128; 5]> = Vec::new();
+    for (_num, _d1, dd) in resid.iter() {
+        let (nc, pat) = strong_components(dd);
+        *comp_hist.entry(nc).or_insert(0) += 1;
+        *pat_hist.entry(pat).or_insert(0) += 1;
+        *sb_hist.entry(nselfbad(dd)).or_insert(0) += 1;
+        if nc >= 3 && threecomp_wit.len() < 10 { threecomp_wit.push(*dd); }
+    }
+    println!("  strong-gcd components (4gcd>=min): {:?}", comp_hist);
+    println!("  component-size patterns: {:?}", pat_hist);
+    println!("  self-bad counts: {:?}", sb_hist);
+    println!("  >=3-COMPONENT residual cores: {}{}", threecomp_wit.len(),
+             if threecomp_wit.is_empty() { "  (sector empty in range)".to_string() }
+             else { format!("  e.g. {:?}", threecomp_wit) });
     // structural danger scan: residual cores whose dual-min is CO-GOOD (g_1 < d_1).
     // Such a shape could carry coprime junk on d_min with crit -> 1: infinite residual family.
     let mut cogood_min = 0u64;

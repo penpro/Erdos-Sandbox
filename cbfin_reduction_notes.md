@@ -65,17 +65,36 @@ From the C-B-FIN workflow (its only surviving agent), verified line-by-line here
    unique minimum and `N > d_k`, `CRIT` first *decreases* — rays are
    down-then-up; never argue monotonicity from `r = 1`.)
 
-**Scope gap (important, found this pass).** Lemma JR handles rays that scale
-**one** element. It does **not** cover **shared-scale rays**: multiply a common
-factor `g` into *two* components simultaneously (e.g. the block-scale `t₁` and a
-singleton `t₂` both carry `g → ∞`, `g` coprime to the rest). Along such a ray
-every pairwise gcd **inside the pair grows linearly with `g`**, so `N` and
-`d_min` grow proportionally and `CRIT` tends to a **finite limit** — such rays
-are *not* self-retiring by JR. This is precisely the structure that Codex's
-strong-gcd components capture (a shared scale is a strong edge or a coupled
-component pair), and it is why the component framework, not single-element
-essentiality, must be the master frame for C-B-FIN. The "essential core"
-reduction of the workflow is therefore **subsumed, not load-bearing**.
+**CORRECTION to a previous version of this §2 (2026-07-10 computation round).** An
+earlier draft claimed shared-scale rays (a factor `g` on *two* components) have a
+finite CRIT limit and are *not* self-retiring, and inferred the component framework
+was needed to handle them. **That was wrong** — and the right statement is *simpler*:
+
+**Lemma WINDOW-RETIRE (PROVED, elementary).** Let `S ⊊ {1..5}` be any nonempty proper
+subset and `g` coprime to `{d_j : j ∉ S}`, growing. In `D` with `d_i ↦ g·d_i` (`i∈S`):
+`ΣD ≥ g·Σ_{i∈S} d_i → ∞`, while `gcd(D)=1` **forces the complement nonempty**, so
+`d_min = min_{j∉S} d_j` is **fixed** for large `g`. Hence the window condition
+`7·ΣD ≤ 1135·d_min` **fails** for all large `g` — *every* growth ray leaves the
+residual through the window, regardless of CRIT, components, or which subset grows
+(single-element, shared-scale, or multi-parameter alike). ∎
+
+So the junk-ray machinery — Codex's CRIT-slope argument and the workflow's
+"essential core" reduction both — **collapses to the window bound.** There is no ray
+subtlety to track. This also gives, for free:
+
+**Lemma RATIO (PROVED).** Every residual core has `7·d_max ≤ 7·ΣD ≤ 1135·d_min`, i.e.
+**`d_max ≤ 162·d_min`** — a bounded ratio.
+
+**Consequence — C-B-FIN restated cleanly.** A residual family with unbounded `ΣD` has
+unbounded `d_min` (by RATIO), i.e. every element `→ ∞` together (bounded ratio). So:
+
+> **C-B-FIN ⟺ there is no infinite family of gcd=1 antichain quintuples with bounded
+> ratio (`d_max ≤ 162·d_min`) and heavy sharing (`CRIT = (ΣD−2Sg)/d_min ≤ 7/2`).**
+
+This is the same wall the whole program keeps hitting (cf. `{4,6,10,14,15}·s`, which is
+bounded-ratio + heavy-sharing but has `gcd = s` — the residual needs the *same* shape
+with `gcd = 1`). The component framework of §3 is the attack on *this* statement; but
+the ray/essentiality bookkeeping is now retired.
 
 ## 3. Scale coordinates for the 3-component sector (REDUCED — the main expansion)
 
@@ -191,3 +210,28 @@ C-B-3COMP    =  finite configuration check over (block library) × (α, β)
 The open mathematics has been reduced from a universal quantifier over an
 unbounded class to a bounded, explicitly-parametrized enumeration plus a
 completed case analysis. That is the target of the next computation pass.
+
+## 6. Computation round (2026-07-10, `census cb`, native Rust component labeling)
+
+Extended the C-B census to compute the strong-gcd components + self-bad counts of
+every residual core natively (retiring Codex's Python graph helper), threaded, to
+M=240 dual entries:
+
+| M | residual | components `{n:count}` | patterns | self-bad | ≥3-comp | primal max | bank |
+|---|---|---|---|---|---|---|---|
+| 120 | 195 | `{1:156, 2:39}` | `[5]:156 [4,1]:38 [3,2]:1` | `{3:188,4:7}` | **0** | 513 | 0 fail |
+| 240 | 276 | `{1:196, 2:80}` | `[5]:196 [4,1]:79 [3,2]:1` | `{3:266,4:10}` | **0** | 513 | 0 fail |
+
+Findings: (i) the **3-component sector is empty through M=240** — consistent with
+WINDOW-RETIRE (a 3-component coupled core needs large shared scales, which the window
+forbids); (ii) exactly **one `[3,2]` core** in the whole range, all others `[5]` or
+`[4,1]`; (iii) **primal max saturated at 513** across a 6× dual range, `0` bank
+failures, worst tower margin `22/9` stable. *(Range-limited evidence, NOT a proof —
+by the RATIO lemma the untested cores would be large-`d_min` bounded-ratio families,
+which no brute enumeration reaches; §3's configuration check is the decisive route.)*
+
+**Net effect of this round on the endgame:** the junk-ray/essential-core layer is gone
+(WINDOW-RETIRE), the residual is bounded-ratio (RATIO), and C-B-FIN is now the single
+crisp statement in §2 — "no infinite bounded-ratio heavy-sharing gcd=1 family." §3's
+scale-coordinate reduction attacks it; the remaining computation is the finite
+configuration check there (with the caveat constants pinned).
