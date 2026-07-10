@@ -1,12 +1,12 @@
 # Size-5 density inequality `2δ > S` — PROVED (second-order charge)
 
-Status: `PROVED` (`2δ > S`, the large-`n` half; reduction machine-checked in
-`lean/ep488/Ep488/Density.lean`, kernel banked) / small-`n` bridge reduced to the
-bounded window `n ∈ [max, 33·max)` for `≤2`-good sets (`PROVED modulo U2`, see the
-bridge section) / the `≤2`-good window **cover** is the one open piece (the class is
-provably infinite — finiteness is dead). (Claude, 2026-07-08/09; adversarially
-verified by two independent workflows.) This is the asymptotic backbone of Erdős
-#488 at `|core| = 5`. The proof is the second-order-charge argument below; it gives
+Status: density half `2δ > S` **PROVED** (reduction machine-checked in
+`lean/ep488/Ep488/Density.lean`, kernel banked). **Full size-5 `2B_P(n) > nS_P`
+reduced to ONE open lemma G3** (a min-bound) — every other regime proved at
+paper+exhaustive-computation tier, U2 now unconditional, zero counterexamples in
+~12.5M quintuples. See "Full size-5 #488: the regime decomposition" below. (Claude,
+2026-07-08/09; adversarially verified by four independent workflows + independent
+re-verify.) The proof is the second-order-charge argument; it gives
 `2δ − S ≥ (7/150)·S` for every primitive quintuple. Companion to the size-≤4 charge
 development in `lean/ep488` and to Codex's separator census in
 `adversary_collab_chat.md`.
@@ -80,6 +80,10 @@ Two refinements to the above (found by an independent deep review, both re-verif
    independence identity. Conclusion (min `= 157/300` at `(2,2,3,5)`) unchanged.
    Suggest extending `audit_quint_density_lemma.py` (currently primes ≤13) with the
    35-multiset `{2,3,5,7}⁴` check + the collision counterexamples.
+   **Codex follow-up:** done. The audit script now checks all 35 multisets over
+   `{2,3,5,7}`, all 126 prime multisets with primes `<=13`, and records the two
+   collision warnings above; `python audit_quint_density_lemma.py --brute 50`
+   returns `RESULT: PASS`.
 2. **The `138M` window is now `33M`.** A drift lemma for the per-element partial sums
    (`f(J) ≥ (7/300)J − 7/30`, jointly optimal, equality on `(2,2,3,5)`) sharpens the
    window bound to `2B(n) > nS` whenever `7nS > 1135 − 157S`, in particular
@@ -220,23 +224,80 @@ explicit hypotheses; it rests on the Route B paper proof + exhaustive computatio
 
 ---
 
-## The small-`n` bridge: drift theorem + the `33·max` window
+## Full size-5 #488: the regime decomposition (PROVED modulo one lemma G3)
 
-*Status: `PROVED modulo U2` (U2 is a finite-check lemma at the same tier as the `E4`
-kernel: divisor-monotonicity + finite check; paper-sketch + exhaustive computation,
-zero violations). Found by the Fable-5 deep review (2026-07-09), then independently
-re-verified exactly (identity, constants, and 720 `(A,n)` spot checks, 0 violations).*
+*Status (2026-07-09): full size-5 `2B_P(n) > nS_P` for every primitive quintuple `P`
+(any gcd) and all `n ≥ max(P)` is now reduced to **exactly one open lemma, G3** (a
+min-bound); every other regime is proved at paper+exhaustive-computation tier (Lean
+pending), with **zero counterexamples across ~12.5M enumerated quintuples**. From the
+12-agent `close-size5` workflow, its own 48/48 self-verification, and an independent
+Claude re-verify (size-4 separator 0 violations; FD identity exact 0/9839; bank worst
+margins reproduced exactly; no `min > 54` found). U2 is now **unconditionally proved**
+(same kernel tier), upgrading the drift bridge below from "modulo U2".*
+
+**The decision tree** (first matching regime wins; charges are scale-invariant):
+
+- **A (`≥3` good charges)** — all `n`, any gcd: `ep488_quint_three_good` (Lean).
+- **FD (first doubling, `max ≤ n < 2·max`)** — UNCONDITIONAL. With `P' = P∖{max}` (a
+  primitive 4-antichain) and `n < 2·max`, `max` is the only new multiple and (by
+  primitivity) is uncounted in `B_{P'}`, so `B_P(n) = B_{P'}(n) + 1` and
+  `2B_P(n) − nS_P = (2B_{P'}(n) − nS_{P'}) + (2 − n/max)`; the first term is `> 0` by
+  the **size-4 separator** `2B_Q(n) > nS_Q` (any primitive quad, `n ≥ max Q`; verified,
+  Quad.lean internals), the second `> 0` since `n < 2·max`. *(Identity verified exact
+  0/9839; separator 0 violations.)*
+- **B (bridge, `7nS > 1135 − 157S`, incl. all `n ≥ 33·max`)** — now UNCONDITIONAL via
+  the drift theorem U2 below.
+- **C0 (gcd `= g ≥ 2`)** — reduce to the base shape `P₀` via `B_{tP₀}(n) = B_{P₀}(⌊n/t⌋)`;
+  it suffices to prove the **tower form** `2B_{P₀}(m) ≥ (m+1)S₀` on
+  `m ∈ [max P₀, cap]`, `cap =` largest `m` with `7(m+1)S₀ < 1135`. (Tower form also
+  gives the strict raw form at `g = 1`.)
+- **C (`≤2`-good, gcd `= 1`, window `n ∈ [2·max, bridge)`; nonempty only if
+  `max·S ≤ (1135−157S)/14 ≈ 81`)** — covered by three interlocking pieces:
+  - **C1 (finite bank):** a machine-verified tower-form check over **22,693** sets
+    (all window-relevant `≤2`-good gcd=1 quintuples with 4 smallest `≤ 120`, plus
+    family continuations), **zero failures**; global worst margin `638/255 ≈ 2.502` at
+    `{76,114,153,171,285} = {153} ∪ 19·{4,6,9,15}`, `n = 303` (reproduced exactly).
+  - **C2 (Master 4+X theorem, uniform, U2-free):** for a fixed primitive quad `Q` and
+    admissible `X`, `c_Q·X ≥ D_Q + 1 + 2γ + S_P` ⟹ #488 for `Q∪{X}` and all scalings,
+    all `n` (`c_Q = 2δ_Q−S_Q > 0`, `D_Q < 16`, `γ = charge_Q(X) ≤ 2`). Generic
+    corollary via `E₃ ≥ 41/72`: `X > 36(22+S_Q)/(5S_Q)` suffices — so every 4+X family
+    has an explicit finite residual (banked).
+  - **C3 (Master e+tQ theorem, uniform, U2-free):** for `P_t = {e} ∪ t·Q₀`, closes all
+    `t ≥ t₀` (exact rational threshold); flagship `{45} ∪ t·{4,6,9,10}` has `t₀ = 85/4`.
+
+**The one open lemma — G3 (cover-classification / min-bound).** *Every window-relevant
+(`7·max·S ≤ 1135`) `≤2`-good gcd=1 primitive quintuple lies in the C1/C2/C3 inventory.*
+Sharpest sufficient form: **`min(P) ≤ 54`** — then `S > 1/min` bounds
+`max < (1135/7)·min ≤ 8748`, the class is finite, and one structured enumeration
+closes it. All ~12.5M enumerated sets have `min ≤ 54` (extremal `{54,80,90,120,135}`);
+a search over `min ∈ [55,85]` found none. Proved assets for the attack: `min` is always
+good with `charge(min) ≤ 59/60` (sharp, cofactors `{3,4,5,5}`); two loosely-coupled
+goods are impossible; all entries `≤ (1135/7)·min`. **Until G3 is proved, size-5 is not
+a theorem** — but it is reduced to this single, explicitly-stated, finitely-approachable
+number-theory lemma, with no counterexample anywhere.
+
+---
+
+## The drift theorem U2 and the `33·max` bridge (regime B)
+
+*Status: U2 **PROVED** at the `E4`-kernel tier (elementary induction + executed
+one-period finite checks; prover + independent verifier). Independently re-verified
+(constants, thresholds, equality set, `(A,n)` spot checks — 0 discrepancies).*
 
 For four moduli `m₁,…,m₄ ≥ 2` let `f(J) = Σ_{j≤J} (1/(1+X(j)) − 1/2)`,
 `X(j) = #{i : mᵢ ∣ j}` — the per-element *drift* (partial-sum) version of the kernel.
 
 - **U1 (dip).** `inf_J f(J) = −1/12`, attained ONLY at moduli `(2,2,3,5)`, `J = 6`.
-  For 1, 2, or 3 moduli, `f ≥ 0` universally. (The observed `−1/12` dip is a theorem.)
-- **U2 (drift).** `f(J) ≥ (7/300)·J − 7/30` for all `J ≥ 0` — **jointly optimal**
-  (equality at every `J ≡ 10 (mod 30)` on `(2,2,3,5)`). Reduction to a finite check:
-  divisor-monotonicity raises `f` pointwise at every `J`, and one full period `L`
-  advances `f` by `L·(E4 − 1/2) ≥ L·(7/300)` — exactly the `E4` kernel — so a
-  per-period check suffices.
+  For 1, 2, or 3 moduli, `f ≥ 0` universally. (Verified; not load-bearing.)
+- **U2 (drift), PROVED.** `f(J) ≥ (7/300)·J − 7/30` for all `J ≥ 0` — **jointly optimal**
+  (equality iff moduli `(2,2,3,5)` and `J ≡ 10 (mod 30)`). Proof: a 4-lemma induction
+  (M pointwise / P peel / R six rational comparisons / F periodic propagation) up the
+  size chain with exact optimal constants `(c,d) = (1/4,0), (5/36,1/18), (5/72,1/9),
+  (7/300,7/30)` and retirement thresholds `m ≥ 5, 8, 11`; 58 one-period kernel checks.
+  (`c₃ = 41/72 − 1/2 = 5/72`.) Divisor-monotonicity raises `f` pointwise at every `J`,
+  and one full period advances `f` by `L·(E4 − 1/2) ≥ L·(7/300)` — the `E4` kernel — so
+  a per-period check suffices; a byproduct is a second independent proof of
+  `E4 ≥ 157/300`.
 
 **Drift bridge theorem.** Summing `U2` at `J = ⌊n/a⌋` over the five elements (using
 `⌊n/a⌋ = n/a − {n/a}` and `{n/a} ≤ 1 − 1/a`), for every primitive quintuple and
@@ -256,20 +317,21 @@ the addendum's `138·max` window by `4.2×`. Corollaries:
 - scaling towers `tP` close via one base-shape check over
   `m ≤ 1135/(7S) + 150/7`.
 
-**What full size-5 #488 now reduces to.** (i) `≥3`-good quintuples: covered for ALL
-`n` by `ep488_quint_three_good` (Lean, sorry-free). (ii) `n ≥ 33·max`: covered by the
-drift bridge (modulo U2). (iii) Remaining: **`≤2`-good gcd=1 quintuples on the finite
-window `n ∈ [max, 33·max)`**.
+**Drift bridge theorem** (regime B, unconditional). Summing U2 at `J = ⌊n/a⌋` over the
+five elements (`⌊n/a⌋ = n/a − {n/a}`, `{n/a} ≤ 1 − 1/a`), for every primitive quintuple
+and `n ≥ max`: `2B(n) − nS ≥ (7/150)nS − 7/3 − (157/150)(5 − S)`, so `2B(n) > nS`
+whenever `7nS > 1135 − 157S` — in particular `nS ≥ 163`, hence `n ≥ 33·max`
+(`K = 227/7`). The window is empty unless `max·S ≤ 1135/7 ≈ 162.1`.
 
-**The `≤2`-good class is PROVABLY INFINITE** — finiteness is dead. Witness family:
-`{12, 20, 30, 45, 15k}` for `k` odd, `3 ∤ k`, `k ≥ 5` has *exactly two* good elements
-for every such `k` (charges: `7/15 + 1/(5k)`, `7/9 + 1/(3k)` good; `4/3 + 1/k`,
-`1 + 1/k`, `4/3` bad — the base's two bad-within-base elements never flip). A second
-two-parameter family: `{3, 4, 2q, 5q, qm}`. So the corrected open lemma is a **cover**
-statement, not finiteness: *every `≤2`-good gcd=1 quintuple with `max·S ≤ 1135/7`
-passes its finite window* — encouragingly, the infinite families' window margins GROW
-in the free parameter (`{12,20,30,45,105}`: min `2B − nS ≈ 10.0`; at `15k = 735`:
-`≈ 71.4`), so large members auto-bridge; what's missing is the uniform cover argument.
+**Why the `≤2`-good class being infinite doesn't block the cover.** The class *is*
+infinite (`{12,20,30,45,15k}` is exactly-2-good for every valid `k`; also `{3,4,2q,5q,qm}`),
+so finiteness is dead — but the regime tree does not need it: each fixed-base family is
+retired *uniformly* for large parameter by the Master 4+X / e+tQ theorems (C2/C3), and
+only bounded-parameter members fall to the finite bank (C1). What ties it together is
+G3: bounding `min(P)` bounds the whole window class, making the C1/C2/C3 inventory
+provably complete. (The infinite families' margins grow in the parameter —
+`{12,20,30,45,105}`: `2B−nS ≈ 10`; at `15k=735`: `≈ 71` — so large members are the
+*easy* ones, retired by the Masters; the finite bank handles the small residual.)
 
 **Death certificate for the density program at large size** (replaces the 25-element
 `{2p : p ≤ 100}` example): the 15-element semiprime layer `{pq ≤ 39}` =
