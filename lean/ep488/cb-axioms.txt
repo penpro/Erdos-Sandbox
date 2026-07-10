@@ -1,0 +1,4 @@
+'Erdos488.bonf_bool' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.cb_bonferroni5' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.floor_bound5' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.cb_cover5' depends on axioms: [propext, Classical.choice, Quot.sound]

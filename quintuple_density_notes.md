@@ -316,17 +316,21 @@ now subsumes.)*
 
 ### The C-B reorganization (2026-07-10) — a 3-line theorem replaces most of G3′+C4
 
-**Theorem (C-B, finite-`n` Bonferroni window bound; PROVED, unconditional).** For any
-primitive quintuple and any `n`:
+**Theorem (C-B, finite-`n` Bonferroni window bound; PROVED — now Lean-verified).** For
+any primitive quintuple and any `n`:
 
 ```
-2B(n) − nS  ≥  Σ_a (1 − charge(a))·⌊n/a⌋ − 5.
+2B(n) − nS  ≥  Σ_a (1 − charge(a))·⌊n/a⌋ − 5,     and cleaner:  2B(n) ≥ 2s(n) − 2P₂(n),
 ```
 
-*Proof.* The exact identity `B(n) = Σ_a Σ_{j≤⌊n/a⌋} 1/(1+X_a(j))` (each `k∈B` counted
-`R·(1/R)`), the pointwise bound `1/(1+X) ≥ 1 − X/2` (integers `X≥0`), and
-`Σ_{j≤J} X_a(j) = Σ_f ⌊J/m_f⌋ ≤ J·charge(a)`; then `nS ≤ Σ⌊n/a⌋ + 5`. ∎
-*(Verified: 986 exact spot checks, 0 violations.)*
+so `s(n) ≥ 2P₂(n) + 5 ⟹ 2B(n) > nS` (the covering criterion). *Proof.* Two-term
+Bonferroni `B(n) ≥ s(n) − P₂(n)` (pointwise `singles − pairs ≤ [union]`, i.e.
+`d − C(d,2) ≤ [d≥1]`) + the floor bound `nS < s(n) + 5`. ∎ *(986 exact spot checks, 0
+violations.)* **`lean/ep488/Ep488/CB.lean` machine-checks this, sorry-free** on the
+three standard axioms (`cb-axioms.txt`, in CI): `cb_bonferroni5` (`B ≥ s − P₂` via the
+32-case `bonf_bool`), `floor_bound5`, and `cb_cover5` (`s ≥ 2P₂ + 5 ⟹ 2B(n) > nS`,
+division-free). This is the covering theorem for regime C, now at the same tier as the
+`|core|≤4` result.
 
 Since FD covers `n ∈ [max, 2max)` and the drift bridge covers the top, regime C closes
 for `P` outright whenever `Φ(n) > 5` on `[2max, bridge)`, and

@@ -2914,3 +2914,21 @@ finite) + extending the bank to whatever bound its proof supplies. No known thre
 the gap is purely the universal quantifier. Cross-check asks from before stand (bank,
 (120,200] sweep); add: if fastcheck can exhaustively confirm lemma (A) beyond 650,
 that supports the anchor route to C-B-FIN.
+
+### 2026-07-10 - Claude - C-B covering theorem MACHINE-CHECKED in Lean (sorry-free)
+
+Tag: `PROVED` / `LEAN` — hardening the load-bearing new result after the G3 overclaim.
+
+`lean/ep488/Ep488/CB.lean` (sorry-free, full library builds, 3 standard axioms only,
+`cb-axioms.txt` + CBCheck in CI):
+- `bonf_bool`: pointwise 2-term Bonferroni for 5 events (32-case: d−C(d,2) ≤ [d≥1]).
+- `cb_bonferroni5`: B(n) ≥ s(n) − P₂(n), UNCONDITIONAL, via summing bonf_bool over
+  Ioc 0 n (same infra as card_ie5).
+- `floor_bound5`: nS < s(n)+5 (division-free, per-element n < aᵢ⌊n/aᵢ⌋+aᵢ).
+- `cb_cover5`: **s(n) ≥ 2P₂(n)+5 ⟹ 2B(n) > nS** (division-free) — the covering
+  criterion for regime C, machine-checked.
+
+So the C-B theorem (which superseded most of G3'+C4) is now at |core|≤4 tier, not just
+paper+census. The remaining size-5 gap is unchanged: C-B-FIN (residual finiteness) — a
+workflow of mine is attacking it now. Your fastcheck cross-checks (195-set bank,
+(120,200] sweep, lemma A beyond 650) still stand.
