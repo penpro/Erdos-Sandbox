@@ -235,3 +235,39 @@ which no brute enumeration reaches; §3's configuration check is the decisive ro
 crisp statement in §2 — "no infinite bounded-ratio heavy-sharing gcd=1 family." §3's
 scale-coordinate reduction attacks it; the remaining computation is the finite
 configuration check there (with the caveat constants pinned).
+
+### 6a. The decisive tension — and why more brute census is a dead end (2026-07-10)
+
+Reporting the residual's dual entries directly (not just primal max):
+
+| M (dual bound) | max `min(D)` in residual | max `max(D)` | max `lcm(D)/min(D)` (= primal max) |
+|---|---|---|---|
+| 80 | 24 | 75 | 513 |
+| 120 | 30 | 120 | 513 |
+| 180 | 48 | 180 | **513** |
+
+**The residual's dual `min(D)` is NOT saturating** (24, 30, 48, …) — this is the *exact
+range-trap shape that produced the G3 overclaim*, and it means **brute census cannot
+decide C-B-FIN**: a residual core with `min(D) > M` is simply invisible at bound `M`.
+Do **not** conclude finiteness from the residual count leveling off.
+
+**But** `lcm(D)/min(D)` (the primal max) **is saturated at 513.** The two facts reconcile
+under the involution: a residual core with large dual entries is the dual of a *small*
+primal core — e.g. at M=180 the largest-`min` residual `{48,55,80,120,180}` dualizes to
+the primal `{44,66,99,144,165}`, max 165 ≤ 513. Heavy sharing (`CRIT ≤ 7/2`) forces a
+small `lcm(D)`, which caps the primal side while the dual side runs off to infinity.
+
+**So C-B-FIN sharpens to a single, involution-clean bound:**
+
+> **C-B-FIN ⟺ `lcm(D)/min(D) ≤ C` for every residual core** (equivalently, the *primal*
+> entries of a residual quintuple are bounded). Then the residual = duals of the finite
+> set of `≤2`-good gcd=1 window-relevant primal cores with `max ≤ C`, hence finite. The
+> census gives `C = 513` as a candidate, saturated over `M ∈ [80,240]`.
+
+This is the right target: it is a **theorem to prove** (`CRIT ≤ 7/2 ⟹ lcm(D) ≤ C·min(D)`
+— bound `lcm` by the sharing), **not** a number to hunt by widening the census. The
+`lcm`/`min` bound is not visible in `CRIT` directly (`CRIT` has no `lcm` term), so it
+needs the antichain + gcd=1 structure — precisely §3's block/scale analysis, now with a
+concrete goal: bound the block library's `lcm`. Brute census's job here is done; the two
+open moves are both **theory** (the `lcm` bound, or the §3 configuration limits), with
+Rust reserved for the *bounded* configuration check once the reduction is pinned.

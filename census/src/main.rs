@@ -354,6 +354,19 @@ fn cb(m: i128) {
     println!("  >=3-COMPONENT residual cores: {}{}", threecomp_wit.len(),
              if threecomp_wit.is_empty() { "  (sector empty in range)".to_string() }
              else { format!("  e.g. {:?}", threecomp_wit) });
+    // finiteness signal: do the residual's DUAL entries saturate below M?
+    let mut max_dmin = 0i128; let mut max_dmax = 0i128; let mut max_lcm_over_dmin = 0i128;
+    let mut wit_dmin = [0i128; 5];
+    for (_num, _d1, dd) in resid.iter() {
+        if dd[0] > max_dmin { max_dmin = dd[0]; wit_dmin = *dd; }
+        if dd[4] > max_dmax { max_dmax = dd[4]; }
+        let mut l = 1i128; for &x in dd.iter() { l = lcm(l, x); }
+        let r = l / dd[0]; if r > max_lcm_over_dmin { max_lcm_over_dmin = r; }
+    }
+    println!("  residual DUAL entries: max min(D) = {} (at {:?}), max max(D) = {} [M={}]",
+             max_dmin, wit_dmin, max_dmax, m);
+    println!("    -> if max min(D) << M and stable across M, residual dual-min is bounded => finite");
+    println!("  max lcm(D)/min(D) over residual = {} (= largest primal max; the entanglement cap)", max_lcm_over_dmin);
     // structural danger scan: residual cores whose dual-min is CO-GOOD (g_1 < d_1).
     // Such a shape could carry coprime junk on d_min with crit -> 1: infinite residual family.
     let mut cogood_min = 0u64;
