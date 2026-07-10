@@ -213,16 +213,116 @@ fn dual(m: i128) {
     }
 }
 
+/// C-B (finite-n Bonferroni) criterion sweep over dual cores.
+///
+/// THEOREM (C-B window bound, unconditional, 3 lines from the exact 1/R identity +
+/// pointwise 1/(1+X) >= 1-X/2):   2B_P(n) - n*S_P >= sum_a (1-charge(a))*floor(n/a) - 5.
+/// On the window n >= 2*max(P) this closes regime C for P whenever
+///   CRIT(P) := max(P)*(S - 2*P2) > 7/2.
+/// Dual-side identity (exact, verified): CRIT = (Sum(D) - 2*Sum_{i<j} gcd(d_i,d_j)) / min(D)
+/// -- all small numbers. This sweep reports every <=2-good window-relevant dual core with
+/// CRIT <= 7/2 (the "C-B residual"): if that list saturates as M grows, regime C
+/// = C-B theorem + finite bank, and the rider-junk families are ALL retired uniformly.
+fn cb(m: i128) {
+    let mut count: u64 = 0;
+    let mut resid: Vec<(i128, i128, [i128; 5])> = Vec::new(); // (crit_num, d_min, D) with crit = num/d_min <= 7/2
+    let mut min_crit_num: i128 = i128::MAX; // track min of num/d1 as fraction: compare a/b vs c/d by cross-mult
+    let mut min_crit: (i128, i128, [i128; 5]) = (0, 1, [0; 5]);
+
+    for a in 2..=m {
+        // window prune: 7*(a+b+c+d+e) <= 1135*a with a<b<c<d<e  =>  each of b..e < (1135-7)/7*a/4-ish;
+        // use exact caps at each level: 7*(partial + remaining_count*next) <= 1135*a.
+        let cap_e = |partial: i128| (1135 * a - 7 * partial) / 7; // e <= cap_e(a+b+c+d)
+        for b in (a + 1)..=m.min((1135 * a - 7 * a) / (7 * 4)) {
+            if b % a == 0 { continue; }
+            let gab = gcd(a, b);
+            for c in (b + 1)..=m.min((1135 * a - 7 * (a + b)) / (7 * 3)) {
+                if c % a == 0 || c % b == 0 { continue; }
+                let gabc = gcd(gab, c);
+                for d in (c + 1)..=m.min((1135 * a - 7 * (a + b + c)) / (7 * 2)) {
+                    if d % a == 0 || d % b == 0 || d % c == 0 { continue; }
+                    let gabcd = gcd(gabc, d);
+                    for e in (d + 1)..=m.min(cap_e(a + b + c + d)) {
+                        if e % a == 0 || e % b == 0 || e % c == 0 || e % d == 0 { continue; }
+                        if gcd(gabcd, e) != 1 { continue; }
+                        let dd = [a, b, c, d, e];
+                        // <=2-good on P side == <=2 co-good on D side (g_i < d_i)
+                        let mut cogood = 0;
+                        for i in 0..5 {
+                            let mut s = 0i128;
+                            for j in 0..5 { if j != i { s += gcd(dd[i], dd[j]); } }
+                            if s < dd[i] { cogood += 1; }
+                        }
+                        if cogood > 2 { continue; }
+                        // window: 7*Sum(D) <= 1135*min(D)  (redundant after caps, kept for safety)
+                        let sumd: i128 = dd.iter().sum();
+                        if 7 * sumd > 1135 * dd[0] { continue; }
+                        count += 1;
+                        // CRIT = (SumD - 2*sum_pairs gcd)/d1  vs 7/2
+                        let mut sg = 0i128;
+                        for i in 0..5 { for j in (i + 1)..5 { sg += gcd(dd[i], dd[j]); } }
+                        let num = sumd - 2 * sg;
+                        // num/d1 <= 7/2  <=>  2*num <= 7*d1
+                        if 2 * num <= 7 * dd[0] {
+                            resid.push((num, dd[0], dd));
+                        }
+                        // track global min crit
+                        if (num as i128) * min_crit.1 < min_crit_num * dd[0] || min_crit_num == i128::MAX {
+                            if min_crit_num == i128::MAX || num * min_crit.1 < min_crit.0 * dd[0] {
+                                min_crit = (num, dd[0], dd);
+                                min_crit_num = num;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    println!("=== C-B criterion sweep, dual cores in [2,{}] ===", m);
+    println!("<=2-good window-relevant (via dual): {}", count);
+    println!("C-B RESIDUAL (crit <= 7/2): {} dual cores", resid.len());
+    // structural danger scan: residual cores whose dual-min is CO-GOOD (g_1 < d_1).
+    // Such a shape could carry coprime junk on d_min with crit -> 1: infinite residual family.
+    let mut cogood_min = 0u64;
+    let mut cogood_wit = [0i128; 5];
+    let mut max_primal_max: i128 = 0;
+    for (_num, _d1, dd) in resid.iter() {
+        let mut g1 = 0i128;
+        for j in 1..5 { g1 += gcd(dd[0], dd[j]); }
+        if g1 < dd[0] { cogood_min += 1; cogood_wit = *dd; }
+        let mut l = 1i128;
+        for &x in dd.iter() { l = lcm(l, x); }
+        let pmax = l / dd[0];
+        if pmax > max_primal_max { max_primal_max = pmax; }
+    }
+    println!("  residual cores with CO-GOOD dual-min (junk danger): {}{}", cogood_min,
+             if cogood_min > 0 { format!("  e.g. {:?}", cogood_wit) } else { String::new() });
+    println!("  largest primal max(P) in residual: {}", max_primal_max);
+    // primal form of residual sets, sorted by crit
+    resid.sort_by(|x, y| (x.0 * y.1).cmp(&(y.0 * x.1)));
+    for (num, d1, dd) in resid.iter().take(400) {
+        let mut l = 1i128;
+        for &x in dd.iter() { l = lcm(l, x); }
+        let mut p: Vec<i128> = dd.iter().map(|&x| l / x).collect();
+        p.sort();
+        println!("  crit={}/{} ~ {:.3}   D={:?}   P={:?}", num, d1, (*num as f64)/(*d1 as f64), dd, p);
+    }
+    if resid.len() > 400 { println!("  ... ({} more)", resid.len() - 400); }
+    println!("global min crit = {}/{} ~ {:.3} at D={:?}", min_crit.0, min_crit.1,
+             (min_crit.0 as f64)/(min_crit.1 as f64), min_crit.2);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
-        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>");
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>");
         std::process::exit(2);
     }
     let n: i128 = args[2].parse().expect("arg must be an integer");
     match args[1].as_str() {
         "quints" => quints(n, args.iter().any(|s| s == "--all-min")),
         "dual" => dual(n),
+        "cb" => cb(n),
         _ => { eprintln!("unknown subcommand {}", args[1]); std::process::exit(2); }
     }
 }
