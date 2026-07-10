@@ -95,15 +95,30 @@ theorem sum_terms_eq_Q (a b c d e : ℕ) :
     = Q a b c d e := by
   unfold brA brB brC brD brE Q; ring
 
-/-- If `157/300 ≤ x·br` and `x > 0`, then the term `2·br − 1/x ≥ 7/(150 x) > 0`. -/
-theorem term_pos {x : ℕ} (hx : 0 < x) {br : ℚ} (h : (157 : ℚ) / 300 ≤ (x : ℚ) * br) :
-    0 < 2 * br - inv x := by
+/-- Quantitative form: if `157/300 ≤ x·br` and `x > 0`, then
+`2·br − 1/x ≥ (7/150)·(1/x)`. -/
+theorem term_ge {x : ℕ} (hx : 0 < x) {br : ℚ} (h : (157 : ℚ) / 300 ≤ (x : ℚ) * br) :
+    (7 : ℚ) / 150 * inv x ≤ 2 * br - inv x := by
   have hxq : (0 : ℚ) < (x : ℚ) := by exact_mod_cast hx
   have hxne : (x : ℚ) ≠ 0 := ne_of_gt hxq
   have key : (x : ℚ) * (2 * br - inv x) = 2 * ((x : ℚ) * br) - 1 := by
     unfold inv; field_simp
-  have hpos : (0 : ℚ) < (x : ℚ) * (2 * br - inv x) := by rw [key]; linarith
-  exact (mul_pos_iff_of_pos_left hxq).mp hpos
+  have h2 : (7 : ℚ) / 150 ≤ (x : ℚ) * (2 * br - inv x) := by rw [key]; linarith
+  have hinv : (0 : ℚ) ≤ (x : ℚ)⁻¹ := inv_nonneg.mpr (le_of_lt hxq)
+  have hxinv : (x : ℚ) * inv x = 1 := by unfold inv; field_simp
+  calc (7 : ℚ) / 150 * inv x
+      ≤ ((x : ℚ) * (2 * br - inv x)) * inv x := by
+        exact mul_le_mul_of_nonneg_right h2 hinv
+    _ = (2 * br - inv x) * ((x : ℚ) * inv x) := by ring
+    _ = 2 * br - inv x := by rw [hxinv, mul_one]
+
+/-- If `157/300 ≤ x·br` and `x > 0`, then the term `2·br − 1/x > 0`. -/
+theorem term_pos {x : ℕ} (hx : 0 < x) {br : ℚ} (h : (157 : ℚ) / 300 ≤ (x : ℚ) * br) :
+    0 < 2 * br - inv x := by
+  have hxq : (0 : ℚ) < (x : ℚ) := by exact_mod_cast hx
+  have hinv : (0 : ℚ) < (x : ℚ)⁻¹ := inv_pos.mpr hxq
+  have hmargin : (0 : ℚ) < (7 : ℚ) / 150 * inv x := by unfold inv; positivity
+  linarith [term_ge hx h]
 
 /-- **Conditional density inequality.** For five positive integers, if each element's
 `E4` of its reduced friends (`= x · brX`) is `≥ 157/300`, then `Q(P) = 2δ − S > 0`.
@@ -121,6 +136,24 @@ theorem Q_pos_of_E4_bounds (a b c d e : ℕ)
   have tC := term_pos hc hC
   have tD := term_pos hd hD
   have tE := term_pos he hE
+  rw [← sum_terms_eq_Q]
+  linarith
+
+/-- **Quantitative margin.** Under the same hypotheses,
+`Q(P) = 2δ − S ≥ (7/150)·S` where `S = Σ 1/x`. -/
+theorem Q_ge_margin (a b c d e : ℕ)
+    (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hd : 0 < d) (he : 0 < e)
+    (hA : (157 : ℚ) / 300 ≤ (a : ℚ) * brA a b c d e)
+    (hB : (157 : ℚ) / 300 ≤ (b : ℚ) * brB a b c d e)
+    (hC : (157 : ℚ) / 300 ≤ (c : ℚ) * brC a b c d e)
+    (hD : (157 : ℚ) / 300 ≤ (d : ℚ) * brD a b c d e)
+    (hE : (157 : ℚ) / 300 ≤ (e : ℚ) * brE a b c d e) :
+    (7 : ℚ) / 150 * (inv a + inv b + inv c + inv d + inv e) ≤ Q a b c d e := by
+  have tA := term_ge ha hA
+  have tB := term_ge hb hB
+  have tC := term_ge hc hC
+  have tD := term_ge hd hD
+  have tE := term_ge he hE
   rw [← sum_terms_eq_Q]
   linarith
 

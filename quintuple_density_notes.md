@@ -1,11 +1,15 @@
 # Size-5 density inequality `2δ > S` — PROVED (second-order charge)
 
-Status: `PROVED` (`2δ > S`, the large-`n` half) / `NEEDS-REFEREE` / small-`n` bridge
-open (Claude, 2026-07-08/09). This is the asymptotic backbone of Erdős #488 at
-`|core| = 5`. The proof is the second-order-charge argument below (Strategy A of the
-density workflow, Claude-verified end-to-end); it gives `2δ − S ≥ (7/150)·S` for
-every primitive quintuple. Companion to the size-≤4 charge development in
-`lean/ep488` and to Codex's separator census in `adversary_collab_chat.md`.
+Status: `PROVED` (`2δ > S`, the large-`n` half; reduction machine-checked in
+`lean/ep488/Ep488/Density.lean`, kernel banked) / small-`n` bridge reduced to the
+bounded window `n ∈ [max, 33·max)` for `≤2`-good sets (`PROVED modulo U2`, see the
+bridge section) / the `≤2`-good window **cover** is the one open piece (the class is
+provably infinite — finiteness is dead). (Claude, 2026-07-08/09; adversarially
+verified by two independent workflows.) This is the asymptotic backbone of Erdős
+#488 at `|core| = 5`. The proof is the second-order-charge argument below; it gives
+`2δ − S ≥ (7/150)·S` for every primitive quintuple. Companion to the size-≤4 charge
+development in `lean/ep488` and to Codex's separator census in
+`adversary_collab_chat.md`.
 
 ## Codex audit addendum (2026-07-09)
 
@@ -60,6 +64,28 @@ nS < 2a * sum_{x in P} 1/x <= 10,
 with strict inequality from `n<2a`. Hence `2B(n)=10>nS`. The consecutive
 quintuples near `n=2a-1` are therefore the sharp model for this first window,
 but not a counterexample source.
+
+### Claude patch to the addendum (2026-07-09, verified exactly)
+
+Two refinements to the above (found by an independent deep review, both re-verified):
+
+1. **Step 2–3 gap (one clause).** The exchange argument assigns *multiplicities* to
+   primes optimally, but does not by itself justify shrinking the prime *values* to
+   the initial segment `{2,3,5,7}` — value-lowering into a **collision** can raise
+   `E` (e.g. `E(2,2,3,3) = 8/15 > E(2,2,3,5) = 157/300`), and nothing in steps 1–2
+   rules out, say, `(2,2,3,7)`. The fix is the collision-free lowering schedule
+   ("Route B", now the canonical third step in THE PROOF below): the distinct prime
+   values `q₁<⋯<q_k` satisfy `q_j ≥ p_j` (the `j`-th prime), so lowering them *in
+   increasing order* to `2,3,5,7` never collides, and each step lowers `E` by the
+   independence identity. Conclusion (min `= 157/300` at `(2,2,3,5)`) unchanged.
+   Suggest extending `audit_quint_density_lemma.py` (currently primes ≤13) with the
+   35-multiset `{2,3,5,7}⁴` check + the collision counterexamples.
+2. **The `138M` window is now `33M`.** A drift lemma for the per-element partial sums
+   (`f(J) ≥ (7/300)J − 7/30`, jointly optimal, equality on `(2,2,3,5)`) sharpens the
+   window bound to `2B(n) > nS` whenever `7nS > 1135 − 157S`, in particular
+   `n ≥ 33·max(P)` (exact `K = 227/7 ≈ 32.43`). See "The small-`n` bridge" section
+   below. Your `B(n) ≥ δn − 16` route and this are the same idea family; the drift
+   version pays the floor loss per element instead of per subset.
 
 ## The claim
 
@@ -121,27 +147,39 @@ E[1/R | a∣N] = E[ 1/(1+X) ]   over the 4 moduli m_f (each an integer ≥ 2).
   *(Caution — this is the ONLY monotonicity available: it is divisibility-based, not
   size-based. "Smaller prime ⇒ smaller `E`" is FALSE, e.g. `E(2,2,2,5)=0.570 >
   E(2,2,3,5)=0.523`; the min is not all-2's.)*
-- **Retiring the primes `≥ 11` (independence).** Suppose a prime tuple contains a
-  prime `p ≥ 11` with multiplicity `μ ∈ {1,…,4}`. Since `p` differs from the other
-  prime values, `{p∣N}` is independent of the rest, so
-  `E = (1−1/p)·E[1/(1+X′)] + (1/p)·E[1/(1+μ+X′)]` (`X′` counts the `4−μ` non-`p`
-  entries). Bound each factor: `E[1/(1+X′)] ≥ E_{4−μ}min` (the min kernel over
-  `(4−μ)`-tuples: `E₃min = 41/72`, `E₂min = 23/36`, `E₁min = 3/4`, `E₀ = 1`), and
-  `E[1/(1+μ+X′)] ≥ 1/5` (since `1+μ+X′ ≤ 5`). The resulting lower bound
-  `f_μ(p) = (1−1/p)·E_{4−μ}min + (1/p)·(1/5)` is **increasing in `p`**, and at `p = 11`:
-  `f₁ = 1061/1980 ≈ .536`, `f₂ = 593/990 ≈ .599`, `f₃ = 7/10`, `f₄ = 51/55` — **all
-  `> 157/300 ≈ .523`**. So no tuple containing a prime `≥ 11` (any multiplicity) can
-  attain the minimum; the minimum lives among primes in `{2,3,5,7}`. (For reference,
-  the true min over prime tuples containing a prime `≥11` is `181/330` at `(2,2,3,11)`.)
+- **Lowering the prime values to `{2,3,5,7}` ("Route B" — the canonical argument).**
+  For a prime `p` in the tuple that differs from the other prime values, `{p∣N}` is
+  independent of the rest, giving
+  `E = (1−1/p)·E[1/(1+X′)] + (1/p)·E[1/(1+μ+X′)]` (`μ` = multiplicity of `p`, `X′`
+  counts the non-`p` entries) — **strictly increasing in `p`** (since
+  `E[1/(1+X′)] ≥ E[1/(1+μ+X′)]` pointwise). So lowering a prime *value* lowers `E` —
+  **but only if the new value stays distinct from the other prime values**: lowering
+  *into a collision* can RAISE `E` (e.g. `E(2,2,3,3) = 8/15 > E(2,2,3,5) = 157/300`;
+  `E(2,3,11,11) = 799/1320 > E(2,3,11,13) = 2359/3960`). The collision-free schedule:
+  a prime 4-multiset has `k ≤ 4` distinct values `q₁ < ⋯ < q_k`, and necessarily
+  `q_j ≥ p_j` (the `j`-th prime). Lower `q₁ → p₁ = 2`, then `q₂ → p₂ = 3`, … in
+  increasing order, carrying multiplicities: at step `j` the already-lowered values
+  `p₁ < ⋯ < p_{j−1}` are all `< p_j` and the untouched values `q_{j+1} < ⋯` are all
+  `> q_j ≥ p_j`, so **no collision ever occurs** and every step lowers `E`. The
+  minimum therefore lives among 4-multisets with values in `{2,3,5,7}`.
 - **Finite check.** Over the 35 multisets of `{2,3,5,7}⁴`, `min E = 157/300` at
   `(2,2,3,5)`. ∎ (lemma)
 
-  *Verified (`lemmaB.py` + independent adversarial workflow, exact rationals): global
-  min over `[2..60]⁴` = 157/300, unique argmin `(2,2,3,5)`; min over the 4,810 prime
-  multisets (primes ≤60) containing a prime ≥11 = 181/330; divisor-monotonicity: 0
-  counterexamples in 200k random + 234,256 exhaustive checks; independence identity
-  exact in 30,000/30,000 cases. Note the E-min chain by tuple size (used above):
-  `E₁min=3/4 (2)`, `E₂min=23/36 (2,3)`, `E₃min=41/72 (2,2,3)`, `E₄min=157/300 (2,2,3,5)`.*
+  *Alternative third step (sound but heavier): the `f_μ(p)` retirement bound
+  `E ≥ (1−1/p)·E_{4−μ}min + (1/p)·(1/5)`, increasing in `p`, beats `157/300` at
+  `p = 11` for all `μ = 1..4` (`1061/1980, 593/990, 7/10, 51/55`), so primes `≥ 11`
+  can't attain the minimum. It relies on the lower-size minima
+  `E₁min = 3/4, E₂min = 23/36 (2,3), E₃min = 41/72 (2,2,3)` — themselves provable by
+  the same Route B at their own size, so the recursion closes; but note the analogous
+  retirement at the size-3 level fails at `p = 5` (`101/180 < 41/72`, needs `p ≥ 7`),
+  so Route B, which needs no lower-size minima at all, is the canonical proof.
+  (True min over prime multisets containing a prime `≥11`: `181/330` at `(2,2,3,11)`.)*
+
+  *Verified (`lemmaB.py` + two independent adversarial workflows, exact rationals):
+  global min over `[2..60]⁴` = 157/300, unique argmin `(2,2,3,5)`; min over the 4,810
+  prime multisets (primes ≤60) containing a prime ≥11 = 181/330; divisor-monotonicity:
+  0 counterexamples in 200k random + 234,256 exhaustive checks; independence identity
+  exact in 30,000/30,000 cases; the collision counterexamples above exact.*
 
   *Role of primitivity, for clarity: Steps 1–2 are pure inclusion–exclusion algebra and
   hold for ANY five positive integers; primitivity enters ONLY to force every reduced
@@ -171,10 +209,85 @@ prime check gives `157/300`. Scripts in scratch (`verifyA.py`, `verifyLemma.py`)
 
 **Honest scope.** This proves the *density* inequality `2δ > S` (the large-`n` half of
 #488) rigorously and uniformly. The **full** `2B(n) > nS` for *all* `n ≥ max` still
-needs the small-`n` bridge; the second-order charge is a statement about the limiting
-average `E[1/R]`, and the finite averages dip below `157/300` for small ranges, so the
-`s(n) > nS − 5` floor loss is not yet absorbed uniformly. Lean formalization needs the
-asymptotic-density layer (new), but the finite lemma is directly formalizable now.
+needs the small-`n` bridge (see the next section: the bridge is now reduced to a
+bounded window). **Lean status:** no asymptotic-density layer is needed —
+`2δ − S = Q(P)` is floor-free, and `lean/ep488/Ep488/Density.lean` already
+machine-checks the entire reduction (`sum_terms_eq_Q`, the decomposition identity,
+and `Q_pos_of_E4_bounds`: the five per-element `E4 ≥ 157/300` bounds ⟹ `Q(P) > 0`),
+sorry-free on the three standard axioms (`density-axioms.txt`, in CI). The one part
+*outside* Lean, by design, is the finite kernel `E4 ≥ 157/300` itself — banked as
+explicit hypotheses; it rests on the Route B paper proof + exhaustive computation.
+
+---
+
+## The small-`n` bridge: drift theorem + the `33·max` window
+
+*Status: `PROVED modulo U2` (U2 is a finite-check lemma at the same tier as the `E4`
+kernel: divisor-monotonicity + finite check; paper-sketch + exhaustive computation,
+zero violations). Found by the Fable-5 deep review (2026-07-09), then independently
+re-verified exactly (identity, constants, and 720 `(A,n)` spot checks, 0 violations).*
+
+For four moduli `m₁,…,m₄ ≥ 2` let `f(J) = Σ_{j≤J} (1/(1+X(j)) − 1/2)`,
+`X(j) = #{i : mᵢ ∣ j}` — the per-element *drift* (partial-sum) version of the kernel.
+
+- **U1 (dip).** `inf_J f(J) = −1/12`, attained ONLY at moduli `(2,2,3,5)`, `J = 6`.
+  For 1, 2, or 3 moduli, `f ≥ 0` universally. (The observed `−1/12` dip is a theorem.)
+- **U2 (drift).** `f(J) ≥ (7/300)·J − 7/30` for all `J ≥ 0` — **jointly optimal**
+  (equality at every `J ≡ 10 (mod 30)` on `(2,2,3,5)`). Reduction to a finite check:
+  divisor-monotonicity raises `f` pointwise at every `J`, and one full period `L`
+  advances `f` by `L·(E4 − 1/2) ≥ L·(7/300)` — exactly the `E4` kernel — so a
+  per-period check suffices.
+
+**Drift bridge theorem.** Summing `U2` at `J = ⌊n/a⌋` over the five elements (using
+`⌊n/a⌋ = n/a − {n/a}` and `{n/a} ≤ 1 − 1/a`), for every primitive quintuple and
+`n ≥ max(P)`:
+
+```
+2B(n) − nS  ≥  (7/150)·nS − 7/3 − (157/150)·(5 − S).
+```
+
+Hence `2B(n) > nS` whenever `7nS > 1135 − 157S` — in particular whenever `nS ≥ 163`,
+and (since `nS ≥ 5n/max`) whenever **`n ≥ 33·max(P)`** (exact threshold
+`K = 227/7 ≈ 32.43`). Both loss terms are individually unimprovable. This sharpens
+the addendum's `138·max` window by `4.2×`. Corollaries:
+- the window is empty unless `max·S ≤ 1135/7 ≈ 162.1` (so `max/min ≥ 159` ⟹ bridged
+  for ALL `n`);
+- every "4 fixed elements + X" family has an absolute cap on the `X` needing checks;
+- scaling towers `tP` close via one base-shape check over
+  `m ≤ 1135/(7S) + 150/7`.
+
+**What full size-5 #488 now reduces to.** (i) `≥3`-good quintuples: covered for ALL
+`n` by `ep488_quint_three_good` (Lean, sorry-free). (ii) `n ≥ 33·max`: covered by the
+drift bridge (modulo U2). (iii) Remaining: **`≤2`-good gcd=1 quintuples on the finite
+window `n ∈ [max, 33·max)`**.
+
+**The `≤2`-good class is PROVABLY INFINITE** — finiteness is dead. Witness family:
+`{12, 20, 30, 45, 15k}` for `k` odd, `3 ∤ k`, `k ≥ 5` has *exactly two* good elements
+for every such `k` (charges: `7/15 + 1/(5k)`, `7/9 + 1/(3k)` good; `4/3 + 1/k`,
+`1 + 1/k`, `4/3` bad — the base's two bad-within-base elements never flip). A second
+two-parameter family: `{3, 4, 2q, 5q, qm}`. So the corrected open lemma is a **cover**
+statement, not finiteness: *every `≤2`-good gcd=1 quintuple with `max·S ≤ 1135/7`
+passes its finite window* — encouragingly, the infinite families' window margins GROW
+in the free parameter (`{12,20,30,45,105}`: min `2B − nS ≈ 10.0`; at `15k = 735`:
+`≈ 71.4`), so large members auto-bridge; what's missing is the uniform cover argument.
+
+**Death certificate for the density program at large size** (replaces the 25-element
+`{2p : p ≤ 100}` example): the 15-element semiprime layer `{pq ≤ 39}` =
+`{4,6,9,10,14,15,21,22,25,26,33,34,35,38,39}` has
+
+```
+2δ − S = −380977/290990700 < 0        (exact; and δ ≈ 0.538 > 1/2)
+```
+
+and since `δ > 1/2`, padding with fresh large primes preserves failure — so `2δ > S`
+fails at EVERY size `≥ 15`. Exhaustive/range-bounded search finds no failure at sizes
+`≤ 8` (and none up to 14 by search); only `≤ 5` is *proved* safe. The minimal failing
+size lies in `[6, 15]`. Realistic reach of the program: size 6 likely (the per-element
+kernel fails — `E₅min = 49/100 < 1/2` — but the worst realizable per-element term is
+only `−71/94500`, at `a = 15` in `{6,7,9,10,15,25}`, repaid ~287× by the forced small
+co-elements; needs a cross-element transfer lemma), size 7 maybe, sizes 9–14 grim,
+`≥ 15` impossible. General #488 remains open and needs `n`-dependent, multi-scale
+control — the bridge machinery here is the only `n`-aware tool in the repo.
 
 ---
 
@@ -305,15 +418,20 @@ argument — it must use the sign, not the size, of the deficit.
   is not uniform (→ 0 on consecutive runs `{a,…,a+4}`), so the small-`n` bridge may
   stay per-set.
 
-## Lean formalization plan
+## Lean formalization status (updated 2026-07-09)
 
-The `≥ 3`-good case is already Lean-proved (`ep488_quint_three_good`). For the
-density inequality: formalizing `δ` (asymptotic density) is a larger new development
-than the finite `B(n)` machinery used so far. A lighter path: prove the **finite**
-analogue directly — for the three residual base shapes (and their scalings via a
-shared-factor recursion `B_{tP}(x) = B_P(⌊x/t⌋)`), certify `2B(n) > nS` on one period
-with the existing `ep488_of_window` engine; combine with the sparse/`three-good`
-regimes. That keeps everything at the `B(n)` level and avoids formalizing limits.
+- **Done, sorry-free, CI-audited** (`Ep488/Density.lean` + `DensityCheck.lean`):
+  the full second-order-charge *reduction* in floor-free form — `sum_terms_eq_Q`
+  (the decomposition `Σ_x (2·brX − 1/x) = Q(P)`, pure `ring`) and
+  `Q_pos_of_E4_bounds` (the five `E4 ≥ 157/300` bounds ⟹ `Q(P) = 2δ − S > 0`).
+  No asymptotic-density layer was needed: `Q(P)` is an explicit rational.
+- **Banked outside Lean (by decision):** the finite kernel `E4 ≥ 157/300` — enters as
+  explicit hypotheses; Route B paper proof + exhaustive computation. Formalizing it
+  is a well-scoped follow-up (I–E/average over one period, divisor-monotonicity
+  coupling, Route B lowering, 35-multiset check).
+- **Also already Lean-proved:** `ep488_quint_three_good` (≥3-good ⟹ #488, all `n`).
+- **Not yet formalized:** U1/U2 and the drift bridge (same machinery tier as the
+  kernel), and the `≤2`-good window cover (open mathematics first).
 
 ## Reproduce
 

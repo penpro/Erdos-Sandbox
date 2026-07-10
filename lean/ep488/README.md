@@ -21,13 +21,15 @@ Every lemma in the chain is `#print axioms`-clean — it depends only on
 `sorry`**. The audits are committed: [`axioms-check.txt`](axioms-check.txt)
 (Basic), [`counting-axioms.txt`](counting-axioms.txt) (Counting),
 [`reduction-axioms.txt`](reduction-axioms.txt) (Reduction),
-[`certificate-axioms.txt`](certificate-axioms.txt) (Certificate), and
+[`certificate-axioms.txt`](certificate-axioms.txt) (Certificate),
 [`quad-axioms.txt`](quad-axioms.txt) (Quad — incl. `ep488_core_le_four`,
-`ep488_quad_prim`, and the Lemma B chain). The root CI regenerates all of these
-on every push and enforces a **positive allowlist** — it fails if any checked
-theorem depends on *any* axiom outside `{propext, Classical.choice, Quot.sound}`
-(not just a `sorryAx` grep), which also rules out a stray `native_decide`
-(`Lean.ofReduceBool`).
+`ep488_quad_prim`, and the Lemma B chain), [`quint-axioms.txt`](quint-axioms.txt)
+(Quint — the size-5 three-good proposition), and
+[`density-axioms.txt`](density-axioms.txt) (Density — the size-5 `2δ>S`
+reduction). The root CI regenerates all of these on every push and enforces a
+**positive allowlist** — it fails if any checked theorem depends on *any* axiom
+outside `{propext, Classical.choice, Quot.sound}` (not just a `sorryAx` grep),
+which also rules out a stray `native_decide` (`Lean.ofReduceBool`).
 
 Build & check:
 ```
@@ -36,7 +38,7 @@ lake build Ep488           # compiles the whole development clean
 lake env lean Ep488/ReductionCheck.lean   # prints the axiom audit for the top theorems
 ```
 
-## The three files
+## The files
 
 ### `Ep488/Basic.lean` — arithmetic core
 
@@ -133,11 +135,41 @@ Formalizes the two-good-charge argument of `../../quadruple_charge_notes.md`
   only on `propext, Classical.choice, Quot.sound`. This is the certificate engine
   verified by using it: a real, machine-checked #488 instance for a size-4 set.
 
+### `Ep488/Quint.lean` — size 5, the three-good-charge proposition (PARTIAL)
+
+Mechanical 4→5 lift of `Quad.lean`. **`ep488_quint_three_good`**: a primitive
+quintuple with **≥ 3 good charges** satisfies #488 — via `card_ie5` (exact 5-set
+inclusion–exclusion), the 4-partner charge bound, and the `H=2, G=3` pointwise
+weight table (`yh_raw_nonneg5`, a 32-case check). **Coverage, not closure**: it
+covers ~99.996% of primitive quintuples (entries ≤ 100, Codex census) but leaves
+the `≤ 2`-good residual untouched — and that residual class is provably infinite
+(see `../../quintuple_density_notes.md`).
+
+### `Ep488/Density.lean` — size 5, the `2δ > S` reduction (banked kernel)
+
+The density inequality `2δ − S = S − 2P₂ + 2T₃ − 2T₄ + 2T₅ =: Q(P)` is floor-free,
+so no asymptotic-density machinery is formalized. Machine-checked, sorry-free:
+
+- **`sum_terms_eq_Q`**: the second-order-charge decomposition
+  `Σ_x (2·brX − 1/x) = Q(P)` — a pure `ring` identity in the `1/lcm` atoms.
+- **`term_ge`** / **`term_pos`**: `157/300 ≤ x·brX ⟹ 2·brX − 1/x ≥ (7/150)/x > 0`.
+- **`Q_pos_of_E4_bounds`** / **`Q_ge_margin`**: if each element's `E4` of its
+  reduced friends is `≥ 157/300`, then `Q(P) > 0`, indeed `Q(P) ≥ (7/150)·S`.
+
+**Deliberately conditional**: the finite kernel `E4 ≥ 157/300` (true for any four
+integers ≥ 2; min at `(2,2,3,5)`) enters as explicit hypotheses. It is proved on
+paper (Route B: divisor-monotonicity → prime tuples → collision-free lowering →
+35-multiset check) and exhaustively verified computationally, but **not yet
+Lean-formalized** — Lean certifies the *reduction* around it. See
+`../../quintuple_density_notes.md`.
+
 ## Honest scope
 
-This formalizes the `|primitive core| ≤ 4` case. The general Erdős #488
-(**arbitrary** finite `A`, i.e. `|core| ≥ 5`) **remains open** — it is not proved
-here or, to our knowledge, anywhere.
+This formalizes the `|primitive core| ≤ 4` case, plus two **partial** size-5
+results (the three-good proposition, and the `2δ > S` reduction with a banked
+kernel). The general Erdős #488 (**arbitrary** finite `A`, i.e. `|core| ≥ 5`)
+**remains open** — it is not proved here or, to our knowledge, anywhere; even the
+full size-5 case is open (the `≤ 2`-good small-`n` window is unresolved).
 
 - The `≤ 3` result is Chojecki's claimed Cor 4.7 (his Lean bundle gates it behind
   one `sorry`); the method backbone is the classical **Heilbronn–Rohrbach

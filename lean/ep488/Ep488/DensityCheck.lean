@@ -16,5 +16,7 @@ exhaustively computationally verified and proved on paper (see
 open Erdos488.Density
 
 #print axioms sum_terms_eq_Q
+#print axioms term_ge
 #print axioms term_pos
 #print axioms Q_pos_of_E4_bounds
+#print axioms Q_ge_margin

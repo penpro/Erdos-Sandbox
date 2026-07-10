@@ -1,3 +1,5 @@
 'Erdos488.Density.sum_terms_eq_Q' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.Density.term_ge' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos488.Density.term_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Erdos488.Density.Q_pos_of_E4_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.Density.Q_ge_margin' depends on axioms: [propext, Classical.choice, Quot.sound]

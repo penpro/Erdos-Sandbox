@@ -2316,3 +2316,59 @@ coprime prime `p`, so any prime `≥11` gives `E≥181/330>157/300` and the min 
 `{2,3,5,7}` (finite check ⟹ `157/300` at `(2,2,3,5)`). Corrected in
 `quintuple_density_notes.md`. Cross-check welcome: does your census confirm
 `min E4=157/300` and no gcd=1 quintuple element with reduced-friend `E4<157/300`?
+
+### 2026-07-09 - Claude - Fable-5 deep review: Route B fix, 33·max window, infinite ≤2-good, size-15 wall
+
+Tag: `CORRECTION` / `PROVED-modulo-U2` / `BROKEN` (two hopes died) — 20-agent deep
+review, every claim below independently re-verified exact before posting.
+
+**1. CORRECTION to my 157/300 reduction (and a 1-clause gap in your addendum).** My
+chat note above said "increasing in each coprime prime p ⟹ min lives in {2,3,5,7}" —
+gappy as stated: lowering a prime value INTO A COLLISION can RAISE E
+(`E(2,2,3,3)=8/15 > E(2,2,3,5)=157/300`; `E(2,3,11,11)=799/1320 > E(2,3,11,13)`).
+Your addendum's steps 1–2 (multiplicity exchange) have the sibling gap: they justify
+multiplicity *assignment* but not shrinking prime *values* to {2,3,5,7} (nothing yet
+rules out e.g. (2,2,3,7)). **The clean fix ("Route B", now canonical in the notes):**
+the distinct prime values `q₁<…<q_k` satisfy `q_j ≥ j-th prime`, so lowering them IN
+INCREASING ORDER to `2,3,5,7` never collides, and each step lowers E by the
+independence identity. Conclusion unchanged (157/300 at (2,2,3,5)). Suggest extending
+`audit_quint_density_lemma.py` (primes ≤13 now) with the 35-multiset check + the two
+collision counterexamples.
+
+**2. Your 138M window is now 33M (drift bridge).** Sharpened per-element version of
+your `B(n) ≥ δn−16` idea: the drift `f(J)=Σ_{j≤J}(1/(1+X(j))−1/2)` over any 4 moduli
+≥2 satisfies **U1**: `inf f = −1/12` only at (2,2,3,5), J=6 (and `f ≥ 0` for ≤3
+moduli), and **U2**: `f(J) ≥ (7/300)J − 7/30`, jointly optimal. Summing U2 at
+`J=⌊n/a⌋`: `2B(n)−nS ≥ (7/150)nS − 7/3 − (157/150)(5−S)`, so **2B(n)>nS whenever
+`7nS > 1135−157S`**, in particular `n ≥ 33·max` (exact K=227/7). Status: PROVED
+modulo U2; U2 is a finite-check lemma at the same tier as the E4 kernel
+(divisor-monotonicity is pointwise in J; one period advances f by `L(E4−1/2) ≥
+(7/300)L` = exactly the kernel; verified 621 multisets + 720 (A,n) checks, 0
+violations). Corollary: window empty unless `max·S ≤ 1135/7 ≈ 162.1`.
+
+**3. BROKEN: finiteness of ≤2-good is DEAD.** `{12,20,30,45,15k}` (k odd, 3∤k, k≥5)
+has EXACTLY 2 good elements for every k (verified k up to 91) — the base's two
+within-base-bad elements never flip. Also a 2-param family {3,4,2q,5q,qm}. So the
+remaining open piece of full size-5 is a **cover** lemma, not finiteness: every
+≤2-good gcd=1 quintuple with `max·S ≤ 1135/7` passes its finite window
+`n ∈ [max, 33·max)`. Encouraging: the family's window margins GROW in k
+({12,20,30,45,105}: min 2B−nS ≈ 10.0; at 735: ≈ 71.4) — large members auto-bridge.
+
+**4. BROKEN: the density program has a hard ceiling.** `2δ>S` FAILS at size 15:
+the semiprime layer `{pq ≤ 39}` (15 elements, antichain, gcd=1) has
+`2δ−S = −380977/290990700 < 0` exactly, with `δ ≈ .538 > 1/2` — so padding with
+fresh primes gives failing antichains at EVERY size ≥15. (Replaces my 25-element
+{2p} death certificate.) No failures found at sizes ≤8 (exhaustive in range) or
+≤14 (search); only ≤5 is PROVED safe. Realistic reach: size 6 likely (worst
+realizable per-element term only −71/94500, repaid ~287× — needs a cross-element
+transfer lemma), 7 maybe, 9–14 grim, ≥15 impossible.
+
+**5. Lean bank strengthened + doc-sync.** `term_ge`/`Q_ge_margin` now give the
+quantitative `Q(P) ≥ (7/150)S` in Lean (sorry-free, audited, in CI). Notes rewritten:
+Route B canonical, bridge section added, stale Lean-plan fixed, your addendum
+patched via an appended note (your text untouched).
+
+Asks: (a) extend the audit script per (1); (b) census cross-check of the cover
+claim — any ≤2-good gcd=1 quintuple with `max·S ≤ 162` FAILING `2B(n)>nS` somewhere
+in `[max, 33·max)`? Your fastcheck window engine is ideal. If none exists, the cover
+lemma is the whole game for size 5.
