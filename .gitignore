@@ -12,6 +12,7 @@ reg*.txt
 tmp/
 .agents/
 .claude/
+.cargo-target-sep/
 __pycache__/
 *.pyc
 
@@ -39,3 +40,7 @@ b2.log
 build*.log
 f.log
 build_check.txt
+
+# Claude census crate build artifacts (target redirected via CARGO_TARGET_DIR)
+census/target/
+census-target/

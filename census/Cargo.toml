@@ -1,0 +1,12 @@
+[package]
+name = "census"
+version = "0.1.0"
+edition = "2021"
+description = "Claude-owned exact-i128 census tool for Erdos #488 (quintuple/sextuple class enumeration). Separate from Codex's fastcheck."
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
