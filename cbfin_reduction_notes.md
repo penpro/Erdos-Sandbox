@@ -509,3 +509,58 @@ quartic decay).
      like a scaled small core plus `O(1)` junk, and scaled cores are already covered.
   Route 2 is the more promising mathematics: it would make the finiteness constant
   irrelevant entirely.
+
+## 10. The effective gap: the DRIFT-TRANSFER program (route to closing size-5 without T)
+
+Status: `PROGRAM` + one `PROVED` seed lemma (Claude/Fable, 2026-07-17). Goal: the
+uniform residual window theorem — *window + `≤2`-good + `CRIT ≤ 7/2` ⟹ `2B(n) > nS`
+on `[2·max, bridge)`* — which makes `T` (10^102 / claimed 10^22) irrelevant and
+closes size-5 outright.
+
+**Why the bridge fails on the window, quantitatively.** Summing U2
+(`f_a(J) ≥ (7/300)J − 7/30`) gives `2B−nS ≥ (7/150)nS − 7/3 − (157/150)(5−S)`:
+the five per-element defects (`7/30` each) plus fractional losses cost ≈ `7.3`,
+and the uniform slope `7/300` only repays it once `nS ≳ 162`. The window is
+exactly the regime where the *worst-case* slope is too lazy. But `7/300` is tight
+ONLY for moduli `(2,2,3,5)` — every other moduli multiset has a strictly better
+slope (`E₄ − 1/2`): e.g. no-2 moduli give slope `≥ 2257/3600 − 1/2 ≈ 0.127` (5.4×)
+and `≤`one-2 give `≥ 329/600 − 1/2 ≈ 0.048` (2×). **The program: show the residual
+structure forces enough elements into good drift classes that the summed slopes
+repay the defects on the window.** This is the finite-`n` (drift) version of the
+size-6 density transfer (`W₀/W₁/W₂` + 2-friend pairing), one size down.
+
+**Seed lemma DRIFT-1 (PROVED).** Let `f` be a *2-friend* of `a` in a primitive set
+(`m_f = f/gcd(a,f) = 2`). Then:
+1. `f = 2^{v₂(a)+1}·t` with `t` a **proper odd divisor** of `odd(a)`; hence
+   `f ≤ (2/3)a` (the 2-friend lemma, re-derived: `t ≤ odd(a)/3`).
+2. The modulus of `a` as seen from `f` is `2a/f = odd(a)/t` — **odd and `≥ 3`**.
+3. If `f₁, f₂` are two 2-friends of the same `a`, their mutual moduli are
+   `tᵢ/gcd(t₁,t₂)` — **odd and `≥ 3` both ways** (the `t`'s are incomparable
+   divisors of `odd(a)` by the antichain).
+
+*Consequence:* an element in the U2-extremal class (moduli `(2,2,3,5)`-type,
+needing **two** 2-friends) forces two elements `≤ (2/3)a` each of which carries
+**at least two odd moduli `≥ 3`** (one to `a`, one to the other 2-friend) — i.e.
+the extremal element's own repayment crew is pushed into `≤`one-2 or no-2 drift
+classes with 2–5× the slope, at **larger arguments** `⌊n/f⌋ ≥ (3/2)⌊n/a⌋`. This is
+precisely the size-6 pairing mechanism, now at the counting level.
+
+**The three lemmas the program needs:**
+1. **Per-class drift certificates** (computational, U2-style): for each moduli
+   class `K ∈ {(2,2,3,5)-type, ≤one-2, no-2, …}`, constants `(σ_K, δ_K)` with
+   `f(J) ≥ σ_K·J − δ_K` — the finite-`n` analogs of `W₀/W₁/W₂`. (Same one-period
+   + retirement machinery as U2's 58 kernels; to be produced WITH executable
+   certificates, paying the standing reproducibility debt at the same time.)
+2. **Class-assignment lemma** (structural, from DRIFT-1 + heavy sharing): in a
+   residual core, classify each element's moduli multiset; show the assignment
+   always leaves total slope `Σ σ·⌊n/a⌋` large enough on `n ≥ 2max`. The `≤2`-good
+   hypothesis enters here: goods have charge `< 1` hence `Σ1/m_f < 1` — their `E₄
+   ≥ 1 − c/2 > 1/2` with slope `(1−c)/2` tied to the *Bonferroni* mass; CRIT ≤ 7/2
+   bounds how much slope the goods can hide.
+3. **Assembly** (paper): `2B−nS = 2Σf_a(⌊n/a⌋) − Σ{n/a} ≥ Σ_a(2σ_a⌊n/a⌋ − 2δ_a)
+   − (5−S) > 0` on `[2max, bridge)`, cases by class pattern.
+
+Honest risk: lemma 2 is where it can die — a residual core might exist whose class
+pattern still under-repays at `n = 2max` (the bank's worst margin `22/9` sits in
+the low window, so slack is real but not huge). If it dies, the failure pattern
+feeds route (a) (stable-partition classification) instead.
