@@ -1,8 +1,10 @@
 # C-B-FIN: structure notes — duality transport, junk rays, and the 3-component sector
 
-Status: `THEORY PASS` (Claude, 2026-07-10; no new computation — pure
-lemma/reduction work expanding Codex's strong-gcd component reduction of the same
-date, see his chat entry "C-B-FIN collapses to one three-component obstruction").
+Status: `W-FIN PROVED AT PAPER TIER` after Codex hostile review (2026-07-17).
+Claude's Section 7 gap-ladder proof is sound after the two display corrections
+recorded below. Section 8 gives a shorter threshold proof and a much smaller,
+though still unusable, explicit cutoff. Full size 5 remains open because the
+finite residual bank has not been extended to that cutoff.
 Tiers marked per claim. Companion to `quintuple_density_notes.md`
 ("The C-B reorganization") and `lean/ep488/Ep488/CB.lean`.
 
@@ -11,8 +13,8 @@ Throughout: `D = {d_1 < … < d_5}` is a **dual core** (divisibility antichain,
 element `i` **self-bad** iff `G_i ≥ d_i` (⟺ primal `charge(P_i) ≥ 1`),
 `Sg := Σ_{i<j} gcd(d_i,d_j)`, `N := ΣD − 2Sg`, `CRIT = N/d_1`.
 **Residual** := `≤2` co-good (`≥3` self-bad) + window (`7ΣD ≤ 1135·d_1`) +
-`CRIT ≤ 7/2`. `C-B-FIN` = "the residual is finite" = the last open piece of
-size-5 #488.
+`CRIT ≤ 7/2`. `C-B-FIN` = "the residual is finite"; this is now proved softly
+by W-FIN. The remaining size-5 gap is effective coverage of that finite class.
 
 ---
 
@@ -33,7 +35,7 @@ residual hypothesis.
 - `k = 3` (**direct 3-line proof, independent of the ≤3 development**): suppose
   `b, c` both self-bad in `{a,b,c}`, `b < c`. Antichain gcds are proper divisors,
   so each `gcd ≤ min/2`. Adding the two badness inequalities:
-  `gcd(a,b)/a + gcd(a,c)/a + gcd(b,c)(1/b + 1/c) ≥ 2` (after dividing by `b`,`c`
+  `gcd(a,b)/b + gcd(a,c)/c + gcd(b,c)(1/b + 1/c) ≥ 2` (after dividing by `b`,`c`
   resp.). But the left side is `≤ 1/2 + 1/2 + (b/2)(1/b + 1/c) = 1 + (1 + b/c)/2
   < 2` since `b < c`. Contradiction. ∎
 - `k = 4`: transport of the Lean-proved size-4 two-good theorem (Codex's
@@ -82,14 +84,17 @@ So the junk-ray machinery — Codex's CRIT-slope argument and the workflow's
 "essential core" reduction both — **collapses to the window bound.** There is no ray
 subtlety to track. This also gives, for free:
 
-**Lemma RATIO (PROVED).** Every residual core has `7·d_max ≤ 7·ΣD ≤ 1135·d_min`, i.e.
-**`d_max ≤ 162·d_min`** — a bounded ratio.
+**Lemma RATIO (PROVED, derivation repaired 2026-07-17).** The displayed chain gives
+`d_max ≤ (1135/7)·d_min`. Subtracting the other four entries gives the stronger
+**`d_max ≤ (1107/7)·d_min < 162·d_min`**, so the earlier integer bound `162`
+was valid but its displayed rounding justification was incomplete.
 
 **Consequence — C-B-FIN restated cleanly.** A residual family with unbounded `ΣD` has
 unbounded `d_min` (by RATIO), i.e. every element `→ ∞` together (bounded ratio). So:
 
 > **C-B-FIN ⟺ there is no infinite family of gcd=1 antichain quintuples with bounded
-> ratio (`d_max ≤ 162·d_min`) and heavy sharing (`CRIT = (ΣD−2Sg)/d_min ≤ 7/2`).**
+> ratio (`d_max ≤ (1135/7)·d_min`) and heavy sharing
+> (`CRIT = (ΣD−2Sg)/d_min ≤ 7/2`).**
 
 This is the same wall the whole program keeps hitting (cf. `{4,6,10,14,15}·s`, which is
 bounded-ratio + heavy-sharing but has `gcd = s` — the residual needs the *same* shape
@@ -272,13 +277,14 @@ concrete goal: bound the block library's `lcm`. Brute census's job here is done;
 open moves are both **theory** (the `lcm` bound, or the §3 configuration limits), with
 Rust reserved for the *bounded* configuration check once the reduction is pinned.
 
-## 7. CLAIMED PROOF of W-FIN (⟹ C-B-FIN) — the gap-ladder / heavy-component argument
+## 7. W-FIN proof (⟹ C-B-FIN) — the gap-ladder / heavy-component argument
 
-Status: `CLAIMED-THEOREM` / `PROOF-SKETCH-COMPLETE` (Claude/Fable, 2026-07-10).
-**Not banked as PROVED** — needs hostile review (Codex) before any status upgrade;
-the G3 history demands it. Every constant below is explicit; no computation is
-invoked anywhere. Note this proves something *stronger* than C-B-FIN: the CRIT
-condition is never used.
+Status: `PROVED` at paper tier (Claude/Fable, 2026-07-10; hostile review by
+Codex, 2026-07-17). The review checked all six steps and found no fatal gap.
+Two local corrections are incorporated above: the RATIO derivation and the
+displayed denominators in the size-three ceiling. Every constant below is
+explicit; no computation is invoked. See `REFEREE_WFIN.md`. This proves
+something *stronger* than C-B-FIN: the CRIT condition is never used.
 
 **Theorem (W-FIN, claimed).** There is an explicit `T` such that every quintuple
 antichain `D` of integers `≥ 2` with `gcd(D) = 1`, at least **3 self-bad** elements
@@ -361,3 +367,145 @@ needed (charges are scale-invariant, and DT divides it out anyway); (v) whether
 "window" is used anywhere besides RATIO — it is not, so W-FIN really only needs
 *bounded ratio*, an even cleaner statement: **no infinite antichain family with
 `gcd = 1`, entries within a fixed ratio, and ≥ 3 self-bad elements.**
+
+## 8. Codex hostile review and shorter threshold proof (2026-07-17)
+
+Status: `PROVED` at paper tier. Full audit: `REFEREE_WFIN.md`.
+
+The proof above survives hostile review. The empty-gap pigeonhole, spanning-tree
+lcm step, cofactor integrality, and size-four hypothesis scope are all valid.
+The two corrections were the RATIO derivation and the denominators in the
+size-three display; neither affects W-FIN.
+
+The eleven-rung ladder can be replaced by a three-level component argument.
+Put
+
+```
+U := R - 4,   epsilon_0 := 1/5,
+epsilon_{j+1} := epsilon_j^3/U^2,
+```
+
+and let `G_j` join `d_r,d_s` when
+`gcd(d_r,d_s) > epsilon_j d`. Every self-bad vertex is nonisolated in
+`G_0`, so at least three vertices are nonisolated and `G_0` has at most three
+components. Compare the component partitions of `G_0,G_1,G_2`:
+
+1. if `G_0,G_1` have the same components, take `J=0`;
+2. otherwise, if `G_1,G_2` have the same components, take `J=1`;
+3. otherwise two strict merges occurred, so `G_2` is connected; take `J=2`.
+
+In either stable case, every cross-component gcd is at most
+`epsilon_{J+1}d`. The spanning-tree argument gives, for a component of size
+`k >= 2`,
+
+```
+h_C > epsilon_J^(k-1)d/U^(k-2).
+```
+
+For `k=2,3,4`, this is greater than respectively
+`3 epsilon_{J+1}d`, `2 epsilon_{J+1}d`, and
+`epsilon_{J+1}d`. (Use `epsilon_{J+1}=epsilon_J^3/U^2`,
+`epsilon_J <= 1/5`, and `U>1`.) Cofactor transfer therefore applies with the
+exact number `5-k` of possible cross edges. The size-`2,3,4` ceilings then
+contradict at least three self-bad vertices unless the selected graph is
+connected.
+
+For a connected selected graph, the same spanning-tree bound gives
+
+```
+1 = gcd(D) > epsilon_J^4 d/U^3 >= epsilon_2^4 d/U^3.
+```
+
+Thus one may take
+
+```
+T = U^3/epsilon_2^4 = 125^12 U^35.
+```
+
+At `R=1135/7`, `log10(T)=102.129655...`. This replaces the original cutoff
+near `10^(10^7)` by roughly `10^102`. It is a major proof simplification but
+still far beyond exhaustive enumeration. Therefore `C-B-FIN` is proved, while
+full size 5 remains open at the effective coverage step.
+
+## 9. Constant optimization v2 — the forced-merge process (CLAIMED: T ~ 10^22)
+
+Status: `CLAIMED` (Claude/Fable, 2026-07-17; written concurrently with Codex's §8
+review — same skeleton as §7/§8, different merge schedule). §8's three-level
+stabilization gives `T ~ 10^102` (PROVED, reviewed). This section claims a further
+drop to `T ~ 10^16–10^22` by tracking **per-edge qualities at merge time** (edges
+merged early keep their good quality in the propagation product) instead of a
+uniform level threshold. **Needs the same hostile review §7 received** — the
+bookkeeping is more delicate than §8's. If it survives, the effective gap narrows
+but remains: `10^22` is still beyond enumeration, so the honest endgame options at
+the end of this section stand either way.
+
+The ladder's tower came from an over-strong requirement: a single global heavy/light
+threshold classifying all ten pairs at once (11-rung pigeonhole, quartic degradation
+per rung). The merge process below never needs a global dichotomy — merges happen
+only when *forced*, and the ceilings force them.
+
+**Setup.** As in §7: `d := min(D)`, entries `≤ (R−4)d`, `R = 1135/7`, `≥ 3` self-bad
+vertices, `gcd(D) = 1`. Write each edge quality as `g_e ≥ d/Y_e`. For a connected
+component `C` assembled from tree edges `e_1, …, e_{k−1}` (attach order), the §7
+propagation gives the common divisor
+
+```
+h_C ≥ d / Z_C,   Z_C := R^{k−2} · Π_i Y_{e_i}      (k = |C|).
+```
+
+**The process.** Maintain a partition of the 5 vertices into components, initially
+built from the edges `≥ d/5` (every bad vertex has one, since its four gcds sum to
+`≥ d_i ≥ d`; isolated vertices are self-good).
+
+At each step, ask: *does every self-bad vertex `i` transfer* — i.e. is its
+cross-component gcd-sum `< h_{C(i)}`? (Transfer = §7 Step 4: badness descends to the
+cofactor antichain of `C(i)`.)
+
+- **If yes (all transfer):** the ceilings (`k = 2,3,4` admit `≤ 0,1,2` self-bad,
+  §1) cap the total self-bad count by the best partition value: `(4,1) → 2`,
+  `(3,2) → 1`, `(3,1,1) → 1`, `(2,2,1) → 0`, `… → 0` — all `≤ 2 < 3`.
+  **Contradiction; the process cannot in fact reach this branch with 3 bads, i.e.
+  the alternative below is forced.** (Note the elegance: a bad vertex in a
+  2-component can *never* transfer — the `k=2` ceiling is `0` — so 2-components
+  holding bad vertices force merges automatically.)
+- **If no:** some bad `i` has cross-sum `≥ h_{C(i)}`, so a single cross edge has
+  `g ≥ h_{C(i)}/3`, i.e. quality `Y_new = 3·Z_{C(i)}`. **Merge** the two components
+  it joins (all previously-used tree edges keep their qualities). The partition
+  strictly coarsens.
+
+Starting from `≤ 5` parts, at most **4 merges** occur before the partition is the
+single component `{1..5}` — and then `h ≥ d/Z_{full}` divides `gcd(D) = 1`, forcing
+`d ≤ Z_{full} =: T`. (Both terminal branches are contradictions for `d > T`, which
+is the theorem.)
+
+**The constant.** Tree-edge qualities compound as `Y_new = 3·R^{k−2}·ΠY_used`; the
+worst merge chains (e.g. `{3,1,1} → {4,1} → {5}` or `{2,2,1} → {3,2} → {5}`) give
+
+```
+T = Z_full ≈ R³ · Π (4 tree-edge Y's)  ≈  10^16 – 10^22
+```
+
+depending on the chain (e.g. the `{3,1,1}` chain: `Y = 5, 5, 1.2·10⁴, 2.4·10¹⁰`,
+`T ≈ 3·10²²`). Every step is explicit; the tower is gone (depth 4, not 11 rungs of
+quartic decay).
+
+**Honest endgame accounting.** With v2, if the proof survives review:
+- `C-B-FIN` (and the stronger bounded-ratio statement) is **closed** — the class is
+  finite with explicit `T ~ 10²²`.
+- **Full size-5 is still not enumerable**: the bank must certify every residual core
+  with `d ≤ T`, and `10²²` is beyond any census. The census evidence (all residual
+  dual-mins `≤ 48` through `M = 240`) says the true `T` is tiny; the *proof* bound
+  is the bottleneck. Two routes remain, either of which finishes size-5:
+  1. **Shrink `T` to ~10³** — the slack is in the propagation loss `R` per tree edge
+     (real cores have diameter-1 heavy graphs and near-uniform entry sizes; a
+     size-aware propagation `h ≥ g²/d_u` on short paths, or replacing the generic
+     `≥ d/5` seed by the bad vertex's `≥ d_i/4 ≥ d/4` with `d_i`-relative tracking,
+     may cut each `R` factor to `O(1)`), or
+  2. **A uniform residual window theorem**: prove directly that window + `≤2`-good +
+     `CRIT ≤ 7/2` implies `2B(n) > nS` on `[2max, bridge)` — bank data (worst margin
+     `22/9`, healthy across all 276 members) suggests real slack to work with; the
+     `h_C` structure of residual cores (they are "almost `h·(small core)`") could
+     feed the C0/tower reduction: a residual core with component divisor `h` behaves
+     like a scaled small core plus `O(1)` junk, and scaled cores are already covered.
+  Route 2 is the more promising mathematics: it would make the finiteness constant
+  irrelevant entirely.
