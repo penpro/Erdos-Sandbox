@@ -271,3 +271,93 @@ needs the antichain + gcd=1 structure — precisely §3's block/scale analysis, 
 concrete goal: bound the block library's `lcm`. Brute census's job here is done; the two
 open moves are both **theory** (the `lcm` bound, or the §3 configuration limits), with
 Rust reserved for the *bounded* configuration check once the reduction is pinned.
+
+## 7. CLAIMED PROOF of W-FIN (⟹ C-B-FIN) — the gap-ladder / heavy-component argument
+
+Status: `CLAIMED-THEOREM` / `PROOF-SKETCH-COMPLETE` (Claude/Fable, 2026-07-10).
+**Not banked as PROVED** — needs hostile review (Codex) before any status upgrade;
+the G3 history demands it. Every constant below is explicit; no computation is
+invoked anywhere. Note this proves something *stronger* than C-B-FIN: the CRIT
+condition is never used.
+
+**Theorem (W-FIN, claimed).** There is an explicit `T` such that every quintuple
+antichain `D` of integers `≥ 2` with `gcd(D) = 1`, at least **3 self-bad** elements
+(`G_i = Σ_{j≠i} gcd(d_i,d_j) ≥ d_i`), and the **window** `ΣD ≤ R·min(D)`
+(`R := 1135/7`) has `min(D) ≤ T`. Since the window also bounds every entry by
+`(R−4)·min(D)` (RATIO), the class is **finite**; by the involution the primal class
+{`≤2`-good, gcd=1, window-relevant} is finite; in particular **the C-B residual is
+finite — C-B-FIN holds** — and size-5 regime C's cover reduces to a bounded check.
+
+**Proof.** Write `d := d_1 = min(D)`; all entries `≤ (R−4)d ≤ 158.2·d`.
+
+*Step 1 (gap ladder).* Define `ε_0 := 1/5` and `ε_{j+1} := ε_j⁴/(4R³)`. The ten
+values `gcd(d_i,d_j)/d` lie in `(0, R/2]`. The eleven intervals
+`(ε_{j+1}, ε_j]`, `j = 0..10`, are disjoint, so **some interval `(ε_{J+1}, ε_J]`
+contains none of the ten values**. Call a pair **heavy** if `gcd > ε_J·d`
+(equivalently `≥` anything above the empty gap), **light** if `gcd ≤ ε_{J+1}·d`.
+Every pair is one or the other.
+
+*Step 2 (bad ⟹ non-isolated).* If `i` is self-bad, its four gcds sum to `≥ d_i ≥ d`,
+so the largest is `≥ d/4 > d/5 = ε_0·d ≥ ε_J·d` — a heavy edge. So every self-bad
+vertex lies in a connected component of the heavy graph of size `≥ 2`.
+
+*Step 3 (component common divisor).* Let `C` be a heavy component, `|C| = k ≥ 2`,
+and take a spanning tree, adding vertices one at a time. Maintain
+`H := gcd(d_i : i ∈ subtree)`. When attaching a new vertex `v` through tree-edge
+`{u, v}` (`u` in the subtree) with `g := gcd(d_u, d_v) > ε_J·d`: both `H` and `g`
+divide `d_u`, hence `lcm(H,g) ∣ d_u`, hence
+`gcd(H,g) = H·g/lcm(H,g) ≥ H·g/d_u ≥ H·(ε_J·d)/((R−4)d) ≥ H·ε_J/R`;
+and `gcd(H, d_v) ≥ gcd(H, g)` since `g ∣ d_v`. Starting from `H = g_first > ε_J·d`
+and applying `≤ 3` attachments: the full-component divisor satisfies
+`h_C := gcd(d_i : i ∈ C) ≥ ε_J⁴·d / R³ = 4·ε_{J+1}·d.`
+
+*Step 4 (cofactor transfer).* Write `d_i = h_C·c_i` for `i ∈ C`. The `c_i` are
+distinct (`d_i` distinct), `≥ 2` (`c_i = 1` would make `d_i` divide every element
+of `C`, contradicting the antichain), form an antichain (`c_i ∣ c_j ⟺ d_i ∣ d_j`),
+and `gcd(d_i, d_j) = h_C·gcd(c_i, c_j)` **for every pair in `C`** (heavy or not).
+Now let `i ∈ C` be self-bad in `D`. Cross-component pairs are light
+(a heavy edge would merge components), so
+`d_i ≤ G_i ≤ h_C·Σ_{j∈C, j≠i} gcd(c_i, c_j) + 3·ε_{J+1}·d.`
+If `i` were **cofactor-good** (`Σ_{j∈C} gcd(c_i,c_j) ≤ c_i − 1`), this gives
+`h_C ≤ 3·ε_{J+1}·d`, contradicting `h_C ≥ 4·ε_{J+1}·d`. Hence **every self-bad
+vertex of `D` inside `C` is self-bad in the cofactor antichain `{c_i : i ∈ C}`**.
+
+*Step 5 (ceilings).* By the self-bad ceiling table (§1: sizes `2,3,4` admit at most
+`0, 1, 2` self-bad — `k=2` trivial, `k=3` by the 3-line lemma, `k=4` by Duality
+Transport from the Lean-proved size-4 two-good theorem), a component of size `k ≤ 4`
+contains at most `k − 2` self-bad vertices (`0` for `k = 2`).
+
+*Step 6 (assembly).* If some component has `k = 5`, then `gcd(D) = h_C ≥ 4ε_{11}·d
+> 1` as soon as `d > T := 1/(4·ε_{11})` — contradicting `gcd(D) = 1`. Otherwise all
+components have size `≤ 4`, and the total number of self-bad vertices is at most
+`max over partitions of 5`: `(4,1) → 2`, `(3,2) → 1`, `(3,1,1) → 1`, `(2,2,1) → 0`,
+`… → 0` — in every case `≤ 2 < 3`, contradicting `≥ 3` self-bad. Hence `d ≤ T`. ∎
+
+**The constant.** `log(1/ε_{j+1}) = 4·log(1/ε_j) + log(4R³)` gives
+`log₁₀(1/ε_{11}) ≈ 4¹¹·(log₁₀5 + log₁₀(4R³)/3) ≈ 10^{7.1}` — i.e. `T ≈ 10^{10⁷}`:
+**explicitly finite, computationally absurd.** The lemma C-B-FIN is closed by this
+(soft finiteness needs no good `T`), but the *bank* (checking each residual member's
+window) is only feasible if `T` shrinks to enumeration range. Known slack to mine:
+the ladder's 11 rungs come from a worst-case pigeonhole over all ten gcds — a
+per-component ladder needs depth ≤ 2–3; the propagation loses `(ε/R)` per edge but
+heavy components have diameter ≤ 3 and most patterns ≤ 1; and Step 6's `k = 5` case
+could instead use `h_C ≥ 2` directly (`gcd > 1` needs only `4ε_{11}d > 1`... that IS
+the bound). Realistic optimized target: `T ~ R^{O(10)}`, then a Rust enumeration to
+`T` (dual side, RATIO-pruned) finishes size-5 outright.
+
+**Sanity check against a real core** (`{4,6,9,10,15}`, `d = 4`): all ten gcd-ratios
+are `≥ 1/4 > ε_0`, so `J = 0` with an empty gap below, the heavy graph is complete,
+`k = 5`, and the argument demands `gcd(D) = h > 1` only when `d > T` — here `d = 4 ≤ T`,
+no contradiction. Consistent: the theorem bites only at large `d`, exactly as it must
+(residual cores exist at small `d`).
+
+**Where a referee should attack:** (i) the empty-gap pigeonhole (11 rungs vs 10
+values — off-by-one?); (ii) Step 3's `lcm(H,g) ∣ d_u` (both divide `d_u`; `H` divides
+it because `u` is *in* the subtree — check the induction order); (iii) Step 4's
+strictness bookkeeping (`cofactor-good` means `≤ c_i − 1`, integers make the gap
+`≥ 1`, scaled by `h_C`); (iv) the `k=4` ceiling's dependency: Quad.lean's two-good
+chain holds for any sorted positive antichain — confirm no `gcd=1` hypothesis is
+needed (charges are scale-invariant, and DT divides it out anyway); (v) whether
+"window" is used anywhere besides RATIO — it is not, so W-FIN really only needs
+*bounded ratio*, an even cleaner statement: **no infinite antichain family with
+`gcd = 1`, entries within a fixed ratio, and ≥ 3 self-bad elements.**

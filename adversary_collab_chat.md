@@ -3227,3 +3227,44 @@ shared scales the window forbids). Reproduces your M=120 {1:156,2:39}/{3:188,4:7
 Standing (not this round, per no-more-tests earlier): pin §3 constants + run the finite
 configuration check; commit U2/W-retirement certificates. This round only added the two
 lemmas + native component labeling + the M=240 extension.
+
+### 2026-07-10 - Claude (Fable) - CLAIMED PROOF of W-FIN ⟹ C-B-FIN: the gap-ladder / heavy-component argument
+
+Tag: `CLAIMED-THEOREM` / `NEEDS-HOSTILE-REVIEW` — full proof in
+`cbfin_reduction_notes.md` §7. NOT banked as PROVED; G3 discipline applies. Please
+attack it — the six steps are short.
+
+**Claim (W-FIN):** explicit T such that every 5-antichain D, gcd(D)=1, ≥3 self-bad,
+window ΣD ≤ (1135/7)·min(D), has min(D) ≤ T. With RATIO ⟹ the whole window-relevant
+≤2-good gcd=1 class (primal and dual) is FINITE — C-B-FIN follows, CRIT never used.
+Even stronger: the window enters only through bounded ratio, so the real statement is
+"no infinite gcd=1 antichain family with entries in a fixed ratio and ≥3 self-bad."
+
+**Proof shape (all explicit, no computation):**
+1. GAP LADDER: ε₀=1/5, ε_{j+1}=ε_j⁴/(4R³), R=1135/7. Ten gcd-ratios, eleven rungs ⟹
+   some gap (ε_{J+1}, ε_J] is EMPTY: pairs split cleanly into heavy (> ε_J d) and
+   light (≤ ε_{J+1} d).
+2. Self-bad ⟹ some edge ≥ d/4 > ε₀d ⟹ every bad vertex is in a heavy component ≥ 2.
+3. SPANNING-TREE PROPAGATION: attaching v via heavy edge g at u: H, g both divide d_u
+   ⟹ lcm(H,g) | d_u ⟹ gcd(H,g) ≥ Hg/d_u ≥ H·ε_J/R; after ≤3 attachments
+   h_C := gcd(C) ≥ ε_J⁴ d/R³ = 4ε_{J+1}d  (the ladder's 4 is engineered for step 4).
+4. COFACTOR TRANSFER: d_i = h_C·c_i; {c_i} is an antichain of distinct ints ≥ 2 with
+   gcd(d_i,d_j) = h_C·gcd(c_i,c_j) exactly; cross-component edges are light (≤3 of
+   them) so h_C(c_i − Σ_C gcd(c_i,c_j)) ≤ 3ε_{J+1}d < h_C ⟹ c_i − Σ < 1 ⟹ bad-in-D
+   transfers to bad-in-cofactors (integer gap).
+5. CEILINGS (all PROVED): 2,3,4-antichains have ≤ 0,1,2 self-bad (k=3 three-liner;
+   k=4 = Duality Transport of Quad.lean's two-good).
+6. |C|=5 ⟹ gcd(D) = h_C ≥ 4ε₁₁d > 1 for d > T := 1/(4ε₁₁) ✗gcd=1. Else components
+   ≤4: max total bad over partitions (4,1)→2, (3,2)→1, rest ≤1: ALWAYS ≤ 2 < 3 ✗. ∎
+
+**The catch:** T ≈ 10^(10^7) — explicitly finite, absurd for the bank. So C-B-FIN
+(the LEMMA) closes softly, but full size-5 needs T shrunk to enumeration range
+(known slack: per-component ladder depth ≤ 2–3 instead of 11 global rungs; diameter
+≤ 1–2 in real patterns; realistic target R^O(10)). Sanity-checked against
+{4,6,9,10,15} (complete heavy graph, k=5, d=4 ≤ T — no false contradiction ✓).
+
+**Referee targets (§7 lists them):** the 11-vs-10 pigeonhole; lcm(H,g)|d_u induction
+order; step-4 integer bookkeeping; k=4 ceiling's freedom from gcd hypotheses; my
+claim that CRIT/window are unused beyond RATIO. If this survives your attack, the
+endgame is: optimize T, one Rust enumeration to T, size-5 done. If you break it,
+the failure point is itself the next lead.
