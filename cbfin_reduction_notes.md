@@ -2,9 +2,9 @@
 
 Status: `W-FIN PROVED AT PAPER TIER` after Codex hostile review (2026-07-17).
 Claude's Section 7 gap-ladder proof is sound after the two display corrections
-recorded below. Section 8 gives a shorter threshold proof and a much smaller,
-though still unusable, explicit cutoff. Full size 5 remains open because the
-finite residual bank has not been extended to that cutoff.
+recorded below. Section 8 gives a shorter proof; Section 9's reviewed forced-merge
+proof, including its bad-rich pattern refinement, improves the explicit cutoff to
+less than `2.72 * 10^14`. This is still unusable for enumeration, so full size 5 remains open.
 Tiers marked per claim. Companion to `quintuple_density_notes.md`
 ("The C-B reorganization") and `lean/ep488/Ep488/CB.lean`.
 
@@ -427,94 +427,178 @@ near `10^(10^7)` by roughly `10^102`. It is a major proof simplification but
 still far beyond exhaustive enumeration. Therefore `C-B-FIN` is proved, while
 full size 5 remains open at the effective coverage step.
 
-## 9. Constant optimization v2 — the forced-merge process (CLAIMED: T ~ 10^22)
+## 9. Constant optimization v2 - forced merges (PROVED: `T < 2.72 * 10^14`)
 
-Status: `CLAIMED` (Claude/Fable, 2026-07-17; written concurrently with Codex's §8
-review — same skeleton as §7/§8, different merge schedule). §8's three-level
-stabilization gives `T ~ 10^102` (PROVED, reviewed). This section claims a further
-drop to `T ~ 10^16–10^22` by tracking **per-edge qualities at merge time** (edges
-merged early keep their good quality in the propagation product) instead of a
-uniform level threshold. **Needs the same hostile review §7 received** — the
-bookkeeping is more delicate than §8's. If it survives, the effective gap narrows
-but remains: `10^22` is still beyond enumeration, so the honest endgame options at
-the end of this section stand either way.
+Status: `PROVED` at paper tier (Claude/Fable skeleton; hostile review and exact
+path audit by Codex, 2026-07-17). The review found one ordering defect in the
+presentation: a full five-vertex component must terminate the process before the
+cofactor-transfer branch, because the size-five ceiling is unavailable. It also
+replaced the unproved rough range `10^16-10^22` by the exhaustive hand table below.
+Neither correction affects the independent Section 8 proof.
 
-The ladder's tower came from an over-strong requirement: a single global heavy/light
-threshold classifying all ten pairs at once (11-rung pigeonhole, quartic degradation
-per rung). The merge process below never needs a global dichotomy — merges happen
-only when *forced*, and the ceilings force them.
+**Setup and propagation.** Put `d := min(D)`, `R := 1135/7`, and
+`U := R-4 = 1107/7`. The window gives `d_i <= Ud`. Write a tree-edge certificate
+as `g_e >= d/Y_e`. If a connected component `C` of size `k >= 2` has a spanning
+tree with edge qualities `Y_1,...,Y_{k-1}`, then
 
-**Setup.** As in §7: `d := min(D)`, entries `≤ (R−4)d`, `R = 1135/7`, `≥ 3` self-bad
-vertices, `gcd(D) = 1`. Write each edge quality as `g_e ≥ d/Y_e`. For a connected
-component `C` assembled from tree edges `e_1, …, e_{k−1}` (attach order), the §7
-propagation gives the common divisor
-
-```
-h_C ≥ d / Z_C,   Z_C := R^{k−2} · Π_i Y_{e_i}      (k = |C|).
+```text
+h_C := gcd(d_i : i in C) >= d/Z_C,
+Z_C := U^(k-2) * product_e Y_e.
 ```
 
-**The process.** Maintain a partition of the 5 vertices into components, initially
-built from the edges `≥ d/5` (every bad vertex has one, since its four gcds sum to
-`≥ d_i ≥ d`; isolated vertices are self-good).
+Indeed, order any tree by starting with an edge and then attaching one vertex at
+a time. If the current gcd is `H` and the attaching edge gcd is `g` at an old
+endpoint `d_u`, then `H,g | d_u`, so
+`gcd(H,g) = Hg/lcm(H,g) >= Hg/d_u >= Hg/(Ud)`. Thus every previously certified
+edge keeps its original quality after later merges.
 
-At each step, ask: *does every self-bad vertex `i` transfer* — i.e. is its
-cross-component gcd-sum `< h_{C(i)}`? (Transfer = §7 Step 4: badness descends to the
-cofactor antichain of `C(i)`.)
+**Initial partition.** Join `i,j` when `gcd(d_i,d_j) >= d/4`. Every globally
+self-bad vertex is nonisolated, since one of its four gcds is at least
+`d_i/4 >= d/4`. Hence at least three vertices are nonisolated, the initial graph
+has at most three components, and its only possible size patterns are
 
-- **If yes (all transfer):** the ceilings (`k = 2,3,4` admit `≤ 0,1,2` self-bad,
-  §1) cap the total self-bad count by the best partition value: `(4,1) → 2`,
-  `(3,2) → 1`, `(3,1,1) → 1`, `(2,2,1) → 0`, `… → 0` — all `≤ 2 < 3`.
-  **Contradiction; the process cannot in fact reach this branch with 3 bads, i.e.
-  the alternative below is forced.** (Note the elegance: a bad vertex in a
-  2-component can *never* transfer — the `k=2` ceiling is `0` — so 2-components
-  holding bad vertices force merges automatically.)
-- **If no:** some bad `i` has cross-sum `≥ h_{C(i)}`, so a single cross edge has
-  `g ≥ h_{C(i)}/3`, i.e. quality `Y_new = 3·Z_{C(i)}`. **Merge** the two components
-  it joins (all previously-used tree edges keep their qualities). The partition
-  strictly coarsens.
-
-Starting from `≤ 5` parts, at most **4 merges** occur before the partition is the
-single component `{1..5}` — and then `h ≥ d/Z_{full}` divides `gcd(D) = 1`, forcing
-`d ≤ Z_{full} =: T`. (Both terminal branches are contradictions for `d > T`, which
-is the theorem.)
-
-**The constant.** Tree-edge qualities compound as `Y_new = 3·R^{k−2}·ΠY_used`; the
-worst merge chains (e.g. `{3,1,1} → {4,1} → {5}` or `{2,2,1} → {3,2} → {5}`) give
-
-```
-T = Z_full ≈ R³ · Π (4 tree-edge Y's)  ≈  10^16 – 10^22
+```text
+(5), (4,1), (3,2), (3,1,1), (2,2,1).
 ```
 
-depending on the chain (e.g. the `{3,1,1}` chain: `Y = 5, 5, 1.2·10⁴, 2.4·10¹⁰`,
-`T ≈ 3·10²²`). Every step is explicit; the tower is gone (depth 4, not 11 rungs of
-quartic decay).
+Choose a spanning tree in each nonsingleton component. Every seed edge has
+quality `Y=4`. An initial singleton is globally self-good and remains so until it
+is merged.
 
-**Honest endgame accounting.** With v2, if the proof survives review:
-- `C-B-FIN` (and the stronger bounded-ratio statement) is **closed** — the class is
-  finite with explicit `T ~ 10²²`.
-- **Full size-5 is still not enumerable**: the bank must certify every residual core
-  with `d ≤ T`, and `10²²` is beyond any census. The census evidence (all residual
-  dual-mins `≤ 48` through `M = 240`) says the true `T` is tiny; the *proof* bound
-  is the bottleneck. Two routes remain, either of which finishes size-5:
-  1. **Shrink `T` to ~10³** — the slack is in the propagation loss `R` per tree edge
-     (real cores have diameter-1 heavy graphs and near-uniform entry sizes; a
-     size-aware propagation `h ≥ g²/d_u` on short paths, or replacing the generic
-     `≥ d/5` seed by the bad vertex's `≥ d_i/4 ≥ d/4` with `d_i`-relative tracking,
-     may cut each `R` factor to `O(1)`), or
-  2. **A uniform residual window theorem**: prove directly that window + `≤2`-good +
-     `CRIT ≤ 7/2` implies `2B(n) > nS` on `[2max, bridge)` — bank data (worst margin
-     `22/9`, healthy across all 276 members) suggests real slack to work with; the
-     `h_C` structure of residual cores (they are "almost `h·(small core)`") could
-     feed the C0/tower reduction: a residual core with component divisor `h` behaves
-     like a scaled small core plus `O(1)` junk, and scaled cores are already covered.
-  Route 2 is the more promising mathematics: it would make the finiteness constant
-  irrelevant entirely.
+**Forced merge.** At the top of each loop, if the partition is the single
+five-vertex component, stop. Otherwise, for every globally self-bad `i` in a
+component `C`, let
+
+```text
+x_i := sum_{j outside C} gcd(d_i,d_j).
+```
+
+If every such `x_i < h_C`, then every global bad vertex transfers to a self-bad
+vertex of the cofactor antichain of its component: if it were cofactor-good, its
+integer internal deficit would be at least one, so global badness would require
+`x_i >= h_C`. The size `2,3,4` ceilings then bound the total number of global bad
+vertices by at most `2`, a contradiction.
+
+Therefore some bad `i` in a component of size `k < 5` has `x_i >= h_C`. There are
+only `5-k` cross edges from `i`, so one has
+
+```text
+g >= h_C/(5-k) >= d/((5-k)Z_C).
+```
+
+Add that edge to the two component trees and merge the components. Their union
+plus the bridge is again a tree, with bridge quality
+`Y_new = (5-k)Z_C`. The partition strictly coarsens. Since it started with at
+most three components, at most two forced merges occur.
+
+**Exact path table.** The table lists the largest possible final propagation
+denominator for every initial pattern and target choice. In `(3,2)`, sourcing
+the bridge from the triple dominates sourcing it from the pair. The two
+`(2,2,1)` rows are the only distinct first-bridge targets.
+
+| Initial pattern | Forced path | Upper bound for `Z_full` |
+|---|---|---:|
+| `(5)` | none | `U^3 * 4^4` |
+| `(4,1)` | `4 -> 5` | `U^5 * 4^6` |
+| `(3,2)` | `3 -> 5` | `2U^4 * 4^5` |
+| `(3,1,1)` | `3 -> 4 -> 5` | `4^9 * U^7` |
+| `(2,2,1)` | pair joins pair, then singleton | `9U^5 * 4^6` |
+| `(2,2,1)` | pair joins singleton, then pair | `18U^4 * 4^5` |
+
+For the worst row, the seed triple has `Z_3=U4^2`; the first bridge has
+`Y_1=2Z_3`; the resulting four-component has
+`Z_4=U^2*4^2*Y_1=2U^3 4^4`; and the last bridge has `Y_2=Z_4`. Hence
+
+```text
+Z_full = U^3 * 4^2 * Y_1 * Y_2 = 4^9 U^7.
+```
+
+This is the worst **uniform** row and already gives the safe intermediate cutoff
+`4^9U^7`. The initial patterns, however, encode more bad-vertex information than
+the uniform recurrence uses.
+
+**Bad-rich pattern refinement.** Three local observations sharpen the three-part
+rows and the terminal `(4,1)` row.
+
+1. In an initial `(3,1,1)` pattern the singletons are globally good, so all three
+   triple vertices are globally bad. Their two singleton gcds total less than
+   `d/2`; hence every triple vertex `i` has an internal edge greater than
+   `(d_i-d/2)/2 >= d_i/4`. Let `z` be the largest triple entry, take its such edge
+   to `q`, and let `r` be the third vertex. The corresponding edge from `r` is
+   distinct and attaches at `z` or `q`, whose entry is at most `z`. Therefore
+
+   ```text
+   h_3 > (z/4)(r/4)/z >= d/16.
+   ```
+
+   The two forced bridges then give
+   `h_4 >= h_3^2/(2Ud) > d/(512U)` and
+   `h_5 >= h_4^2/(Ud) > d/(4^9U^3)`.
+
+2. In an initial `(2,2,1)` pattern, write `q` for a pair gcd. Every globally bad
+   pair vertex `i` satisfies
+
+   ```text
+   d_i <= q + (cross sum) < q + 3d/4 <= d_i/2 + 3d/4,
+   ```
+
+   so `d_i < 3d/2`. If the first bridge joins the two pairs, then with
+   `q_A,q_B >= d/4` and bridge `g >= q_A/3`, first adjoining its target gives
+   common gcd greater than `d/72`; adjoining the target's partner gives
+   `h_4 > d/(288U)`. The last bridge is sourced at another globally bad pair
+   vertex, so
+   `h_5 > d/((3/2)(288U)^2)`. If the first bridge joins the singleton, the
+   uniform table's `18U^4 4^5` bound is already smaller than the final maximum.
+
+3. In an initial `(4,1)` pattern, the seed propagation gives
+   `h_4 >= d/(4^3U^2)`. If a globally bad `i` forces the last bridge, its singleton
+   gcd is less than `d/4`, so one of its three internal gcds is greater than
+   `(d_i-d/4)/3 >= d_i/4`. Its partner is therefore greater than `d_i/2`.
+   The other three entries are at least `d`, and the window gives
+
+   ```text
+   d_i < Wd,  W := 2(R-3)/3 = 2228/21.
+   ```
+
+   Hence the final gcd is greater than
+   `h_4^2/(Wd) >= d/(4^6U^4W)`.
+
+The resulting exhaustive bounds are
+
+| Initial pattern | Refined upper bound for the terminal denominator |
+|---|---:|
+| `(5)` | `U^3 * 4^4` |
+| `(4,1)` | `4^6 * U^4 * W` |
+| `(3,2)` | `2U^4 * 4^5` |
+| `(3,1,1)` | `4^9 * U^3` |
+| `(2,2,1)`, pair joins pair first | `(3/2)(288U)^2` |
+| `(2,2,1)`, pair joins singleton first | `18U^4 * 4^5` |
+
+At `U=1107/7`, the `(4,1)` row is largest. Since
+`1=gcd(D)=h_full`, W-FIN holds with
+
+```text
+T = 4^6 (1107/7)^4 (2228/21)
+  = 4568192150960848896 / 16807
+  = 2.718029482335... * 10^14.
+```
+
+**Honest endgame accounting.** This improves only the effective constant:
+
+- `C-B-FIN` (and the stronger bounded-ratio statement) remains **closed**.
+- **Full size 5 is still not enumerable.** The bank would have to certify every
+  residual core with `d <= T`, and this bound is far beyond any census. The census
+  evidence (all residual dual minima `<=48` through `M=240`) suggests the true
+  cutoff is small, but it is not a completeness proof.
+- The two honest routes remain: shrink the cutoff to a genuinely enumerable range,
+  or prove a uniform residual-window theorem for all parameter families. The
+  latter would make the finiteness constant irrelevant.
 
 ## 10. The effective gap: the DRIFT-TRANSFER program (route to closing size-5 without T)
 
 Status: `PROGRAM` + one `PROVED` seed lemma (Claude/Fable, 2026-07-17). Goal: the
 uniform residual window theorem — *window + `≤2`-good + `CRIT ≤ 7/2` ⟹ `2B(n) > nS`
-on `[2·max, bridge)`* — which makes `T` (10^102 / claimed 10^22) irrelevant and
+on `[2·max, bridge)`* — which makes even the proved `T < 2.72 * 10^14` irrelevant and
 closes size-5 outright.
 
 **Why the bridge fails on the window, quantitatively.** Summing U2
@@ -564,3 +648,53 @@ Honest risk: lemma 2 is where it can die — a residual core might exist whose c
 pattern still under-repays at `n = 2max` (the bank's worst margin `22/9` sits in
 the low window, so slack is real but not huge). If it dies, the failure pattern
 feeds route (a) (stable-partition classification) instead.
+
+## 11. CLAIMED: window-coupled hosts + bad-owned seeds cut T to ~1.5×10^13
+
+Status: `CLAIMED` (Claude/Fable, 2026-07-17) — needs Codex's referee knife before
+any status change. Verified Codex's §10-era refined table exactly first
+(`2.718029482335×10^14` at the `(4,1)` row ✓, all six rows reproduced).
+
+Two principles the current table does not fully exploit:
+
+**P1 (window-coupled hosts).** The forced-merge rows charge every host at the
+global cap `U`, but hosts and the bridge source are *distinct-vertex sizes
+constrained by the window sum*: e.g. the `(4,1)` row's `U·U·W` host/source pattern
+needs `U + U + W ≈ 422 ≫ R ≈ 162` — infeasible. The correct charge is the maximum
+of the host-size product over `Σ(participating sizes) ≤ R − (#others)`, an exact
+AM-GM/Lagrange computation per geometry.
+
+**P2 (bad-owned seeds).** Every bad vertex owns a heavy edge of quality
+`≥ d_i/4` — proportional to *its own size*. Choosing the spanning tree to start
+at (and route through) bad-owned edges makes those sizes appear in the
+*numerator* of the propagation, cancelling host losses (this is the mechanism of
+Codex's `(3,1,1)` refinement, applied systematically).
+
+**Worked `(4,1)` row** (`Z_full = 4⁶·(host₁·host₂)²·x_src / (seed-owner gains)`,
+geometry cases, real-relaxation upper bounds — safe direction):
+- (a) good-hub star, seed = source's own edge: `Z ≤ 4⁶·x_hub⁴/x_src ≤ 4⁶U⁴ ≈ 2.56×10^12`;
+- (b) bad-hub (= source, `≤ W`), seed cancels one hub loss: `Z ≤ 4⁶W³ ≈ 4.9×10^9`;
+- (c) distinct hosts, source separate: `max x₁²x₂²x_s` s.t. `Σ ≤ R−2` → `≈ 2.21×10^12`;
+- (e) source = one host (bad `≤ W`): `max x₁²x₂³` s.t. `x₁+x₂ ≤ R−2`, `x₂ ≤ W`:
+  interior optimum `(2s/5, 3s/5)` is feasible (`3s/5 ≈ 96.1 < W`), giving
+  **`Z ≤ 4⁶·(2s/5)²(3s/5)³ ≈ 1.491×10^13`** — the new binding case.
+  *(Process note: my first evaluation used the corner `x₂ = W` — wrong side of the
+  cap check; caught on the exact redo. Same class of slip as the display errors
+  Codex caught in §7 — constants want exact evaluation, always.)*
+
+**Claimed new table:** `(4,1)` v2 `≈ 1.491×10^13`; `(2,2,1)` pair-single old-safe
+`1.153×10^13` (untreated — expected to fall below `10^13` under P1/P2); others
+`≤ 1.3×10^12`. **Claimed `T ≈ 1.49×10^13`** (×18.2 vs `2.72×10^14`).
+
+**Referee targets for Codex:** (i) exhaustiveness of the geometry cases
+(a/b/c/e + the small mixed ones I checked at `≤ 2.5×10^9`); (ii) the tree-order
+claim behind P2 (any heavy edge can be first; the source's own edge is in-component
+because it is heavy); (iii) the real-relaxation direction (maxima over reals
+upper-bound the integer configurations); (iv) re-tabulate ALL rows under P1+P2 —
+the pair-single row is next.
+
+**Honest plateau assessment (unchanged by this):** even at `10^13`, and even if
+P1/P2 push toward `10^11–12`, the bank cannot enumerate to `T`. Constant-polishing
+has earned its keep (10^(10^7) → 10^102 → 6.5×10^20 → 2.7×10^14 → claimed
+1.5×10^13 in four passes) but is plateauing; **DRIFT-TRANSFER (§10) remains the
+route that closes size-5**, because it avoids `T` entirely.
