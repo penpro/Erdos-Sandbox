@@ -769,12 +769,121 @@ fn shape2(rho: i128) {
     println!("note: goods floored at free -1/12; S>0 dropped; J>{} uses free line — all conservative.", jt);
 }
 
+/// STAGE-2 v1: donation-pattern certificate.
+/// Per shape W (3 bads t*W + 2 goods): enumerate the 64 patterns of which (bad, good)
+/// donations are exactly 2. Per pattern:
+///  - bad rows: exact floor tables min over admissible donation pairs (m1,m2)
+///    [forced 2 where patterned; otherwise m>=3; badness 1/m1+1/m2 >= need_i];
+///  - goods: floor class by #donated-2s (DRIFT-1: each donated 2 returns an odd
+///    modulus >=3; a row with BOTH donations = 2 makes the goods' mutual moduli odd
+///    both ways) — floors F_k := min f over 4-multisets with >= k entries odd >=3.
+/// Assemble margin(tau) = 2*Sum rows + 2*Sum goods - 5*60 (S dropped), min over
+/// tau in [2*wmax, 33*rho*wmax] and over patterns. Exact i128, f*60 integral.
+fn fk_oddclass_floor(k_odd: usize, jt: i128) -> i128 {
+    // min over 4-multisets with >= k_odd entries odd >=3 (entries in [2, JT+1], exact tail)
+    // of min_{2<=J<=JT} f(J)*60; beyond JT the free line is positive so small-J governs.
+    let mut best = i128::MAX;
+    let hi = jt + 1;
+    for m1 in 2..=hi { for m2 in m1..=hi { for m3 in m2..=hi { for m4 in m3..=hi {
+        let ms = [m1, m2, m3, m4];
+        let odd = ms.iter().filter(|&&m| m >= 3 && m % 2 == 1).count();
+        if odd < k_odd { continue; }
+        let f = f_exact(&ms, jt);
+        for j in 2..=(jt as usize) {
+            // representative validity: all entries <= J+1 required for tail-exactness at J
+            if ms.iter().all(|&m| m <= j as i128 + 1) && f[j] < best { best = f[j]; }
+        }
+    }}}}
+    best
+}
+
+fn shape2v1(rho: i128) {
+    println!("=== stage-2 v1: donation-pattern certificates (rho<{}) ===", rho);
+    let jt: i128 = 40;
+    // goods' class floors by odd-count (0..=3), certified by exhaustive small-J scan
+    let mut fk = [0i128; 4];
+    for k in 0..4 { fk[k] = fk_oddclass_floor(k, 24); }
+    println!("goods class floors f*60 (min over J>=2), by #odd-moduli>=3 pinned: {:?}", fk);
+    let shapes: [[i128; 3]; 9] = [[4,6,9],[6,8,9],[8,9,12],[8,12,18],[9,12,16],[12,16,18],[12,18,27],[16,18,24],[16,24,36]];
+    for w in shapes.iter() {
+        let pins: Vec<[i128; 2]> = (0..3).map(|i| {
+            let mut p = [0i128; 2]; let mut k = 0;
+            for j in 0..3 { if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; } }
+            p
+        }).collect();
+        // badness needs: 1/m1+1/m2 >= 1 - sum 1/pin  (as exact fractions x60: need60_i)
+        // row floor tables per (forced1, forced2) in {2, free>=3}^2, per J<=JT:
+        // rowtab[i][combo][J] = min over admissible (m1,m2) of f(pins_i + (m1,m2))(J)*60
+        let mut rowtab = vec![[[i128::MAX; 41]; 4]; 3];
+        for i in 0..3 {
+            let p = pins[i];
+            // need: 1/m1 + 1/m2 >= 1 - 1/p0 - 1/p1  (rational; compare via lcm)
+            let needn = p[0]*p[1] - p[1] - p[0]; // (1 - 1/p0 - 1/p1) * p0*p1
+            let needd = p[0]*p[1];
+            for m1 in 2..=(jt + 1) { for m2 in 2..=(jt + 1) {
+                // badness: 1/m1+1/m2 >= needn/needd  <=>  (m2+m1)*needd >= needn*m1*m2
+                if (m1 + m2) * needd < needn * m1 * m2 { continue; }
+                let ms = [p[0], p[1], m1, m2];
+                let f = f_exact(&ms, jt);
+                for combo in 0..4 {
+                    let want1 = combo & 1 == 1; // donation to good1 is exactly 2
+                    let want2 = combo & 2 == 2;
+                    if want1 != (m1 == 2) { continue; }
+                    if want2 != (m2 == 2) { continue; }
+                    for j in 2..=(jt as usize) {
+                        if m1 <= j as i128 + 1 && m2 <= j as i128 + 1 && f[j] < rowtab[i][combo][j] {
+                            rowtab[i][combo][j] = f[j];
+                        }
+                    }
+                }
+            }}
+        }
+        // assemble: patterns = 2^(3 rows x 2 cols) but per row only the combo matters: 4^3 = 64
+        let wmax = w[2];
+        let (tau_lo, tau_hi) = (2 * wmax, 33 * rho * wmax);
+        let mut worst = (i128::MAX, 0i128, 0usize);
+        for pat in 0..64usize {
+            let combos = [pat & 3, (pat >> 2) & 3, (pat >> 4) & 3];
+            // goods' donated-2 counts + shared-row bonus
+            let mut c = [0usize; 2];
+            let mut shared = false;
+            for i in 0..3 {
+                if combos[i] & 1 == 1 { c[0] += 1; }
+                if combos[i] & 2 == 2 { c[1] += 1; }
+                if combos[i] == 3 { shared = true; }
+            }
+            let g0 = fk[(c[0] + if shared {1} else {0}).min(3)];
+            let g1 = fk[(c[1] + if shared {1} else {0}).min(3)];
+            for tau in tau_lo..=tau_hi {
+                let mut m60 = 2 * (g0 + g1) - 300;
+                let mut feasible = true;
+                for i in 0..3 {
+                    let j = tau / w[i];
+                    let fj = if j <= jt {
+                        let v = rowtab[i][combos[i]][j as usize];
+                        if v == i128::MAX { feasible = false; break; }
+                        v
+                    } else { (420 * j) / 300 * 1 - 14 };
+                    m60 += 2 * fj;
+                }
+                if !feasible { continue; } // combo impossible for this row (badness) — pattern vacuous
+                if m60 < worst.0 { worst = (m60, tau, pat); }
+            }
+        }
+        println!("  W={:?}: min margin*60 = {} at tau={} pattern={:06b}  [{}]",
+                 w, worst.0, worst.1, worst.2,
+                 if worst.0 > 0 { "PASS uniform" } else { "SHORT" });
+    }
+    println!("(goods floored by DRIFT-1 odd-class; badness-restricted bad rows; S dropped — conservative)");
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters\n  census shape2 [rho]");
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters\n  census shape2 [rho]\n  census shape2v1 [rho]");
         std::process::exit(2);
     }
+    if args[1] == "shape2v1" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; shape2v1(r); return; }
     if args[1] == "clusters" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; clusters(r); return; }
     if args[1] == "shape2" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; shape2(r); return; }
     match args[1].as_str() {

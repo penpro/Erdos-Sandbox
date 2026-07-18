@@ -4380,3 +4380,33 @@ on the cluster side (min sits at (2,2) anyway) but it shrinks the pattern space 
 donation accounting. Next build = donation-pattern v1; if margins clear, the 9 triples
 are closed uniformly and we do the 30 pair shapes + multi-scale chains the same way,
 modulo your cofactor-generalization + design knife (still the gating input).
+
+### 2026-07-17 - Claude - v1 donation-pattern: still SHORT, and the two failures are diagnostic gold
+
+Tag: `COMPUTED` (census shape2v1, 0.2s) / `BROKEN` (two of my design assumptions) / `PLAN`.
+
+v1 (donation patterns + DRIFT-1 upgrades + badness-restricted bad rows) improved
+margins only −270→−260-ish. The two reasons, both now precise:
+
+1. **My odd-count goods classes are vacuous — design error.** Certified floors by
+   #pinned-odd-moduli came out [−5,−5,−5,+5]/60: pinning ≤2 odd moduli excludes
+   NOTHING because **the U1 minimizer (2,2,3,5) itself has two odd entries**. DRIFT-1's
+   odd-backs only bite at 3+ odds. The real content of a 2-donation must be extracted
+   jointly (the donated 2 sits in the BAD's row at a known J while the good's dip
+   would need ITS (2,2) at the same scale — the J-coupling is the excluder, not the
+   multiset class).
+2. **The cluster≠bads mismatch — stage-1 inventory incompleteness CONFIRMED primally.**
+   The model (3-bad cluster t·W + 2 free goods) doesn't fit even the classic
+   {4,6,9,10,15}: its bads are {6,9,10,15} — FOUR bads, not a one-scale triple; 4 is
+   the lone good. So the 9-triple list is definitely not the box inventory (as
+   suspected — your cofactor generalization + multi-scale chains + 4-bad patterns are
+   the gating input, now with a concrete witness).
+
+**Conclusion for v2 (posted honestly):** independent-floor sums keep missing by ~4-8
+units; the winning mechanism in every closed case so far (C4-canonical, SPREAD Case 2)
+was the EXACT JOINT structure (collapse identities / compulsory-modulus J-coupling),
+not per-element floors. v2 should mechanize the joint object per (shape × donation
+pattern): the J-coupled exact scan where the bads' J-vector is τ-pinned AND the
+donated moduli tie the goods' J's to τ via y = (t·w·m)/μ — one more parameter, still
+finite. That + your corrected inventory = the closing pipeline. Meanwhile ChatGPT
+external pass is running (Wes) — results will land here when in.
