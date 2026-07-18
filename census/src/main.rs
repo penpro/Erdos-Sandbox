@@ -877,11 +877,112 @@ fn shape2v1(rho: i128) {
     println!("(goods floored by DRIFT-1 odd-class; badness-restricted bad rows; S dropped — conservative)");
 }
 
+/// charge-good staircase floor (f*60), certified by spreadcheck (reproduced):
+/// f >= 1/2 (J>=2), 5/6 (J>=6), 7/6 (J>=12), 3/2 (J>=15).
+fn stair60(j: i128) -> i128 {
+    if j >= 15 { 90 } else if j >= 12 { 70 } else if j >= 6 { 50 } else if j >= 2 { 30 } else { 0 }
+}
+
+/// STAGE-2 v1.5: staircase goods + donor stairs, over a shape file (Codex's 69-list).
+/// Rows exact as v1 (badness-restricted donation pairs, 2-flag combos); goods at the
+/// certified charge-good staircase; a donated 2 to bad w_i*s pins the donor good
+/// y <= 2*w_i*s, hence J_y >= floor(tau/(2*w_i)) — evaluated per pattern (sound:
+/// max over its 2-donations). Runs each shape both as W and W-dual (involution warning).
+fn shape2v15(rho: i128, shapes: &[[i128; 3]]) {
+    println!("=== stage-2 v1.5: staircase + donor stairs (rho<{}), {} shapes x (W, Wv) ===", rho, shapes.len());
+    let jt: i128 = 40;
+    let mut pass_count = 0; let mut short_count = 0;
+    let mut worst_overall: (i128, [i128;3], bool) = (i128::MAX, [0;3], false);
+    for w0 in shapes.iter() {
+        for dualize in [false, true] {
+            let l = lcm(lcm(w0[0], w0[1]), w0[2]);
+            let mut w = if dualize { [l/w0[2], l/w0[1], l/w0[0]] } else { *w0 };
+            // normalize by gcd
+            let g = gcd(gcd(w[0], w[1]), w[2]);
+            for x in w.iter_mut() { *x /= g; }
+            let pins: Vec<[i128; 2]> = (0..3).map(|i| {
+                let mut p = [0i128; 2]; let mut k = 0;
+                for j in 0..3 { if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; } }
+                p
+            }).collect();
+            let mut rowtab = vec![[[i128::MAX; 41]; 4]; 3];
+            for i in 0..3 {
+                let p = pins[i];
+                let needn = p[0]*p[1] - p[1] - p[0];
+                let needd = p[0]*p[1];
+                for m1 in 2..=(jt + 1) { for m2 in 2..=(jt + 1) {
+                    if (m1 + m2) * needd < needn * m1 * m2 { continue; }
+                    let ms = [p[0], p[1], m1, m2];
+                    let f = f_exact(&ms, jt);
+                    for combo in 0..4 {
+                        if (combo & 1 == 1) != (m1 == 2) { continue; }
+                        if (combo & 2 == 2) != (m2 == 2) { continue; }
+                        for j in 2..=(jt as usize) {
+                            if m1 <= j as i128 + 1 && m2 <= j as i128 + 1 && f[j] < rowtab[i][combo][j] {
+                                rowtab[i][combo][j] = f[j];
+                            }
+                        }
+                    }
+                }}
+            }
+            let wmax = *w.iter().max().unwrap();
+            let (tau_lo, tau_hi) = (2 * wmax, 33 * rho * wmax);
+            let mut worst = (i128::MAX, 0i128, 0usize);
+            for pat in 0..64usize {
+                let combos = [pat & 3, (pat >> 2) & 3, (pat >> 4) & 3];
+                for tau in tau_lo..=tau_hi {
+                    // goods' stair levels: J >= 2 always; donor of a 2 to bad i: J >= tau/(2 w_i)
+                    let mut jg = [2i128, 2i128];
+                    for i in 0..3 {
+                        if combos[i] & 1 == 1 { jg[0] = jg[0].max(tau / (2 * w[i])); }
+                        if combos[i] & 2 == 2 { jg[1] = jg[1].max(tau / (2 * w[i])); }
+                    }
+                    let mut m60 = 2 * (stair60(jg[0]) + stair60(jg[1])) - 300;
+                    let mut feasible = true;
+                    for i in 0..3 {
+                        let j = tau / w[i];
+                        let fj = if j <= jt {
+                            let v = rowtab[i][combos[i]][j as usize];
+                            if v == i128::MAX { feasible = false; break; }
+                            v
+                        } else { (420 * j) / 300 - 14 };
+                        m60 += 2 * fj;
+                    }
+                    if !feasible { continue; }
+                    if m60 < worst.0 { worst = (m60, tau, pat); }
+                }
+            }
+            if worst.0 > 0 { pass_count += 1; } else {
+                short_count += 1;
+                if worst.0 < worst_overall.0 { worst_overall = (worst.0, *w0, dualize); }
+                if short_count <= 12 {
+                    println!("  SHORT W={:?}{} margin*60={} tau={} pat={:06b}",
+                             w0, if dualize {"^v"} else {""}, worst.0, worst.1, worst.2);
+                }
+            }
+        }
+    }
+    println!("PASS {} / SHORT {} (of {} shape-sides); worst {:?}{} at {}",
+             pass_count, short_count, 2*shapes.len(), worst_overall.1,
+             if worst_overall.2 {"^v"} else {""}, worst_overall.0);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters\n  census shape2 [rho]\n  census shape2v1 [rho]");
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters\n  census shape2 [rho]\n  census shape2v1 [rho]\n  census shape2v15 <shapefile> [rho]");
         std::process::exit(2);
+    }
+    if args[1] == "shape2v15" {
+        let path = args.get(2).expect("shape file");
+        let txt = std::fs::read_to_string(path).expect("read shapes");
+        let shapes: Vec<[i128; 3]> = txt.lines().filter_map(|l| {
+            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
+            if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
+        }).collect();
+        let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
+        shape2v15(r, &shapes);
+        return;
     }
     if args[1] == "shape2v1" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; shape2v1(r); return; }
     if args[1] == "clusters" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; clusters(r); return; }
