@@ -235,3 +235,23 @@ PASS 69 (incl. 55 VACUOUS) / ZERO 0 (pass via +S) / SHORT 0 (of 69 W^vee sides)
   PASS  W=[4, 6, 9, 15] worst margin*60=540 at tau=30 cls=[2,4,B,B] q=3
   VACUOUS W=[4, 6, 14, 21] (no 4-bad configuration in the model)
 PASS 10 (incl. 1 VACUOUS) / ZERO 0 / SHORT 0 (of 10 4-bad shapes)
+
+=== shapes4inv 120 7: filter-complete 4-bad shape inventory (w1<=120) 2026-07-18 ===
+(all quadruples w1<w2<w3<w4<7*w1, gcd=1, antichain, every row sum gcd(wi,wj)/wj >= 1/2)
+  36 , 40 , 45 , 60
+  40 , 45 , 60 , 72
+TOTAL 4-bad candidate shapes (w1 <= 120, filter-complete): 174
+(full list: census/shapes4inv120.csv; w1 saturates at 40 vs cap 120)
+
+=== shape4 on the FULL 174-shape inventory 2026-07-18 ===
+  PASS  W=[6, 10, 14, 15] worst margin*60=120 at tau=30 cls=[2,2,2,4] q=3
+  PASS  W=[6, 9, 10, 15] worst margin*60=180 at tau=30 cls=[2,4,2,4] q=3
+  PASS  W=[6, 9, 14, 15] worst margin*60=240 at tau=30 cls=[2,4,2,4] q=3
+  PASS  W=[6, 10, 15, 21] worst margin*60=240 at tau=42 cls=[2,2,4,4] q=3
+  PASS  W=[2, 3, 5, 7] worst margin*60=360 at tau=14 cls=[2,4,4,4] q=3
+  PASS  W=[12, 18, 20, 45] worst margin*60=360 at tau=90 cls=[2,4,2,B] q=3
+  PASS  W=[4, 6, 10, 15] worst margin*60=420 at tau=30 cls=[2,4,4,B] q=3
+  PASS  W=[20, 30, 36, 45] worst margin*60=420 at tau=90 cls=[2,4,2,B] q=5
+  PASS  W=[6, 10, 15, 27] worst margin*60=480 at tau=60 cls=[2,2,4,4] q=3
+  PASS  W=[4, 6, 9, 15] worst margin*60=540 at tau=30 cls=[2,4,B,B] q=3
+PASS 174 (incl. 164 VACUOUS) / ZERO 0 / SHORT 0 (of 174 4-bad shapes)

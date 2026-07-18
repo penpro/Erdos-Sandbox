@@ -1774,6 +1774,69 @@ fn shape4(rho: i128, shapes: &[[i128; 4]]) {
              pass + vac, vac, zero, short, results.len());
 }
 
+/// 4-bad SHAPE INVENTORY by exhaustive filter enumeration: all quadruples
+/// w1 < w2 < w3 < w4 with w1 <= w1max, w4 < rho*w1 (shape-level ratio bound:
+/// max(P) >= w4*s, min(P) <= w1*s), gcd = 1, antichain (no divisibility), and
+/// EVERY row's necessary badness condition with a single good donating at best
+/// modulus 2: sum_{j != i} gcd(w_i,w_j)/w_j >= 1/2. This is a NECESSARY filter
+/// for a 4-bad quintuple's bad-quadruple shape, so the enumeration is COMPLETE
+/// up to w1max (the open completeness piece is bounding w1).
+fn shapes4inv(w1max: i128, rho: i128) {
+    println!("=== 4-bad shape inventory: filter-complete enumeration, w1 <= {}, ratio < {} ===", w1max, rho);
+    let nthreads = std::thread::available_parallelism().map(|n| n.get() as i128).unwrap_or(4).max(1);
+    let found: Vec<[i128; 4]> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads).map(|tid| {
+            s.spawn(move || {
+                let mut out: Vec<[i128; 4]> = Vec::new();
+                let mut w1 = 2 + tid;
+                while w1 <= w1max {
+                    let hi = rho * w1; // exclusive
+                    for w2 in (w1 + 1)..hi {
+                        if w2 % w1 == 0 { continue; }
+                        for w3 in (w2 + 1)..hi {
+                            if w3 % w1 == 0 || w3 % w2 == 0 { continue; }
+                            // prune: rows 1..3 can still gain at most 1 from w4 terms? each
+                            // term gcd/w <= 1; cheap partial check: row i partial + 1 >= 1/2 always true,
+                            // so prune only on the pair-level: skip if w1's row can't reach 1/2 even
+                            // with gcd(w1,w4)=w1 at the smallest allowed w4 (= w3+1).
+                            let p12 = gcd(w1, w2); let p13 = gcd(w1, w3);
+                            // max possible row-1 sum: p12/w2 + p13/w3 + w1/(w3+1)
+                            // exact check via i128 cross-multiplication
+                            let d = w2 * w3 * (w3 + 1);
+                            let best1 = 2 * (p12 * w3 * (w3 + 1) + p13 * w2 * (w3 + 1) + w1 * w2 * w3);
+                            if best1 < d { continue; }
+                            for w4 in (w3 + 1)..hi {
+                                if w4 % w1 == 0 || w4 % w2 == 0 || w4 % w3 == 0 { continue; }
+                                let w = [w1, w2, w3, w4];
+                                if gcd(gcd(w1, w2), gcd(w3, w4)) != 1 { continue; }
+                                let mut ok = true;
+                                for i in 0..4 {
+                                    // sum_{j != i} gcd(w_i, w_j)/w_j >= 1/2, exact
+                                    let mut prod = 1i128;
+                                    for j in 0..4 { if j != i { prod *= w[j]; } }
+                                    let mut lhs = 0i128;
+                                    for j in 0..4 { if j != i { lhs += gcd(w[i], w[j]) * (prod / w[j]); } }
+                                    if 2 * lhs < prod { ok = false; break; }
+                                }
+                                if ok { out.push(w); }
+                            }
+                        }
+                    }
+                    w1 += nthreads;
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let mut found = found;
+    found.sort();
+    for w in found.iter() { println!("  {} , {} , {} , {}", w[0], w[1], w[2], w[3]); }
+    println!("TOTAL 4-bad candidate shapes (w1 <= {}, filter-complete): {}", w1max, found.len());
+}
+
 /// STAGE-2 v2: donation-VALUE descriptors. Each good's stair source = its best
 /// donation (i, v), v in 2..=6 (v>=7 gives J-bound below the flat stair region —
 /// treated as none). Descriptor space 16x16; rows constrained only at the named
@@ -1882,6 +1945,12 @@ fn main() {
         }).collect();
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape2v2(r, &shapes);
+        return;
+    }
+    if args[1] == "shapes4inv" {
+        let w1max: i128 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(120);
+        let r: i128 = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(7);
+        shapes4inv(w1max, r);
         return;
     }
     if args[1] == "shape4" {

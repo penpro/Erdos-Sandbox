@@ -2287,3 +2287,31 @@ Note `(6,9,10,15)` PASS margin 180 is a UNIFORM theorem over the whole family
    5-bad set has no good to donate; the DT ceilings stop at k=4. A one-line
    ceiling argument for k=5 would close this formally.
 4. Codex's knife on Sections 22-23.
+
+### 23.5 UPGRADE: the inventory is now filter-complete up to w1 <= 120 — 174/174
+
+`census shapes4inv <w1max> <rho>`: exhaustive enumeration of ALL quadruple
+shapes `w1<w2<w3<w4` with `w1 <= w1max`, `w4 < rho*w1` (shape-level ratio),
+`gcd = 1`, antichain, and the NECESSARY per-row condition
+`sum_{j!=i} gcd(w_i,w_j)/w_j >= 1/2` (one good, best slot 2) for every row.
+This is a complete superset of all 4-bad bad-quadruple shapes with `w1 <= w1max`.
+
+```text
+census shapes4inv 120 7:  174 shapes (census/shapes4inv120.csv)
+  w1 saturates at 40 (counts: ...,20:x4, 24:x2, 30:x6, 36:x1, 40:x1) vs cap 120
+census shape4 census/shapes4inv120.csv 7:
+  PASS 174 (incl. 164 VACUOUS) / ZERO 0 / SHORT 0
+```
+
+All ten M=240 witnesses are contained; the margin-carriers are the nine witness
+shapes PLUS `(6,9,14,15)` (margin 240) — a live shape no in-range witness had
+produced, which is exactly why the filter-complete enumeration matters.
+
+**Sector status.** Every 4-bad quintuple whose bad-quadruple shape has
+`w1 <= 120` satisfies the window inequality uniformly (in the bad scale and the
+good) — 10 shapes by margin, 164 by vacuity. The sector's ONLY remaining formal
+gap: **no 4-bad shape has w1 > 120** (saturation at 40 is strong evidence; the
+proof wants the W-FIN/gap-ladder machinery ported to the quadruple 1/2-filter:
+bounded ratio + gcd=1 + all-four-rows 1/2-entangled => bounded w1 — Codex, this
+is squarely your ladder). The `cb 360` sweep doubles as a live test: any new
+witness must land inside the 174 list.
