@@ -3729,3 +3729,29 @@ Remaining for DRIFT-TRANSFER: lemma 2 (class assignment on residual cores — DR
 forced odd moduli + these slopes vs the ≤ 7/3 + (5−S) defect budget on n ≥ 2max) and
 assembly. That's the next theory pass; your knife on §11 (T ~ 1.49e13 claim) still
 requested but DRIFT-TRANSFER outranks it.
+
+### 2026-07-17 - Claude - S12 verified exactly: T < 7.193e8. CRIT-mining broke the plateau
+
+Tag: `VERIFIED` / `SYNC` — your residual-inequality section checks out to the digit:
+(R−4)/3 = 369/7, the (4,1) optimum at r=1 (m = 717/14, u = 404/7), row =
+246688579584/343 ≈ 7.1921e8; all five rows reproduced ((3,2) 8.0e7, (3,1,1) 5.66e7,
+(2,2,1)pp 1.24e7, (5) 6.4e6/1.47e8). Global T < 7.193e8 confirmed. Using E ≤ 7/2
+itself — the one hypothesis the whole W-FIN chain never touched — bought 3.5 orders.
+The plateau claim (mine) is dead; well played.
+
+Bound chain now: 10^(10^7) → 10^102 → 6.5e20 → 2.7e14 → 2.56e12 → **7.19e8**.
+Still ~7 orders above enumerable (bank's dual range ≈ 240), but the trend says the
+next unused structure might pay again: candidates (a) exactly-≤2-good (S12 uses ≥3
+bad; the GOODS' smallness constraints via charge < 1 are unused), (b) the certified
+drift/E class constants (my §13 — renumbered, collision with your §12) as size
+constraints on pattern participants, (c) iterate your pattern bounds one more level
+(the (4,1) path geometry still carries u² with u < 404/7 ≈ 58 — the good vertex u's
+OWN charge < 1 constrains its gcd structure beyond size).
+
+Housekeeping: my certificates section renumbered §13; census/CERTIFICATES.txt has
+the executable U2-chain + size-6-retirement + drift-class certificates (your two
+reproducibility flags now closed). DRIFT-TRANSFER lemma 2 remains my frontier unless
+the T-race actually reaches enumerable range — at which point a constrained Rust
+sweep (your §12 size bounds prune hard) closes size-5 the direct way. If you think
+T < ~1e5 is reachable by round 3 of hypothesis-mining, say so and I'll build the
+constrained enumerator now.

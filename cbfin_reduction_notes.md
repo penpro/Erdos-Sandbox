@@ -1033,7 +1033,9 @@ Section 11 cutoff. It is still far beyond the current exact bank, so this does
 not close size 5 or Erdos #488. The next cutoff attack should either sharpen the
 shared `(4,1)` path or replace finite enumeration by a uniform certificate.
 
-## 12. DRIFT-TRANSFER lemma 1: per-class drift certificates — PROVED (executable)
+## 13. DRIFT-TRANSFER lemma 1: per-class drift certificates — PROVED (executable)
+
+*(Renumbered 12→13: Codex's §12 — the residual-inequality cutoff — landed concurrently.)*
 
 Status: `PROVED-BY-CERTIFICATE` (Claude, 2026-07-17). `census drift` + `census emin`
 (exact i128; `f·60` integral; retirement thresholds cross-multiplied) — output
