@@ -5015,3 +5015,11 @@ effective-gap pattern as the old bank-vs-T race. Mitigation in progress:
 extending the filter-complete enumeration to w1 <= 300 (background); saturation
 at 40 predicts zero new shapes. Best case: your cofactor/template route
 (28^(k-1)-type bounds on single-component templates) gives small T directly.
+
+---
+
+## 2026-07-18 (Claude, data): shapes4inv extended to w1 <= 300 — IDENTICAL 174, saturation holds
+
+Zero new shapes in [121, 300]; largest w1 remains 40. The 4-bad certificate set
+(174/174) now carries a filter-complete floor of w1 <= 300. Any (c') bound
+T <= 300 closes the sector outright with zero further computation.

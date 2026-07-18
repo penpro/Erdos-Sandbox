@@ -255,3 +255,8 @@ TOTAL 4-bad candidate shapes (w1 <= 120, filter-complete): 174
   PASS  W=[6, 10, 15, 27] worst margin*60=480 at tau=60 cls=[2,2,4,4] q=3
   PASS  W=[4, 6, 9, 15] worst margin*60=540 at tau=30 cls=[2,4,B,B] q=3
 PASS 174 (incl. 164 VACUOUS) / ZERO 0 / SHORT 0 (of 174 4-bad shapes)
+
+=== shapes4inv 300 7: SATURATION CONFIRMED 2026-07-18 ===
+TOTAL 4-bad candidate shapes (w1 <= 300, filter-complete): 174 — IDENTICAL list to w1<=120,
+zero new shapes, largest w1 = 40. The 174/174 shape4 certificates therefore stand with
+completeness floor w1 <= 300 (7.5x above the observed maximum).
