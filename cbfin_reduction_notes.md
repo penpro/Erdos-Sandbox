@@ -4,8 +4,9 @@ Status: `W-FIN PROVED AT PAPER TIER` after Codex hostile review (2026-07-17).
 Claude's Section 7 gap-ladder proof is sound after the two display corrections
 recorded below. Sections 8-9 give reviewed forced-merge proofs; Section 11's
 source-owned tree refinement gives the universal W-FIN cutoff below
-`2.562 * 10^12`. Section 12 uses the actual C-B residual inequality and
-improves its cutoff to below `7.193 * 10^8`. This is still unusable for
+`2.562 * 10^12`. Sections 12 and 12A use the actual C-B residual inequality and
+exact bad-edge cofactors to improve its cutoff below `4.622 * 10^6`. This is
+still unusable for
 enumeration, so full size 5 remains open.
 Tiers marked per claim. Companion to `quintuple_density_notes.md`
 ("The C-B reorganization") and `lean/ep488/Ep488/CB.lean`.
@@ -1033,6 +1034,314 @@ Section 11 cutoff. It is still far beyond the current exact bank, so this does
 not close size 5 or Erdos #488. The next cutoff attack should either sharpen the
 shared `(4,1)` path or replace finite enumeration by a uniform certificate.
 
+## 12A. Exact bad-edge cofactors cut the residual cutoff below `4.622 * 10^6`
+
+Status: `PROVED` at paper tier (Codex, 2026-07-17), strengthening Section 12.
+No enumeration is used. The `7.193 * 10^8` bound above remains a valid real
+relaxation; this subsection retains the integer cofactor information that it
+discarded. Independent recheck is still requested before publication.
+
+Write `R=1135/7`, `U=R-4=1107/7`, and retain the residual size bounds
+
+```text
+B=(R-1/2)/3=2263/42,  V=(R+7/2)/2=2319/28,
+A=(R+9)/3=1198/21,   Q=(R-1)/3=376/7,
+G=(R+4)/2=1163/14.
+```
+
+### The cofactor gain
+
+In a `(4,1)` pattern, let `b` be bad in the four-component and let `y` be the
+singleton. The three internal gcds have sum greater than `b-1/4`, so one of
+them, say `q`, satisfies
+
+```text
+q > (b-1/4)/3.
+```
+
+The ratio `b/q` is an integer. Since `b>=1`,
+
+```text
+b/q < 3b/(b-1/4) <= 4,
+```
+
+hence `b/q<=3`. Thus every bad vertex has a **strong owned edge** of the exact
+form `q=b/alpha`, `alpha in {2,3}`. If one edge is strongly owned by two bad
+endpoints, their reduced coprime cofactors are therefore exactly `{3,2}`.
+This removes the continuous near-equal endpoint that made Section 12 loose.
+
+The analogous fact for a bad pair vertex in `(3,2)` or `(2,2,1)` is also exact.
+If the pair gcd is `q>=1/4` and the source is `b=alpha q`, the three cross gcds
+are below `1/4`, so
+
+```text
+(alpha-1)q < 3/4,
+```
+
+and again `alpha<=3`.
+
+### A universal residual entry cap
+
+There is a safe substitute for the tempting but unproved assertion that every
+four-element complement has positive total deficit. If `Q` is any four-element
+antichain of total size `K`, let `z=max(Q)` and let `T=Q-{z}`. For a sorted
+triple `a<b<c`,
+
+```text
+2 sum_pair gcd <= 2a+b < a+b+c,
+```
+
+so the triple deficit is positive. Also
+`2 sum_(t in T) gcd(z,t) <= sum(T)`. Therefore
+
+```text
+E_Q := K-2 sum_pair gcd(Q) > z-sum(T) = 2z-K >= -K/2.
+```
+
+Now fix any residual entry `x`, and let its four-element complement have total
+size `K`. Since `2 gcd(x,q)<=q` for every complement entry,
+
+```text
+E > x-3K/2 >= 5x/2-3R/2.
+```
+
+Combining this with `E<=7/2` gives the universal residual cap
+
+```text
+x < X := (3R+7)/5 = 3454/35 = 98.685714... .
+```
+
+This uses only the elementary triple deficit, not the separately computed
+quadruple density assertion.
+
+### Pattern `(5)`
+
+If the connected seed graph has a bad-bad edge, keep the reviewed Section 12
+bound
+
+The reviewed owner cancellation leaves two host slots. Even if a high-degree
+host occupies both slots, the universal cap applies to each, so
+
+```text
+Z <= 4^4 X^2 = 3054109696/1225 = 2493150.7722... .
+```
+
+Suppose there is no bad-bad seed edge. With one good center, all four bad-owned
+edges form the star, the residual estimate gives `c<13/2`, and
+`Z<4^4(13/2)^3=70304`. With two goods and three bad vertices of total size `K`,
+the three bad-owned edges are distinct and form a forest. Extend them to a
+tree. If the extension touches a bad vertex, its host factor cancels its owned
+gain and `Z<4^4G^2`. If the extension is the good-good edge, all bad vertices
+are leaves. For `M=max(c,u)`,
+
+```text
+M < K+5,       product(bad sizes) >= K-2,       M<G.
+```
+
+For `M<=21/2`, the crude `M^3` bound is smaller; for `M>=21/2`,
+`M^3/(M-7)` is increasing. Hence
+
+```text
+Z < 4^4 G^3/(G-7)
+  = 100674415808/52185
+  = 1929183.0182... .
+```
+
+Thus the no-bad-bad connected case is below the retained bad-bad row.
+
+### Pattern `(4,1)`
+
+If there is no bad-bad seed edge, the four-component is a good-center star.
+Its three bad leaves have strong owned cofactors at most `3`, and `c<6`, so
+
+```text
+Z < 3^6 c^4 < 3^6 6^4 = 944784.
+```
+
+Now take the source-owned edge and an edge owned by an internal bad vertex.
+If these edges are distinct, write their cofactors as `alpha,beta<=3`. The
+tree-product formula gives
+
+```text
+Z <= 16 alpha^2 beta^2 H^2/(s t^2).
+```
+
+All star cases, all cases in which the source is internal, and all cases in
+which the other internal vertex is bad are at most `1296 B^2`. The remaining
+geometry is the path
+
+```text
+s -- t -- u -- r,
+```
+
+where `s,t,r` are bad, `s` is the final bridge source, and `u` is good. The two
+owned gcds are `s/alpha` and `t/beta`. Bounding the other four internal gcds
+by `s/2,s/2,r/2,r/2` and the singleton gcds by a total below `1` gives
+
+```text
+u < s(1+2/alpha) - t(1-2/beta) + r + 9/2,
+u <= R-s-t-r-1.
+```
+
+Use `s,r<=B` and `t>=1`. For fixed `s`, the first upper bound increases with
+`r` and the window bound decreases, so the maximum is at their meeting point
+or at `r=B`. The resulting one-variable functions have their maximum at
+`s=1,r=B`. Exact evaluation of the four cofactor cases is
+
+| `(alpha,beta)` | upper bound for `Z` |
+|---|---:|
+| `(2,2)` | `411602944/441` |
+| `(2,3)` | `101767744/49` |
+| `(3,2)` | `101767744/49` |
+| `(3,3)` | `226442304/49` |
+
+The last value is `4621271.5102...`.
+
+It remains to check a shared strong edge. Its endpoint cofactors are `{3,2}`.
+For a shared end-path the worst orientation is
+
+```text
+Z <= 4^6(27/16) q u^2/r^2,
+u < min(2q+2r+9/2, R-5q-r-1),   q<r+1/2.
+```
+
+The two bounds meet the badness cap at
+
+```text
+r=536/35, q=1107/70, u=4673/70,
+```
+
+giving `Z<652683970881/314230=2077089.9369...`. For a middle shared path,
+the exact tree formula is at most `15552 q^3/r^2`; badness gives
+`q<r+1/2`, so `r<=B` gives less than `861502`. A shared star is no larger
+(`gamma=2` gives the same envelope; `gamma=3` gives `q<2r/3+1/2`). Therefore
+
+```text
+Z_(4,1) < 226442304/49.
+```
+
+### Pattern `(3,2)`
+
+If the first bridge source is a bad pair vertex `s=alpha q`, then `alpha<=3`,
+the bridge gcd is at least `q/3`, and the first merged divisor is
+
+```text
+h_3 >= q/(3 alpha) >= 1/36.
+```
+
+The triple tree has common divisor at least `1/(16A)`. Both divisors meet at
+a triple target of size below `A`, so
+
+```text
+Z <= 576 A^2 = 91853056/49 = 1874552.1632... .
+```
+
+For completeness, a triple source is smaller. If its tree host is bad, the
+distinct/shared owner exchange gives `Z<24576Q=9240576/7`. If the host `h` is
+good and the third triple vertex `v` is bad, include the distinct `v`-owned
+edge. The two possible hosts give
+
+```text
+Z < 2048 p h^2/(s v^2),  p<12,
+h < (s+v)/2+11/2,        h^2/(s v^2) <= 169/4,
+```
+
+or `Z<24576Q`; these are at most `1038336` and `9240576/7`. If both remaining
+triple vertices are good, both pair vertices are bad. With
+`h<s+11/2`, the last row is at most
+
+```text
+3072 (Q+11/2)^2/Q = 65975136/329.
+```
+
+Thus the pair-source row is the `(3,2)` maximum.
+
+### Patterns `(3,1,1)` and `(2,2,1)`
+
+In `(3,1,1)`, all triple vertices are bad. For sorted sizes
+`M>=m>=ell`, badness of the largest gives
+
+```text
+M < (m+ell+1)/2 <= (M+ell+1)/2,
+```
+
+so `M<ell+1`. A largest-owned edge and the distinct edge owned by the third
+vertex give
+
+```text
+h_3/d > k := (M-1/2)(ell-1/2)/(4M).
+```
+
+The two forced bridges therefore have terminal denominator
+
+```text
+Z <= 4M^3/k^4
+  = 1024 M^7/((M-1/2)^4(ell-1/2)^4).
+```
+
+For `1<=M<2`, set `ell=1`; the function decreases to `M=7/6` and then
+increases. For `M>=2`, set `ell=M-1`; the resulting function decreases.
+The supremum occurs at `M=2,ell=1`, and
+
+```text
+Z < 33554432/81 = 414252.2469... .
+```
+
+Finally consider `(2,2,1)`. The singleton satisfies
+
+```text
+e_y>y-1,   sum(pair errors)>K/2-3,
+```
+
+so residuality gives `y<11/2`. At least three of the four pair vertices are
+bad. For a pair-pair first bridge, let the target in the second pair be
+`t=beta q_B`. If it is bad, `beta<=3`. If it is the unique good pair vertex,
+its partner is bad with cofactor at most `3`, so `q_B>=1/3`; since every pair
+entry is below `10`, the integer `beta` is at most `29`. The first merged
+divisor is at least `1/36`, and the final source is below `3/2`, hence
+
+```text
+Z < 36^2 beta^2 (3/2) <= 1634904.
+```
+
+If a pair joins the singleton first, the same `1/36` divisor gives at most
+`3888*29=112752` when the second source is in the triple. If the second source
+is in the remaining pair, two `1/36` divisors meet at a target below `11/2`,
+giving `Z<7128`.
+
+### Corrected exact table
+
+| Initial pattern | Residual terminal denominator bound |
+|---|---:|
+| `(5)` | `3054109696/1225` |
+| `(4,1)` | `226442304/49` |
+| `(3,2)` | `91853056/49` |
+| `(3,1,1)` | `33554432/81` |
+| `(2,2,1)`, pair joins pair first | `1634904` |
+| `(2,2,1)`, pair joins singleton first | `112752` |
+
+The distinct-owner `(4,1)` row is now largest. Since `gcd(D)=1`, the actual
+C-B residual satisfies
+
+```text
+d < T_CB := 226442304/49
+          = 4621271.510204... .
+```
+
+This is a factor `428278784/2751903 = 155.630...` below Section 12's previous
+residual cutoff and `1186548346944/2140369 = 554366.255...` below Section 11. It is
+still not an enumerable completion: `d` bounds the minimum dual entry, not the
+number of cases, and the other four entries can range up to `R d`.
+
+Exact arithmetic used only to evaluate the displayed formulas:
+
+```powershell
+python -c "from fractions import Fraction as F; R=F(1135,7); X=(3*R+7)/5; A=F(1198,21); rows={'5':256*X**2,'41':F(226442304,49),'32':576*A**2,'311':F(33554432,81),'221pp':1634904,'221ps':112752}; [print(k,v,float(v)) for k,v in rows.items()]"
+```
+
+No negative-existence or exhaustive-range claim is based on this Python check.
+
+
 ## 13. DRIFT-TRANSFER lemma 1: per-class drift certificates — PROVED (executable)
 
 *(Renumbered 12→13: Codex's §12 — the residual-inequality cutoff — landed concurrently.)*
@@ -1073,3 +1382,51 @@ slopes) and the assembly. The certified numbers to beat, on the window `n ≥ 2m
 defects total ≤ `2·Σδ ≤ 7/3`-ish + `(5−S)` fractional loss vs slope gains
 `2σ_K·⌊n/a⌋` per element — with `σ` now 2–5× the U2 baseline for every element
 DRIFT-1 pushes out of the extremal class.
+
+## 14. THE SPREAD THEOREM: full #488 separator for every quintuple with `max/min ≥ 14791/914`
+
+Status: `PROVED` at certificate tier (Claude, 2026-07-17; rests only on DRIFT-1,
+the §13 certified drift chains, and FD — all previously proved/certified).
+Referee pass requested per protocol. Verified exactly (`ρ₀` arithmetic + class
+assignment + spot checks on `{2,3,5,7,41}`, the `min=2376` G3-refutation set,
+`{3,4,10,14,58}`).
+
+**Theorem (SPREAD).** Every primitive quintuple `P = {a₁<…<a₅}` with
+`a₅/a₁ ≥ ρ₀ := 14791/914 (≈ 16.183)` satisfies `2B(n) > nS` for **all**
+`n ≥ max(P)` — hence full #488 for `P` (via `B(m)/m ≤ S < 2B(n)/n`). **No
+goodness, window, or CRIT hypothesis.**
+
+**Proof.** FD covers `max ≤ n < 2max`. For `n ≥ 2max`, use
+`2B(n) − nS = 2Σ_a f_a(⌊n/a⌋) − Σ_a{n/a}` with the certified per-class drift
+bounds (§13). Class assignment is structural, by the 2-friend lemma (DRIFT-1: a
+2-friend of `a` is `≤ (2/3)a`):
+- `a₁` has **no** 2-friend (it would be `< a₁ = min`) → class **no-2**:
+  `σ₁ = 457/3600, δ₁ = 2/5`;
+- `a₂` has **at most one** (only `a₁` is smaller) → class **≤one-2**:
+  `σ₂ = 29/600, δ₂ = 1/2`;
+- `a₃,a₄,a₅` → free class: `σ = 7/300, δ = 7/30`.
+Then, with `⌊n/a⌋ > n/a − 1` and `Σ{n/a} ≤ 5 − S`:
+`2B(n) − nS > 2n·Σσ_a/a − 2Σσ_a − 2Σδ_a − (5−S)`, and at the binding point
+`n = 2max`, using `max/a₁ = ρ` and `max/aᵢ ≥ 1`:
+`LHS ≥ (914ρ + 348 + 504)/1800` vs `need = 15643/1800 − S` — positive exactly
+when `ρ ≥ 14791/914`. ∎
+
+**Consequences.**
+1. All the "rider-junk" families, the G3-refutation sets with spread (e.g.
+   `min = 2376`, `ρ = 37.4`), `{2,3,5,7,p}` for `p ≥ 33`, and every other
+   spread quintuple are covered **uniformly** — no bank, no C4, no case analysis.
+2. **The open set of size-5 collapses to COMPACT residual cores:**
+   `max/min < 14791/914`, `≤2`-good, window-relevant, `CRIT ≤ 7/2`, with
+   `min ≤ T` (Codex's residual cutoff, currently `< 4.622×10^6`). Everything
+   else is theorem-covered: A (≥3-good, Lean) ∪ FD ∪ C-B (Lean) ∪ bridge ∪
+   SPREAD ∪ bank(≤240).
+3. The compactness constraint (`entries within 16.19×`) is exactly the regime
+   where Codex's §12 residual-inequality bounds are sharpest — the two attacks
+   now provably meet on the same finite box: `d ≤ 4.622×10^6`, entries
+   `≤ 16.19·d`, heavy sharing. The remaining gap is enumeration/structure for
+   THAT box alone.
+
+*(Improvement slack, honest: the free-class slopes for `a₃..a₅` used `max/aᵢ ≥ 1`;
+in the compact regime those ratios are `> 1` and per-structure slopes are far
+better than class minima — the same machinery with compact-aware constants should
+cut `ρ₀` well below 16.2, shrinking the open box further. Next pass.)*
