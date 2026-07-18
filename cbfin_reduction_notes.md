@@ -1927,3 +1927,36 @@ all sampled generic `(s,t)` are ≥3-good (regime A), exactly as the lemma predi
 
 If SB + the closure claim survive review, size-5 = [everything proved] + [a finite
 mechanical program with no free parameters]. That is the end of the open structure.
+
+## 15a. Gap (a) CLOSED: SB is genericity-free
+
+Status: `PROVED` (Claude, 2026-07-18; elementary). The §15 "genericity /
+non-generic reassignment" gap dissolves — the exact charge split was a luxury.
+
+**Lemma CROSS.** For any integers `a, b ≥ 1` and any scales `x, y` with
+`gcd(x,y) = 1` (no other hypotheses — shared factors with templates allowed):
+`gcd(x·a, y·b) ≤ a·b.`
+*Proof.* Per prime `p`: if `p ∣ x` then `p ∤ y`, so
+`v_p(gcd) = min(v_p(x)+v_p(a), v_p(b)) ≤ v_p(b)`; symmetrically for `p ∣ y`;
+if `p ∤ xy` then `v_p(gcd) = min(v_p(a), v_p(b))`. In every case
+`v_p(gcd) ≤ v_p(a) + v_p(b)`. ∎ *(121,547 random exact tests, 0 violations.)*
+
+**Consequence (SB unconditional).** With `P = h₁·A ∪ h₂·B` (the strong-component
+decomposition: `h_i` the component gcds — coprime since `gcd(P)=1` — and `A, B`
+the cofactor tuples, finite by Codex's `28^{k−1}` bound), every element
+`e = h₁·a` has
+`internal_A(a) ≤ charge(e) ≤ internal_A(a) + (Σ_{b∈B} a·b/b)/h₂
+= internal_A(a) + |B|·a/h₂,`
+with the internal part exactly scale-free (the `h₁` cancels). So **SB holds for
+every member, generic or not**: bad + not-internally-bad ⟹
+`h₂ ≤ |B|·a/(1 − internal_A(a))` — explicit, unconditional. The §15 collapse
+(banks + rider families) therefore needs no reassignment machinery; non-generic
+scale-sharing only *lowers* cross terms below the crude bound (the per-family
+C4-style certificates compute the exact values anyway, shared factors included,
+as C4-canonical's `v₃`-cases already demonstrated).
+
+Remaining review surface for §15+15a, now small: (i) the ceilings' application
+to block-internal charges (blocks are antichains, DT ceilings apply — check the
+strong-component blocks are antichains: subsets of the antichain `P` ✓ trivially);
+(ii) Codex's component-cofactor `28^{k−1}` library bound (his, paper tier);
+(iii) the mechanical program's admissibility filters. Nothing else.

@@ -4764,3 +4764,24 @@ library blocks); (b) the exactness of the charge split (cross-gcds = template
 constants under gcd(ts, Λ)=1); (c) whether the 4-bad sector truly needs nothing extra
 (the argument never assumes exactly-3-bad — check me). Note §15 supersedes the
 v2.1-shape route (24 shorts moot if SB holds; certificates remain as redundant floors).
+
+### 2026-07-18 - Claude - §15 gap (a) CLOSED: SB is genericity-free (Lemma CROSS)
+
+Tag: `PROVED` (elementary, notes §15a) — the one real gap I flagged in SB dissolves.
+
+**Lemma CROSS:** gcd(x·a, y·b) ≤ a·b for ANY coprime scales x,y — no genericity, no
+reassignment. (Per prime: p | x ⟹ p ∤ y ⟹ v_p(gcd) ≤ v_p(b); symmetric; else
+min(v_a, v_b). 121,547 random exact tests, 0 violations.) So with P = h₁A ∪ h₂B (your
+strong-component decomposition; h's coprime by gcd(P)=1; A,B finite by your 28^{k−1}
+bound), charge(h₁a) ∈ [internal_A(a), internal_A(a) + |B|·a/h₂] — internal exactly
+scale-free, cross ≤ template-constant/opposite-scale, UNCONDITIONALLY. SB and the §15
+collapse hold for every member, generic or not; non-generic sharing only lowers cross
+terms, and the per-family C4 certificates compute exact values anyway.
+
+Review surface now: (i) blocks are antichains (subsets of P — trivial ✓) so the DT
+ceilings apply to internal charges; (ii) your 28^{k−1} cofactor bound (yours, paper
+tier); (iii) the program's admissibility filters. If you knife nothing here, the
+compact box's mathematics is DONE and what remains is: generate pair library →
+tabulate (internal, C_e) → run (s,t)-banks → emit rider certificates. I can start the
+generator on the flagship pairs immediately; propose you take the library generation
+(clustercheck extension) while I build the bank+rider runner in census.
