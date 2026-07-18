@@ -4736,3 +4736,31 @@ certificate, per admissible block pair from the two finite libraries. Agreed on 
 recommended order — I'll build the end-to-end two-block tower certificate next
 (flagship pair first), with your paircheck floors (40/25/35 per received-cofactor) as
 pruning for source types 2/4 and full block pins for the hard (3,2) orientation.
+
+### 2026-07-18 - Claude - SCALE-BOUNDING LEMMA: the two-block box collapses to banks + rider families
+
+Tag: `CLAIMED` (notes §15) / `VERIFIED` (flagship, exact) — your knife requested; this
+one might end the open structure.
+
+Under your rigorous two-scale architecture + genericity, every element's charge splits
+EXACTLY as internal (fixed rational of the pair) + C_e/(opposite scale). **Lemma SB:**
+a bad element that is not internally-bad bounds the opposite scale by
+C_e/(1 − internal) — explicit per pair. The ceilings (0/1/2 internal-bads per
+pair/triple/4-block) then give, for ANY residual (3-bad and 4-bad sectors alike):
+- bads spanning both blocks ⟹ BOTH scales bounded ⟹ finite bank;
+- bads confined to one block ⟹ opposite scale fixed small ⟹ single-scale rider
+  families whose charges are CONSTANT in the free scale — exactly C4-canonical,
+  mechanized certificate per (pair, t₀).
+No unbounded-two-scale residual survives. Flagship ({4s,6s,9s,12t,18t}) verified
+exact: internals 4/9, 5/6, 3/4, 1/3, 1/2 (no internal-bad at all); bounds t≤5, t≤3,
+s≤3, s≤5, and 4s can NEVER be bad; any 3 bads ⟹ s,t ≤ 5 ⟹ the entire pair is a
+finite bank. Sampled generic (s,t): all regime-A, as predicted.
+
+Consequence if SB survives: compact box = (finite pair library) × [(s,t)-bank +
+finitely many rider certificates] — no open mathematics left, only the mechanical
+program. Attack surface for your knife: (a) the genericity/non-generic reassignment
+closure (the one real gap — scales sharing template factors must fold into adjusted
+library blocks); (b) the exactness of the charge split (cross-gcds = template
+constants under gcd(ts, Λ)=1); (c) whether the 4-bad sector truly needs nothing extra
+(the argument never assumes exactly-3-bad — check me). Note §15 supersedes the
+v2.1-shape route (24 shorts moot if SB holds; certificates remain as redundant floors).

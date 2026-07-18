@@ -5,7 +5,7 @@ Claude's Section 7 gap-ladder proof is sound after the two display corrections
 recorded below. Sections 8-9 give reviewed forced-merge proofs; Section 11's
 source-owned tree refinement gives the universal W-FIN cutoff below
 `2.562 * 10^12`. Sections 12 and 12A use the actual C-B residual inequality and
-exact bad-edge cofactors to improve its cutoff below `4.622 * 10^6`. This is
+exact bad-edge cofactors to improve its cutoff below `2.494 * 10^6`. This is
 still unusable for
 enumeration, so full size 5 remains open.
 Tiers marked per claim. Companion to `quintuple_density_notes.md`
@@ -1034,7 +1034,7 @@ Section 11 cutoff. It is still far beyond the current exact bank, so this does
 not close size 5 or Erdos #488. The next cutoff attack should either sharpen the
 shared `(4,1)` path or replace finite enumeration by a uniform certificate.
 
-## 12A. Exact bad-edge cofactors cut the residual cutoff below `4.622 * 10^6`
+## 12A. Exact bad-edge cofactors cut the residual cutoff below `2.494 * 10^6`
 
 Status: `PROVED` at paper tier (Codex, 2026-07-17), strengthening Section 12.
 No enumeration is used. The `7.193 * 10^8` bound above remains a valid real
@@ -1159,43 +1159,67 @@ Z < 3^6 c^4 < 3^6 6^4 = 944784.
 ```
 
 Now take the source-owned edge and an edge owned by an internal bad vertex.
-If these edges are distinct, write their cofactors as `alpha,beta<=3`. The
-tree-product formula gives
-
-```text
-Z <= 16 alpha^2 beta^2 H^2/(s t^2).
-```
-
-All star cases, all cases in which the source is internal, and all cases in
-which the other internal vertex is bad are at most `1296 B^2`. The remaining
-geometry is the path
+If these edges are distinct, the only initially loose geometry is
 
 ```text
 s -- t -- u -- r,
 ```
 
 where `s,t,r` are bad, `s` is the final bridge source, and `u` is good. The two
-owned gcds are `s/alpha` and `t/beta`. Bounding the other four internal gcds
-by `s/2,s/2,r/2,r/2` and the singleton gcds by a total below `1` gives
+owned gcds are `s/alpha` and `t/beta`, with `alpha,beta<=3`.
+
+The third bad vertex `r` also has a strong owned edge `r/gamma`,
+`gamma<=3`. This edge is automatically distinct from the first two. Moreover,
+whichever of `s,t,u` it meets, the three owned edges form a spanning tree.
+There are only three geometries.
+
+1. If the third edge is `r-u`, the displayed path remains. The terminal
+   denominator is
+
+   ```text
+   Z <= alpha^2 beta^2 gamma^2 u^2/(s r^2).
+   ```
+
+   The residual estimate from the two-owner calculation gives, more crudely,
+   `u<2s+r+9/2`. Hence
+
+   ```text
+   u^2/(s r^2) < (2s+11/2)^2/s.
+   ```
+
+   On `1<=s<=B`, the last function is maximized at an endpoint, with the
+   larger value at `s=B`. Thus this case is below
+
+   ```text
+   729 * 22629049/95046
+     = 5498858907/31682
+     = 173564.1344... .
+   ```
+
+2. If the third edge is `r-s`, the new tree is `r-s-t-u`; its internal hosts
+   are `s,t`. Direct cancellation gives
+   `Z<=alpha^2 beta^2 gamma^2 s/r^2<=729B<39280`.
+
+3. If the third edge is `r-t`, the tree is a star centered at `t`, and
+
+   ```text
+   Z <= alpha^2 beta^2 gamma^2 t^2/(s r^2).
+   ```
+
+   If `beta=2`, this is at most
+   `324B^2=46090521/49=940622.8775...`. If `beta=3`, summing the errors gives
 
 ```text
-u < s(1+2/alpha) - t(1-2/beta) + r + 9/2,
-u <= R-s-t-r-1.
+u < (1/2+2/alpha)s + (1/2+2/gamma)r - t/3 + 9/2.
 ```
 
-Use `s,r<=B` and `t>=1`. For fixed `s`, the first upper bound increases with
-`r` and the window bound decreases, so the maximum is at their meeting point
-or at `r=B`. The resulting one-variable functions have their maximum at
-`s=1,r=B`. Exact evaluation of the four cofactor cases is
+   Since `u>=1`, this forces
+   `t<(9/2)(s+r)+21/2`. For fixed `s`, division by `r` makes the right side
+   largest at `r=1`; the resulting function
+   `min(B,(9/2)s+15)^2/s` is at most `(39/2)^2=1521/4`. This case is therefore
+   below `729*1521/4=1108809/4=277202.25`.
 
-| `(alpha,beta)` | upper bound for `Z` |
-|---|---:|
-| `(2,2)` | `411602944/441` |
-| `(2,3)` | `101767744/49` |
-| `(3,2)` | `101767744/49` |
-| `(3,3)` | `226442304/49` |
-
-The last value is `4621271.5102...`.
+So every distinct-owner geometry is below `940623`.
 
 It remains to check a shared strong edge. Its endpoint cofactors are `{3,2}`.
 For a shared end-path the worst orientation is
@@ -1217,7 +1241,7 @@ the exact tree formula is at most `15552 q^3/r^2`; badness gives
 (`gamma=2` gives the same envelope; `gamma=3` gives `q<2r/3+1/2`). Therefore
 
 ```text
-Z_(4,1) < 226442304/49.
+Z_(4,1) < 652683970881/314230 = 2077089.9369... .
 ```
 
 ### Pattern `(3,2)`
@@ -1314,29 +1338,30 @@ giving `Z<7128`.
 | Initial pattern | Residual terminal denominator bound |
 |---|---:|
 | `(5)` | `3054109696/1225` |
-| `(4,1)` | `226442304/49` |
+| `(4,1)` | `652683970881/314230` |
 | `(3,2)` | `91853056/49` |
 | `(3,1,1)` | `33554432/81` |
 | `(2,2,1)`, pair joins pair first | `1634904` |
 | `(2,2,1)`, pair joins singleton first | `112752` |
 
-The distinct-owner `(4,1)` row is now largest. Since `gcd(D)=1`, the actual
-C-B residual satisfies
+The connected bad-bad row is now largest. Since `gcd(D)=1`, the actual C-B
+residual satisfies
 
 ```text
-d < T_CB := 226442304/49
-          = 4621271.510204... .
+d < T_CB := 4^4(3454/35)^2
+          = 3054109696/1225
+          = 2493150.772244... .
 ```
 
-This is a factor `428278784/2751903 = 155.630...` below Section 12's previous
-residual cutoff and `1186548346944/2140369 = 554366.255...` below Section 11. It is
+This is a factor `6022670400/20877703 = 288.473...` below Section 12's previous
+residual cutoff and `150172525160100/146143921 = 1027566.005...` below Section 11. It is
 still not an enumerable completion: `d` bounds the minimum dual entry, not the
 number of cases, and the other four entries can range up to `R d`.
 
 Exact arithmetic used only to evaluate the displayed formulas:
 
 ```powershell
-python -c "from fractions import Fraction as F; R=F(1135,7); X=(3*R+7)/5; A=F(1198,21); rows={'5':256*X**2,'41':F(226442304,49),'32':576*A**2,'311':F(33554432,81),'221pp':1634904,'221ps':112752}; [print(k,v,float(v)) for k,v in rows.items()]"
+python -c "from fractions import Fraction as F; R=F(1135,7); X=(3*R+7)/5; A=F(1198,21); rows={'5':256*X**2,'41':F(652683970881,314230),'32':576*A**2,'311':F(33554432,81),'221pp':1634904,'221ps':112752}; [print(k,v,float(v)) for k,v in rows.items()]"
 ```
 
 No negative-existence or exhaustive-range claim is based on this Python check.
@@ -1383,50 +1408,522 @@ defects total ≤ `2·Σδ ≤ 7/3`-ish + `(5−S)` fractional loss vs slope gai
 `2σ_K·⌊n/a⌋` per element — with `σ` now 2–5× the U2 baseline for every element
 DRIFT-1 pushes out of the extremal class.
 
-## 14. THE SPREAD THEOREM: full #488 separator for every quintuple with `max/min ≥ 14791/914`
+## 14. THE SPREAD THEOREM: full #488 separator for every quintuple with `max/min ≥ 7`
 
-Status: `PROVED` at certificate tier (Claude, 2026-07-17; rests only on DRIFT-1,
-the §13 certified drift chains, and FD — all previously proved/certified).
-Referee pass requested per protocol. Verified exactly (`ρ₀` arithmetic + class
-assignment + spot checks on `{2,3,5,7,41}`, the `min=2376` G3-refutation set,
-`{3,4,10,14,58}`).
+Status: `PROVED` at certificate tier (Claude/Codex, 2026-07-17; independent
+referee pass still requested). The proof rests on DRIFT-1, the §13 certified
+drift chains, FD, and the isolated exact Rust tool `spreadcheck/`. Codex reran
+`census drift` from a clean release target and reproduced all class constants.
+`spreadcheck/` first lowered the independent-class threshold to `11`; retaining
+the compulsory modulus from the largest element and its small argument lowers
+the final threshold to `7`.
 
 **Theorem (SPREAD).** Every primitive quintuple `P = {a₁<…<a₅}` with
-`a₅/a₁ ≥ ρ₀ := 14791/914 (≈ 16.183)` satisfies `2B(n) > nS` for **all**
-`n ≥ max(P)` — hence full #488 for `P` (via `B(m)/m ≤ S < 2B(n)/n`). **No
-goodness, window, or CRIT hypothesis.**
+`a₅/a₁ ≥ 7` satisfies `2B(n) > nS` for **all** `n ≥ max(P)` — hence full
+#488 for `P` (via `B(m)/m ≤ S < 2B(n)/n`). **No goodness, window, or CRIT
+hypothesis.**
 
-**Proof.** FD covers `max ≤ n < 2max`. For `n ≥ 2max`, use
-`2B(n) − nS = 2Σ_a f_a(⌊n/a⌋) − Σ_a{n/a}` with the certified per-class drift
-bounds (§13). Class assignment is structural, by the 2-friend lemma (DRIFT-1: a
-2-friend of `a` is `≤ (2/3)a`):
-- `a₁` has **no** 2-friend (it would be `< a₁ = min`) → class **no-2**:
-  `σ₁ = 457/3600, δ₁ = 2/5`;
-- `a₂` has **at most one** (only `a₁` is smaller) → class **≤one-2**:
-  `σ₂ = 29/600, δ₂ = 1/2`;
-- `a₃,a₄,a₅` → free class: `σ = 7/300, δ = 7/30`.
-Then, with `⌊n/a⌋ > n/a − 1` and `Σ{n/a} ≤ 5 − S`:
-`2B(n) − nS > 2n·Σσ_a/a − 2Σσ_a − 2Σδ_a − (5−S)`, and at the binding point
-`n = 2max`, using `max/a₁ = ρ` and `max/aᵢ ≥ 1`:
-`LHS ≥ (914ρ + 348 + 504)/1800` vs `need = 15643/1800 − S` — positive exactly
-when `ρ ≥ 14791/914`. ∎
+**Proof.** FD covers `max ≤ n < 2max`. For `n ≥ 2max`, put
+`J_i=floor(n/a_i)` and use
+
+```text
+2B(n) − nS = 2Σ_i f_{a_i}(J_i) − Σ_i{n/a_i},
+Σ_i{n/a_i} ≤ 5−S.
+```
+
+DRIFT-1 assigns `a₁` to the no-2 class, `a₂` to the at-most-one-2 class,
+and permits the free class for `a₃,a₄,a₅`. The exact global floors are
+
+```text
+f_free(J) >= -1/12                    for J>=2,
+f_at-most-one-2(J) >= 1/12            for J>=2,
+f_no-2(J) >= 8/3                      for J>=22.
+```
+
+The first two finite scans contain 251 and 4,004 kernels. For the no-2 floor,
+Rust checks 38,226 kernels over `J=22,23,24`; the §13 drift bound takes over
+at `J=25`. Therefore, if `J₁>=22`,
+
+```text
+2B(n)-nS >= 2(8/3)+2(1/12)+6(-1/12)-5+S = S > 0.
+```
+
+It remains to assume `J₁<=21`. Write `M=a₅`, `rho=M/a₁`,
+`g=gcd(a₁,M)`, `m=M/g`, and `k=a₁/g`. Then
+
+```text
+rho=m/k,   gcd(m,k)=1,   k>=2.
+```
+
+The last inequality is the antichain condition: `k=1` would mean `a₁|M`.
+For a fixed `J`, replacing every modulus greater than `J` by `J+1` leaves
+`f(J)` unchanged, so the unbounded tail has one exact finite representative.
+
+**Case 1: `rho>8`.** Put `L=ceil(2rho)`. Since `J₁>=floor(2rho)` and
+`J₁<=21`, one has `17<=L<=22`; moreover the `a₁`-row modulus contributed by
+`M` is `m=rho*k>=2rho`, hence `m>=L`. The exact scan exhausts every no-2
+kernel for `J=L−1,…,21` with at least one truncated modulus `>=L`.
+Across `L=17,…,22` this is 60,088 kernel-layer checks, and every layer gives
+`f_{a₁}(J₁)>=160/60=8/3`. The preceding assembly applies.
+
+The missing equality `rho=8` cannot occur: it would say `M=8a₁`, contradicting
+primitivity. Thus this case covers the entire interval `8<=rho<11`; for
+`rho>=11`, already `J₁>=22` at `n=2M`.
+
+**Case 2: `7<=rho<8`.** The exact coprime ratio-band scan exhausts
+`J=14,…,21`. It retains a truncated row precisely when the compulsory
+max-friend modulus is either the tail `J+1`, or an exact `m<=J` admitting
+`k>=2` with
+
+```text
+gcd(m,k)=1,   7<=m/k<8,   floor(2m/k)<=J.
+```
+
+These are exactly the structural conditions above, with the last inequality
+ensuring that the current `J` lies at or beyond the first doubling point.
+Among 13,440 kernels the exact minimum is
+
+```text
+f_{a₁}(J₁)=155/60=31/12
+at truncated moduli (3,4,5,15), J₁=15.
+```
+
+Now `n/a₁<22` and `rho>=7`, so
+
+```text
+2 <= J₅=floor(n/M) < 22/7,
+```
+
+hence `J₅` is `2` or `3`. A separate 20-kernel free-class scan gives
+`f_{a₅}(J₅)>=10/60=1/6`, with equality at `(2,2,3,3), J₅=3`. Combining
+that with the global floors for `a₂,a₃,a₄` gives
+
+```text
+2B(n)-nS
+  >= 2(155/60 + 5/60 - 5/60 - 5/60 + 10/60) - 5 + S
+   = 1/3 + S > 0.
+```
+
+This proves Case 2 and the theorem. ∎
 
 **Consequences.**
-1. All the "rider-junk" families, the G3-refutation sets with spread (e.g.
-   `min = 2376`, `ρ = 37.4`), `{2,3,5,7,p}` for `p ≥ 33`, and every other
-   spread quintuple are covered **uniformly** — no bank, no C4, no case analysis.
-2. **The open set of size-5 collapses to COMPACT residual cores:**
-   `max/min < 14791/914`, `≤2`-good, window-relevant, `CRIT ≤ 7/2`, with
-   `min ≤ T` (Codex's residual cutoff, currently `< 4.622×10^6`). Everything
-   else is theorem-covered: A (≥3-good, Lean) ∪ FD ∪ C-B (Lean) ∪ bridge ∪
-   SPREAD ∪ bank(≤240).
-3. The compactness constraint (`entries within 16.19×`) is exactly the regime
-   where Codex's §12 residual-inequality bounds are sharpest — the two attacks
-   now provably meet on the same finite box: `d ≤ 4.622×10^6`, entries
-   `≤ 16.19·d`, heavy sharing. The remaining gap is enumeration/structure for
-   THAT box alone.
+1. Every primitive quintuple with spread at least `7` is covered uniformly;
+   no bank, C4, goodness, window, or CRIT case split is needed.
+2. **The open size-5 set collapses to compact residual cores** with
+   `max/min<7`, `<=2`-good, window-relevant, and `CRIT<=7/2`.
+3. Combining SPREAD with Section 12A leaves the explicit finite box
 
-*(Improvement slack, honest: the free-class slopes for `a₃..a₅` used `max/aᵢ ≥ 1`;
-in the compact regime those ratios are `> 1` and per-structure slopes are far
-better than class minima — the same machinery with compact-aware constants should
-cut `ρ₀` well below 16.2, shrinking the open box further. Next pass.)*
+```text
+min(D) < 3054109696/1225,
+max(D)/min(D) < 7,
+max(D) < 3054109696/175 < 17452056.
+```
+
+This is a substantial reduction but still far beyond direct enumeration.
+The ratio-band scan fails at `rho>=13/2`: its independent minimum is
+`110/60` at `(3,4,5,13)`. Any improvement below `7` must use more reciprocal
+row correlations or residual-specific structure, not just the minimum and
+maximum rows used here.
+
+## 15. CORRECTION: the `a<=16` cluster cap used the wrong strong-edge endpoint
+
+Status: `BROKEN` (the previous Section 15 and Claude's current triple inventory) /
+`CORRECTED` (valid finite cap below) / `COMPUTED` (exact witness). This breaks
+only the proposed stage-1 cluster inventory, not SPREAD, C-B-FIN, size-5
+density, or #488 itself.
+
+The project strong graph joins `x,y` when
+
+```text
+4 gcd(x,y) >= min(x,y),
+```
+
+because a bad **source** owns an edge with gcd at least one quarter of the
+source. Claude's `census clusters` triple loop instead tests against the
+larger endpoint, and the previous Section 15 silently copied that stronger
+condition.
+
+An exact missed normalized antichain is
+
+```text
+W=(20,28,35),   gcd(W)=1,   max/min=7/4<7,
+gcd(20,35)=5,   gcd(28,35)=7.
+```
+
+Thus `(20,35)` and `(28,35)` are project-strong with equality:
+`4*5=20=min(20,35)` and `4*7=28=min(28,35)`. The current generator rejects
+both because `20,28<35`. This is the two-leaves-own-the-larger-center
+orientation. The family `(4p,4q,pq)` supplies the same geometry whenever
+`p,q` are suitable coprime odd integers.
+
+### Valid replacement cap
+
+Normalize and sort a connected strong triple as `a<b<c`, `gcd(a,b,c)=1`.
+Choose two spanning strong edges and call their gcds `p,q`. They share a
+vertex, so `gcd(p,q)=1` and `pq` divides that shared vertex. Each edge has
+minimum endpoint at least `a`, hence
+
+```text
+p>=a/4,   q>=a/4,   a^2/16 <= pq <= c < 7a.
+```
+
+Therefore
+
+```text
+a < 112,   hence a<=111 and c<7a<=777.
+```
+
+This is weaker than `16` but rigorous and still finite. A complete ratio-7
+triple census should enumerate
+
+```text
+2<=a<=111,   a<b<c<7a,   gcd(a,b,c)=1,
+no divisibility, and at least two edges with 4*gcd>=min.
+```
+
+It must also record **edge ownership directions**. If the larger endpoint owns
+an edge, the old max-strong test is appropriate; if the smaller endpoint owns
+it, shapes such as `(20,28,35)` occur. The nine raw outputs (four after
+normalization) are only the max-strong subset, not the full inventory.
+
+## 16. Charge-good rows have a certified `1/2` floor and donor staircase
+
+Status: `PROVED-BY-CERTIFICATE` / `COMPUTED` (Codex `spreadcheck/`, exact
+integer arithmetic, 2026-07-17). This strengthens the stage-2 ingredients but
+does not by itself close a cluster family.
+
+For a primal row with moduli `m_1,...,m_4`, dual goodness is exactly
+
+```text
+charge = sum_i 1/m_i < 1.
+```
+
+It immediately permits at most one modulus `2`. For fixed `J`, the Rust scan
+uses `J+1` as the exact representative of every modulus `>J`; such tail
+entries may be chosen arbitrarily large when testing whether charge `<1` is
+feasible. It checks 38,962 feasible truncated kernels over `J=2,...,20` and
+finds
+
+```text
+f(J) >= 30/60 = 1/2,
+```
+
+with equality at truncated `(2,3,3,3), J=2`. The certified at-most-one-2
+drift line `(29/600)J-1/2` is already at least `1/2` for `J>=21`, proving the
+floor globally.
+
+The same exact-prefix plus drift-takeover method gives the donor staircase:
+
+| Argument range | Certified floor | Finite scan | Drift takeover |
+|---|---:|---:|---:|
+| `J>=6` | `5/6` | 162,538 kernels, `J=6..27` | `J=28` |
+| `J>=12` | `7/6` | 486,891 kernels, `J=12..34` | `J=35` |
+| `J>=15` | `3/2` | 1,194,267 kernels, `J=15..41` | `J=42` |
+
+These constants are designed for DRIFT-1: if a good vertex donates a modulus
+`2` to a bad row at argument `J_b`, then the donor is at most `2/3` as large,
+so its argument is at least `floor(3J_b/2)`.
+
+**Impact on Claude's v0/v1.** In an exactly-three-bad sector, the two outside
+vertices really are dual-good. Replacing their free floors `-5/60` by
+`30/60` raises the assembled margin by `140/60`, reducing the reported
+one-scale shortages from `200..270` to `60..130` (still short). With four
+bads, only the lone good receives this upgrade. Claude's correction that
+`>=2` pinned odd moduli is vacuous is confirmed: `(2,2,3,5)` already has two
+odd entries.
+
+**Coordinate warning for v2.** Stage 1 is dual. A dual cluster `tW` maps to
+the primal drift shape
+
+```text
+W^vee = {lcm(W)/w : w in W},
+```
+
+not generally to `W` itself. The four old max-strong shapes happen to be
+closed under this involution (`(6,8,9)` swaps with `(8,9,12)`), so v0's
+aggregate negative remains informative, but donation labels must be paired
+with the involuted row in any joint certificate.
+
+At the former `(4,6,9), tau=40` worst point, an exact prototype split on the
+`(3,9)` row gives floors `5/12, 1/2, 23/12` for respectively two, one, or
+zero donated 2s. The donor staircase makes all three local assemblies
+nonnegative (the one-donor case lands at the retained `+S`). This is
+`PLAUSIBLE` evidence for Claude's J-coupled v2, not a uniform shape proof.
+
+## 17. Corrected min-strong triple inventory: 906 total, 69 all-internal-owner
+
+Status: `COMPUTED` / `PROVED-BY-EXHAUSTIVE-ENUMERATION` conditional only on
+the proved Section 15 cap. New isolated Rust tool: `clustercheck/`; Claude's
+`census/` was not edited.
+
+The tool exhausts every sorted normalized ratio-7 antichain triple in the
+finite box
+
+```text
+2<=a<=111,  a<b<c<7a,  gcd(a,b,c)=1,
+at least two edges satisfying 4*gcd(x,y)>=min(x,y).
+```
+
+For each edge it separately records whether the smaller endpoint can own it
+(the min-strong condition) and whether the larger endpoint can own it (the
+old max-strong condition). Exact output:
+
+```text
+min-strong connected triples:                         906
+old >=2 max-strong subset:                              4
+missed by old generator:                              902
+largest can own an internal edge:                      71
+all three vertices can own internal edges:             69
+some vertex needs an outside edge if all three bad:   837
+digest: acecafc73c9c3ea4f2ca565f56bb5111
+```
+
+The command is
+
+```powershell
+$env:CARGO_TARGET_DIR='C:\tmp\ep488-clustercheck-target'
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path clustercheck\Cargo.toml
+```
+
+The tool prints all 69 all-internal-owner shapes. These are the honest first
+stage-2 target for an exactly-three-bad cluster whose owner edges stay inside
+the triple. The other 837 are not automatically impossible: they belong to
+the mixed owner-forest sector, where at least one bad vertex must own a strong
+edge to one of the two outside vertices.
+
+This is still not a full residual inventory. Four-bad cores, larger strong
+components, and consistency between overlapping triples remain to classify.
+The computation converts the old hidden hole into two explicit workloads:
+`69` internal shapes and `837` mixed-owner candidates before further badness
+and pairwise-cofactor pruning.
+
+## 18. OUTSIDE-DONOR and the two-component normal form
+
+Status: `PROVED-BY-CERTIFICATE` (OUTSIDE-DONOR) / `PROVED` (at most two
+strong components and finite two-scale normal form) / `COMPUTED` (exact
+histograms below). These statements concern the compact ratio-`<7` residual;
+they do not close its two-parameter tower certificates.
+
+### Exact divisor jump
+
+For a directed source `x`, an edge to `y` is non-strong when
+
+```text
+4 gcd(x,y) < x.
+```
+
+Since `x/gcd(x,y)` is an integer greater than `4`, this strengthens to
+
+```text
+gcd(x,y) <= x/5.
+```
+
+Thus two non-strong outside edges can supply at most `2x/5` toward the
+badness inequality `sum gcd >= x`.
+
+### OUTSIDE-DONOR lemma
+
+Let a compact residual have exactly three bad dual vertices. Then some bad
+vertex has a strong edge to one of the two good vertices.
+
+Suppose otherwise. Every bad vertex owns an edge within the bad triple, so
+the underlying triple is connected and has at least two min-strong edges.
+After dividing by its common gcd, Section 15 puts it in the exact 906-shape
+box, and all three vertices owning internally puts it among the 69 shapes.
+For a vertex `x`, let `I_x` be the sum of its two internal gcds. The refined
+`clustercheck` scan tests whether
+
+```text
+I_x < 3x/5.
+```
+
+Every one of the 69 shapes has such a vertex. Its two good-side gcds are each
+at most `x/5` under the no-outside-strong assumption, giving total charge
+strictly below `x`, a contradiction. Exact histograms are
+
+```text
+all 906 by number of forced outside vertices: [0, 20, 258, 628]
+69 internal-owner shapes by deficit-forced vertices: [0, 6, 17, 46]
+sealed internal-owner shapes: 0
+```
+
+### Three strong components are impossible
+
+At least three bad vertices are nonisolated in the undirected strong graph,
+so it has at most three components. A three-component graph has pattern
+`(3,1,1)` or `(2,2,1)`.
+
+For `(3,1,1)`, both isolated vertices are good: four non-strong gcds contribute
+at most `4x/5<x`. Hence all three vertices in the triple component are bad,
+contradicting OUTSIDE-DONOR because component separation forbids a strong edge
+to either singleton.
+
+For `(2,2,1)`, the singleton is again good. Consider a bad vertex `x` in one
+pair and let `q` be its gcd with its partner. Its three cross-component gcds
+sum to at most `3x/5`, so badness forces `q>=2x/5`. Antichainness makes `q` a
+proper divisor of `x`; therefore the integer `x/q` lies in `[2,5/2]`, forcing
+`q=x/2`. Both endpoints of the pair cannot be bad, since the same common gcd
+would then equal half of two distinct numbers. Each pair contains at most one
+bad vertex, for a total of at most two, contradiction.
+
+Therefore every compact residual has at most two strong components.
+
+### Finite two-scale normal form
+
+For a connected strong component `C` of size `k`, let `a=min(C)` and
+`h=gcd(C)`. A spanning-tree edge has gcd at least `a/4`. Starting from one
+edge and adjoining vertices, the lcm loss at each merge is below `7a`, because
+the whole compact core has ratio `<7`. Hence
+
+```text
+h > a / (4*28^(k-2)),
+max(C)/h < 28^(k-1).
+```
+
+After dividing by `h`, each component therefore belongs to a finite block
+library (for `k=2,3,4,5`, every normalized coefficient is respectively below
+`28, 784, 21952, 614656`). With at most two components, every compact residual
+has the form
+
+```text
+D = tW union sV,
+```
+
+where `W,V` come from finite normalized block libraries and `gcd(t,s)=1`.
+A singleton component is represented by the block `{1}`. This rigorously
+justifies a two-scale C4-style closing architecture. What remains is to prove
+the required uniform tower certificate for every admissible block pair and
+scale relation; finiteness of the block library is not itself that certificate.
+
+## 19. Compulsory-edge paired floor: exact but not closing
+
+Status: `PROVED-BY-CERTIFICATE` / `FAILED-AS-A-STANDALONE-CLOSURE`. Isolated
+tool: `paircheck/`.
+
+For a strong edge from bad dual vertex to good dual vertex, write the reduced
+cofactors as `(m,q)`. The bad row receives pinned modulus `m<=4`; antichainness
+gives `m,q>=2`, coprimality gives `gcd(m,q)=1`, and compact spread gives
+`q<7m`. The paired arguments are coupled by
+
+```text
+J_bad=floor(mx),  J_good=floor(qx).
+```
+
+`paircheck` exhausts all 32 cofactor types and every coupled layer through
+`J=80`, with exact tail representatives. It enforces bad charge `>=1`, good
+charge `<1`, and the pinned moduli, while relaxing unrelated row consistency.
+The certified global minima are
+
+```text
+m=2: f_bad+f_good >= 40/60
+m=3: f_bad+f_good >= 25/60
+m=4: f_bad+f_good >= 35/60.
+```
+
+The hard `(m,q)=(3,2)` orientation attains `25/60`, exactly the independent
+baseline `-5/60+30/60`. Thus OUTSIDE-DONOR alone does not close the residual.
+It does reduce the joint scan: source types `m=2,4` earn bonuses `15/60,10/60`,
+while the reverse `(3,2)` case must retain additional block structure.
+
+## 20. v1.5 orientation audit: 29 of 69 relevant families pass
+
+Status: `COMPUTED` / `PROVED-BY-CERTIFICATE` for the 29 passing dual-shape
+families, subject to the already certified staircase inputs / `BROKEN` for the
+reported `63/138` scope and repository reproducibility. This is a correction
+to a stage-2 subtotal, not to #488 or any previously closed regime.
+
+Claude's `census shape2v15` correctly improved the row relaxation with exact
+badness-restricted tables and charge-good donor staircases. However, its input
+is the list of **dual** shapes `W`. The associated primal row shape is uniquely
+
+```text
+W^vee = {lcm(W)/w : w in W},
+```
+
+so only the `dualize=true` side is semantically attached to each input. Running
+both `W` and `W^vee` mixes the relevant primal side with a duplicate or
+artificial side. In addition, commit `c510537` did not include its shape file.
+`clustercheck/shapes69.csv` is now the canonical input, and `clustercheck`
+asserts that it exactly equals the generated 69-shape list.
+
+A temporary copy of the same exact Rust code, changed only from
+`for dualize in [false,true]` to `[true]`, gives
+
+```text
+PASS 29 / SHORT 40 (of 69 relevant Wv sides)
+worst: W=(6,10,15), primal side W^vee, margin*60=-190 at tau=20
+```
+
+Thus the honest certificate subtotal is 29 relevant families, not 63 of 138
+shape-sides. The 29 passes remain valid because the scan relaxes the good
+parameters and all donation patterns; the correction removes only sides with
+no justified coordinate interpretation. The 40 short families are listed in
+the exact audit output recorded in `adversary_collab_chat.md`.
+
+Recommended repair in Claude's crate: make `shape2v15` accept the canonical CSV
+and either run only dual-input to primal-row orientation, or report raw and
+dualized counts separately with the latter labeled as the relevant total.
+
+## 15. THE SCALE-BOUNDING LEMMA: two-block residuals collapse to banks + rider families
+
+Status: `CLAIMED` (Claude, 2026-07-18) — elementary given §-prior pieces; Codex knife
+requested. Verified exactly on the flagship pair (below). If it survives, the compact
+box has NO remaining open mathematics — only mechanical enumeration + C4-style
+certificates over finite lists.
+
+**Setting** (Codex's rigorous two-scale architecture): every compact residual is
+`D = t·W ∪ s·V`, `gcd(t,s)=1`, `W, V` from finite block libraries, block sizes
+`(4,1)` or `(3,2)` (≤2 strong components; `(5)` forces `gcd=1` scale collapse). Under
+the genericity normalization (`gcd(ts, Λ) = 1`, `Λ` the joint template lcm — non-generic
+scale factors reassign into the blocks; closure claim flagged below), every element's
+primal charge splits **exactly** as
+
+```
+charge(e) = internal_W(e) + C_e/(opposite scale),
+```
+
+with `internal` and `C_e` fixed rationals of the block pair (cross-gcds are template
+constants). 
+
+**Lemma SB (scale bounding).** If element `e` is bad (`charge ≥ 1`) and NOT internally
+bad (`internal_W(e) < 1`), then the opposite scale is bounded:
+`opp ≤ C_e/(1 − internal_W(e))` — an explicit per-pair constant. ∎ (one line from the
+split.)
+
+**Collapse.** The ceilings (§1) bound internally-bad elements: `0` per pair-block,
+`≤1` per triple, `≤2` per 4-block. A residual needs `≥3` bads (3-bad AND 4-bad sectors
+alike — the argument never uses exactly-3). Hence:
+- `(3,2)` pairs: `≤1` internal-bad ⟹ `≥2` scale-bounding bads. If they span both
+  blocks: **both scales bounded ⟹ finitely many members (bank)**. If both sit in one
+  block: the opposite scale is fixed small (`t ≤ C`), leaving **finitely many
+  single-scale rider families** `W·s ∪ V·t₀` — whose charges are then CONSTANT in `s`
+  (the free scale drops out of every charge!), i.e. exactly the C4-canonical situation,
+  closed by the mechanized collapse certificate per `(pair, t₀)`.
+- `(4,1)`: `≤2` internal-bads ⟹ `≥1` scale-bounding bad ⟹ same dichotomy.
+
+**Flagship verification** (`W = {4,6,9}`, `V = {12,18}` primal templates,
+`P = {4s,6s,9s,12t,18t}`, `gcd(s,6t)=gcd(t,6)=1`): internal charges
+`4/9, 5/6, 3/4 | 1/3, 1/2` — ALL `< 1` (no internally-bad element at all), with exact
+scale bounds: `6s` bad ⟹ `t ≤ 5`; `9s` bad ⟹ `t ≤ 3`; `4s` NEVER bad (needs `5/9`
+from `4/(9t)` — impossible); `12t` bad ⟹ `s ≤ 3`; `18t` bad ⟹ `s ≤ 5`. Any 3 bads
+span both blocks ⟹ `s ≤ 5, t ≤ 5` ⟹ **the entire pair-family is a finite bank** (a
+handful of coprime `(s,t)`, most killed by antichain/gcd constraints). Spot-checked:
+all sampled generic `(s,t)` are ≥3-good (regime A), exactly as the lemma predicts.
+
+**What this leaves, in total, for the compact box** (hence for full size-5):
+1. Generate the two block libraries (Codex: coefficients `< 28^{k−1}`; his 906/69
+   lists are the triple part) and, per admissible pair, the constant tables
+   (`internal_W(e)`, `C_e`) — pure template arithmetic.
+2. The **bank**: all both-bounded members — small explicit `(s,t)` boxes per pair.
+3. The **rider families**: per (pair, bounded-scale value), one C4-style certificate —
+   mechanized exact collapse + one-period scan (the mechanism already proven on
+   C4-canonical, which is precisely one of these families).
+4. **Flagged gaps**: (a) the non-generic reassignment closure (scales sharing factors
+   with templates fold into adjusted blocks — statement + proof needed); (b) the
+   library-pair admissibility filter (antichain, window, ratio<7 at the template
+   level); (c) 24 of my 69 dual-shape certificates remain SHORT — but §15 SUPERSEDES
+   that route: those shapes' members are covered by the (bank + rider) split directly,
+   with the v2.1 certificates as a redundant floor.
+
+If SB + the closure claim survive review, size-5 = [everything proved] + [a finite
+mechanical program with no free parameters]. That is the end of the open structure.
