@@ -2209,3 +2209,81 @@ Consequences:
   the v3 analogue (3 bads + 2 goods -> 4 bads + 1 good; the class matrix
   becomes 4x1 with richer pins). This is now the only open sector of the
   compact box on the shapes route.
+
+## 23. The 4-BAD sector: census, witnesses, and the shape4 certificate — 10/10 closed
+
+Status: `COMPUTED` (census `cb` self-bad histogram; `shape4` certificates) /
+`PROVED` (the good-junk structure lemma below; the certificate identities are
+Section 22's) / `OPEN` (inventory completeness for 4-bad shapes; 5-bad
+exclusion). Claude, 2026-07-18.
+
+### 23.1 The sector is real but tiny
+
+`census cb 240` now reports the self-bad histogram of the C-B residual (by
+Duality Transport, dual self-bad count = primal bad count):
+
+```text
+residual 276:  3-bad 266, 4-bad 10, 5-bad 0
+components: {[5]: 196, [4,1]: 79, [3,2]: 1}
+```
+
+All ten 4-bad residuals are SINGLE strong component. Their normalized primal
+bad-quadruple shapes (bads/gcd; ten distinct):
+
+```text
+(2,3,5,7)s=5 g=6   (4,6,9,15)s=3 g=8   (4,6,10,15)s=3 g=8   (4,6,14,21)s=3 g=8
+(6,9,10,15)s=1 g=4 (6,10,14,15)s=1 g=4 (6,10,15,21)s=1 g=4  (6,10,15,27)s=1 g=4
+(12,18,20,45)s=1 g=8                   (20,30,36,45)s=1 g=8
+```
+
+(`census/shapes4bad10.csv`, extractor `census/extract_4bad.py`.) The list
+includes the celebrities: `{4,6,9,10,15}` and `{4,6,10,14,15}` are the
+`(6,9,10,15)` and `(6,10,14,15)` rows.
+
+### 23.2 Good-junk structure: the sector's only infinite direction
+
+**Lemma (good-junk).** In a 4-bad quintuple (4 bads, 1 good `y`), multiplying
+`y` by any `q` coprime to all bads leaves every bad's charge UNCHANGED
+(`gcd(b, qy) = gcd(b, y)`), while `y`'s own charge only drops. So each 4-bad
+configuration generates a 1-parameter infinite family, and it is the ONLY junk
+direction (coefficient junk on a bad changes that bad's own charge scale).
+In slot terms: as `q` grows, the good's donated slots `qy/gcd` grow through the
+exact classes into all-BIG — precisely the free-good branch of the certificate.
+
+### 23.3 shape4: the v3 certificate with a 4x1 class matrix
+
+`census shape4 <csv> [rho]`: 4 bad rows `w_i*s` (three pins each), one good;
+class matrix = 4 slots (exact 2..=6 or BIG >= 7); an exact slot pins the good
+exactly as in Section 22 (`y = v*w_i**s/q`, `gcd(v,q)=1`, spread-bounded q,
+all four gcds forced and checked); a pinned good's own row has NO free slot —
+goodness and drift are fully determined. The all-BIG column covers the entire
+good-junk tail uniformly. Same assembly, tau-range, stairs, tails as v2.1/v3.
+
+```text
+census shape4 census/shapes4bad10.csv 7:
+PASS 10 (incl. 1 VACUOUS) / ZERO 0 / SHORT 0
+margins*60: (6,10,14,15):120 (6,9,10,15):180 (6,10,15,21):240 (2,3,5,7):360
+(12,18,20,45):360 (4,6,10,15):420 (20,30,36,45):420 (6,10,15,27):480
+(4,6,9,15):540;  (4,6,14,21): VACUOUS in-box
+```
+
+The `(4,6,14,21)` vacuity is CORRECT, not a bug: its witness
+`P=[8,12,18,42,63]` has ratio `63/8 = 7.875 >= 7`, so it is retired by SPREAD
+(rho0=7) and its ratio<7 box-slice is genuinely empty — the certificates tile.
+Note `(6,9,10,15)` PASS margin 180 is a UNIFORM theorem over the whole family
+`{6s,9s,10s,15s} + any good` — containing the notorious `{4,6,9,10,15}`.
+
+### 23.4 What remains for the compact box (both sectors closed in-inventory)
+
+1. **3-bad inventory completeness**: the 906 -> 69 relevance filter (Codex's
+   clustercheck derivation) is the hypothesis under my Section 22 certificates.
+2. **4-bad inventory completeness**: the ten shapes are the M=240 in-range
+   witnesses, NOT a derived inventory. Needed: the structural argument (row
+   badness with one good forces `sum_j gcd(w_i,w_j)/w_j >= 1/2` for EVERY row —
+   a 4-fold entanglement condition — plus shape-level `w4/w1 < 7`; a W-FIN-type
+   bound caps the shape list) or Codex's component machinery. `cb 360`
+   saturation sweep running for empirical stability.
+3. **5-bad exclusion**: no 5-bad residual in range (histogram above), and a
+   5-bad set has no good to donate; the DT ceilings stop at k=4. A one-line
+   ceiling argument for k=5 would close this formally.
+4. Codex's knife on Sections 22-23.

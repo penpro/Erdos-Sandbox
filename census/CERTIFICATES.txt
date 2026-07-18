@@ -135,3 +135,103 @@ PASS 67 / ZERO 1 (pass via +S) / SHORT 1 (of 69 W^vee sides)
   VACUOUS W=[16, 45, 60] (no 3-bad configuration exists)
   VACUOUS W=[16, 51, 68] (no 3-bad configuration exists)
 PASS 69 (incl. 55 VACUOUS) / ZERO 0 (pass via +S) / SHORT 0 (of 69 W^vee sides)
+
+=== shape2v3 verbose per-shape table (same logic, full margins) 2026-07-18 ===
+=== stage-2 v3: exact slot-matrix + generalized q-coupling (rho<7), 69 dual shapes -> W^vee sides ===
+  PASS  W=[4, 6, 9]^v worst margin*60=40 at tau=18 cls=[B,2,B,4,B,B] q0=0 q1=3
+  PASS  W=[9, 10, 15]^v worst margin*60=120 at tau=20 cls=[B,2,5,4,B,2] q0=4 q1=3
+  PASS  W=[6, 14, 21]^v worst margin*60=140 at tau=14 cls=[B,2,B,4,B,4] q0=0 q1=3
+  PASS  W=[6, 10, 15]^v worst margin*60=180 at tau=12 cls=[B,2,B,4,B,4] q0=0 q1=3
+  PASS  W=[10, 12, 15]^v worst margin*60=180 at tau=12 cls=[2,5,B,2,4,5] q0=3 q1=6
+  PASS  W=[4, 10, 15]^v worst margin*60=200 at tau=31 cls=[B,2,B,4,B,B] q0=0 q1=3
+  PASS  W=[8, 9, 12]^v worst margin*60=240 at tau=18 cls=[B,3,2,B,B,2] q0=3 q1=5
+  PASS  W=[12, 14, 21]^v worst margin*60=240 at tau=14 cls=[B,2,B,4,2,B] q0=3 q1=3
+  PASS  W=[9, 14, 21]^v worst margin*60=360 at tau=28 cls=[2,5,4,5,2,B] q0=3 q1=4
+  PASS  W=[12, 15, 20]^v worst margin*60=422 at tau=205 cls=[B,2,5,3,2,6] q0=6 q1=5
+  PASS  W=[9, 22, 33]^v worst margin*60=518 at tau=369 cls=[2,3,4,2,2,B] q0=3 q1=5
+  PASS  W=[9, 26, 39]^v worst margin*60=528 at tau=369 cls=[2,6,4,4,2,B] q0=3 q1=5
+  PASS  W=[9, 20, 30]^v worst margin*60=542 at tau=369 cls=[3,4,2,B,B,2] q0=5 q1=3
+  PASS  W=[8, 15, 20]^v worst margin*60=586 at tau=615 cls=[2,4,3,3,4,B] q0=5 q1=7
+  VACUOUS W=[4, 14, 21] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[4, 18, 27] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[6, 8, 9] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[6, 15, 20] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[6, 21, 28] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[6, 22, 33] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[6, 26, 39] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 10, 15] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 14, 21] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 18, 27] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 21, 28] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 22, 33] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 26, 39] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 27, 36] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 30, 45] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 33, 44] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 34, 51] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[8, 39, 52] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 12, 16] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 15, 20] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 16, 24] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 21, 28] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 24, 32] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 28, 42] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 30, 40] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 32, 48] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 33, 44] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 34, 51] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 38, 57] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 39, 52] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 40, 60] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[9, 42, 56] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 21, 28] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 22, 33] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 26, 39] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 33, 44] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 34, 51] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 38, 57] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 39, 52] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 46, 69] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 50, 75] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 51, 68] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[12, 57, 76] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[15, 16, 20] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 21, 28] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 27, 36] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 33, 44] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 39, 52] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 45, 60] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 51, 68] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 57, 76] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 63, 84] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 69, 92] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 75, 100] (no 3-bad configuration in the stage-2 model)
+  VACUOUS W=[16, 81, 108] (no 3-bad configuration in the stage-2 model)
+PASS 69 (incl. 55 VACUOUS) / ZERO 0 (pass via +S) / SHORT 0 (of 69 W^vee sides)
+
+=== cb 240 self-bad census + the ten 4-bad residual witnesses 2026-07-18 ===
+  4-BAD residual: D=[8, 10, 12, 18, 45]  P=[8, 20, 30, 36, 45]  comps=1 [5]
+  4-BAD residual: D=[8, 12, 20, 30, 45]  P=[8, 12, 18, 30, 45]  comps=1 [5]
+  4-BAD residual: D=[8, 12, 28, 42, 63]  P=[8, 12, 18, 42, 63]  comps=1 [5]
+  4-BAD residual: D=[8, 18, 20, 30, 45]  P=[8, 12, 18, 20, 45]  comps=1 [5]
+  4-BAD residual: D=[12, 18, 20, 30, 45]  P=[4, 6, 9, 10, 15]  comps=1 [5]
+  4-BAD residual: D=[20, 28, 42, 70, 105]  P=[4, 6, 10, 15, 21]  comps=1 [5]
+  4-BAD residual: D=[20, 36, 54, 90, 135]  P=[4, 6, 10, 15, 27]  comps=1 [5]
+  4-BAD residual: D=[24, 40, 60, 90, 135]  P=[8, 12, 18, 27, 45]  comps=1 [5]
+  4-BAD residual: D=[28, 30, 42, 70, 105]  P=[4, 6, 10, 14, 15]  comps=1 [5]
+  4-BAD residual: D=[30, 42, 70, 105, 175]  P=[6, 10, 15, 25, 35]  comps=1 [5]
+  self-bad counts: {3: 266, 4: 10}
+
+=== shape4 on the ten in-range 4-bad shapes (census/shapes4bad10.csv) 2026-07-18 ===
+=== stage-4B: 4-bad exact slot-matrix + q-coupling (rho<7), 10 primal bad-quad shapes ===
+  PASS  W=[6, 10, 14, 15] worst margin*60=120 at tau=30 cls=[2,2,2,4] q=3
+  PASS  W=[6, 9, 10, 15] worst margin*60=180 at tau=30 cls=[2,4,2,4] q=3
+  PASS  W=[6, 10, 15, 21] worst margin*60=240 at tau=42 cls=[2,2,4,4] q=3
+  PASS  W=[2, 3, 5, 7] worst margin*60=360 at tau=14 cls=[2,4,4,4] q=3
+  PASS  W=[12, 18, 20, 45] worst margin*60=360 at tau=90 cls=[2,4,2,B] q=3
+  PASS  W=[4, 6, 10, 15] worst margin*60=420 at tau=30 cls=[2,4,4,B] q=3
+  PASS  W=[20, 30, 36, 45] worst margin*60=420 at tau=90 cls=[2,4,2,B] q=5
+  PASS  W=[6, 10, 15, 27] worst margin*60=480 at tau=60 cls=[2,2,4,4] q=3
+  PASS  W=[4, 6, 9, 15] worst margin*60=540 at tau=30 cls=[2,4,B,B] q=3
+  VACUOUS W=[4, 6, 14, 21] (no 4-bad configuration in the model)
+PASS 10 (incl. 1 VACUOUS) / ZERO 0 / SHORT 0 (of 10 4-bad shapes)

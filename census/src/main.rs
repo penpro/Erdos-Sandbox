@@ -348,6 +348,16 @@ fn cb(m: i128) {
         *sb_hist.entry(nselfbad(dd)).or_insert(0) += 1;
         if nc >= 3 && threecomp_wit.len() < 10 { threecomp_wit.push(*dd); }
     }
+    // >=4-bad residuals: the sector outside the 3-bad shape certificates — list them all
+    for (_num, _d1, dd) in resid.iter() {
+        if nselfbad(dd) >= 4 {
+            let mut l = 1i128; for &x in dd.iter() { l = lcm(l, x); }
+            let mut pp: Vec<i128> = dd.iter().map(|&x| l / x).collect();
+            pp.sort_unstable();
+            let (nc, pat) = strong_components(dd);
+            println!("  4-BAD residual: D={:?}  P={:?}  comps={} {:?}", dd, pp, nc, &pat[..nc.min(5)]);
+        }
+    }
     println!("  strong-gcd components (4gcd>=min): {:?}", comp_hist);
     println!("  component-size patterns: {:?}", pat_hist);
     println!("  self-bad counts: {:?}", sb_hist);
@@ -1554,13 +1564,6 @@ fn shape2v3(rho: i128, shapes: &[[i128; 3]]) {
         all
     });
     let mut pass = 0; let mut vac = 0; let mut zero: Vec<_> = Vec::new(); let mut short: Vec<_> = Vec::new();
-    for r in results.iter() {
-        if r.0 == i128::MAX { vac += 1; println!("  VACUOUS W={:?} (no 3-bad configuration exists)", r.1); }
-        else if r.0 > 0 { pass += 1; }
-        else if r.0 == 0 { zero.push(*r); }
-        else { short.push(*r); }
-    }
-    short.sort();
     let decode = |d: u64| -> String {
         let mut cs = [0u64; 6];
         let mut x = d;
@@ -1568,6 +1571,19 @@ fn shape2v3(rho: i128, shapes: &[[i128; 3]]) {
         format!("[{}]", cs.iter().map(|&c| if c == 0 { "B".to_string() } else { c.to_string() })
                 .collect::<Vec<_>>().join(","))
     };
+    let mut sorted = results.clone();
+    sorted.sort();
+    for r in sorted.iter() {
+        if r.0 == i128::MAX { vac += 1; println!("  VACUOUS W={:?} (no 3-bad configuration in the stage-2 model)", r.1); }
+        else if r.0 > 0 {
+            pass += 1;
+            println!("  PASS  W={:?}^v worst margin*60={} at tau={} cls={} q0={} q1={}",
+                     r.1, r.0, r.2, decode(r.3), r.4, r.5);
+        }
+        else if r.0 == 0 { zero.push(*r); }
+        else { short.push(*r); }
+    }
+    short.sort();
     for (m, w, tau, dig, q0, q1) in short.iter() {
         println!("  SHORT W={:?}^v margin*60={} tau={} cls={} q0={} q1={}", w, m, tau, decode(*dig), q0, q1);
     }
@@ -1576,6 +1592,186 @@ fn shape2v3(rho: i128, shapes: &[[i128; 3]]) {
     }
     println!("PASS {} (incl. {} VACUOUS) / ZERO {} (pass via +S) / SHORT {} (of {} W^vee sides)",
              pass + vac, vac, zero.len(), short.len(), results.len());
+}
+
+/// STAGE-4B: the v3 exact slot-matrix certificate for the 4-BAD sector — 4 bad
+/// rows w_i*s (CSV: PRIMAL bad-quadruple coefficients, gcd-normalized) + ONE good.
+/// Class matrix = 4 slots (one per row), each exact 2..=6 or BIG >= 7. The good is
+/// pinned by its first exact slot exactly as in v3 (y = v*w_i**s/q, gcd(v,q)=1,
+/// q >= 2, spread-bounded), which forces ALL FOUR of its gcds; its own row then has
+/// four KNOWN moduli (no free slot at all): exact goodness test and exact drift row.
+/// The all-BIG column (free good) covers the entire coprime-junk tail on the good
+/// (multiplying the good by coprime junk preserves every bad's charge, so each
+/// witness spawns a 1-parameter infinite family whose tail is all-BIG) — the
+/// certificate is uniform in both the common bad scale s and the good.
+/// NOTE: covers the exactly-4-bad sector; 5-bad has no good to donate and is
+/// separately excluded/open (flagged to Codex).
+fn shape4(rho: i128, shapes: &[[i128; 4]]) {
+    println!("=== stage-4B: 4-bad exact slot-matrix + q-coupling (rho<{}), {} primal bad-quad shapes ===", rho, shapes.len());
+    let jt: i128 = 40;
+    let mc: i128 = 41;
+    let sides: Vec<[i128; 4]> = shapes.to_vec();
+    let nthreads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
+    let results: Vec<(i128, [i128; 4], i128, u64, i128)> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads).map(|tid| {
+            let sides = &sides;
+            s.spawn(move || {
+                let mut out = Vec::new();
+                for (idx, w0) in sides.iter().enumerate() {
+                    if idx % nthreads != tid { continue; }
+                    let mut w = *w0;
+                    let g = w.iter().fold(0i128, |a, &b| gcd(a, b));
+                    for x in w.iter_mut() { *x /= g; }
+                    let wmax = *w.iter().max().unwrap();
+                    let wmin = *w.iter().min().unwrap();
+                    let pins: Vec<[i128; 3]> = (0..4).map(|i| {
+                        let mut p = [0i128; 3]; let mut k = 0;
+                        for j in 0..4 { if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; } }
+                        p
+                    }).collect();
+                    // rowtab[i][c][j]: c = 0 BIG (m >= 7), c = m-1 exact m in 2..=41
+                    let rti = |i: usize, c: usize, j: usize| (i * 42 + c) * 41 + j;
+                    let mut rowtab = vec![i128::MAX; 4 * 42 * 41];
+                    let mut needs = [[0i128; 2]; 4];
+                    for i in 0..4 {
+                        let p = pins[i];
+                        let dd = p[0] * p[1] * p[2];
+                        let nn = dd - dd / p[0] - dd / p[1] - dd / p[2];
+                        needs[i] = [nn, dd];
+                        for m in 2..=mc {
+                            if needs[i][0] * m > needs[i][1] { continue; } // 1/m < need: row not bad
+                            let f = f_exact(&[p[0], p[1], p[2], m], jt);
+                            let ce = m as usize - 1;
+                            for j in 2..=(jt as usize) {
+                                let v = f[j];
+                                let ji = j as i128;
+                                if v < rowtab[rti(i, ce, j)] { rowtab[rti(i, ce, j)] = v; }
+                                let okb = (m >= 7 && m <= ji + 1) || (ji < 6 && m == ji + 1);
+                                if okb && v < rowtab[rti(i, 0, j)] { rowtab[rti(i, 0, j)] = v; }
+                            }
+                        }
+                    }
+                    let (tau_lo, tau_hi) = (2 * wmax, 33 * rho * wmax);
+                    let clamp = |m: i128| -> i128 { if m > mc { mc } else { m } };
+                    // per-row feasible classes
+                    let cap = |c: i128| if c == 0 { 7 } else { c };
+                    let mut rowcls: [Vec<i128>; 4] = [Vec::new(), Vec::new(), Vec::new(), Vec::new()];
+                    for i in 0..4 {
+                        for c in [0i128, 2, 3, 4, 5, 6] {
+                            if needs[i][0] * cap(c) <= needs[i][1] { rowcls[i].push(c); }
+                        }
+                    }
+                    let mut worst = (i128::MAX, 0i128, 0u64, 0i128);
+                    for &c0 in rowcls[0].iter() {
+                    for &c1 in rowcls[1].iter() {
+                    for &c2 in rowcls[2].iter() {
+                    for &c3 in rowcls[3].iter() {
+                        let col = [c0, c1, c2, c3];
+                        let dig: u64 = col.iter().fold(0u64, |acc, &c| acc * 8 + c as u64);
+                        let pinat = (0..4).find(|&i| col[i] >= 2).map(|i| (i, col[i]));
+                        let qs: Vec<i128> = match &pinat {
+                            None => vec![0],
+                            Some((istar, vstar)) => {
+                                let mut v = Vec::new();
+                                let mut q = 2i128;
+                                while q * wmax < vstar * rho * w[*istar] {
+                                    if gcd(q, *vstar) == 1 && q * rho * wmin > vstar * w[*istar] { v.push(q); }
+                                    q += 1;
+                                }
+                                v
+                            }
+                        };
+                        'branch: for &q in qs.iter() {
+                            let mut srow = [0i128; 4];
+                            let mut sy = [0i128; 4];
+                            let mut rowyf: Vec<i128> = Vec::new();
+                            if let Some((istar, vstar)) = pinat {
+                                for j in 0..4 {
+                                    let gj = gcd(vstar * w[istar], q * w[j]);
+                                    srow[j] = vstar * w[istar] / gj;
+                                    sy[j] = q * w[j] / gj;
+                                    if col[j] >= 2 { if srow[j] != col[j] { continue 'branch; } }
+                                    else { if srow[j] < 7 { continue 'branch; } }
+                                    if sy[j] < 2 { continue 'branch; }
+                                }
+                                let p: i128 = sy.iter().product();
+                                let num: i128 = sy.iter().map(|&m| p / m).sum();
+                                if num >= p { continue 'branch; } // the good cannot be good
+                                rowyf = f_exact(&[clamp(sy[0]), clamp(sy[1]), clamp(sy[2]), clamp(sy[3])], jt);
+                            }
+                            let mut cls = [0usize; 4];
+                            let mut dead = false;
+                            for i in 0..4 {
+                                cls[i] = if srow[i] > 0 { clamp(srow[i]) as usize - 1 }
+                                         else if col[i] >= 2 { col[i] as usize - 1 }
+                                         else { 0 };
+                                let a = if cls[i] == 0 { 7 } else { cls[i] as i128 + 1 };
+                                if needs[i][0] * a > needs[i][1] { dead = true; break; }
+                            }
+                            if dead { continue; }
+                            for tau in tau_lo..=tau_hi {
+                                let mut m60 = -300i128;
+                                match pinat {
+                                    None => { m60 += 2 * stair60(2); }
+                                    Some((istar, vstar)) => {
+                                        let jlo = q * tau / (vstar * w[istar]);
+                                        let jhi = q * (tau + 1) / (vstar * w[istar]);
+                                        let mut best = i128::MAX;
+                                        let mut jy = jlo;
+                                        while jy <= jhi {
+                                            let v = if jy <= jt {
+                                                let e = rowyf[jy as usize];
+                                                let st = stair60(jy);
+                                                if e > st { e } else { st }
+                                            } else { 90 };
+                                            if v < best { best = v; }
+                                            jy += 1;
+                                        }
+                                        m60 += 2 * best;
+                                    }
+                                }
+                                let mut feasible = true;
+                                for i in 0..4 {
+                                    let j = tau / w[i];
+                                    let fj = if j <= jt {
+                                        let v = rowtab[rti(i, cls[i], j as usize)];
+                                        if v == i128::MAX { feasible = false; break; }
+                                        v
+                                    } else { (420 * j) / 300 - 14 };
+                                    m60 += 2 * fj;
+                                }
+                                if !feasible { continue; }
+                                if m60 < worst.0 { worst = (m60, tau, dig, *qs.iter().find(|&&x| x == q).unwrap()); }
+                            }
+                        }
+                    }}}}
+                    out.push((worst.0, *w0, worst.1, worst.2, worst.3));
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let decode = |d: u64| -> String {
+        let mut cs = [0u64; 4];
+        let mut x = d;
+        for k in (0..4).rev() { cs[k] = x % 8; x /= 8; }
+        format!("[{}]", cs.iter().map(|&c| if c == 0 { "B".to_string() } else { c.to_string() })
+                .collect::<Vec<_>>().join(","))
+    };
+    let mut pass = 0; let mut vac = 0; let mut zero = 0; let mut short = 0;
+    let mut sorted = results.clone();
+    sorted.sort();
+    for r in sorted.iter() {
+        if r.0 == i128::MAX { vac += 1; println!("  VACUOUS W={:?} (no 4-bad configuration in the model)", r.1); }
+        else if r.0 > 0 { pass += 1; println!("  PASS  W={:?} worst margin*60={} at tau={} cls={} q={}", r.1, r.0, r.2, decode(r.3), r.4); }
+        else if r.0 == 0 { zero += 1; println!("  ZERO  W={:?} (passes via retained +S) tau={} cls={} q={}", r.1, r.2, decode(r.3), r.4); }
+        else { short += 1; println!("  SHORT W={:?} margin*60={} tau={} cls={} q={}", r.1, r.0, r.2, decode(r.3), r.4); }
+    }
+    println!("PASS {} (incl. {} VACUOUS) / ZERO {} / SHORT {} (of {} 4-bad shapes)",
+             pass + vac, vac, zero, short, results.len());
 }
 
 /// STAGE-2 v2: donation-VALUE descriptors. Each good's stair source = its best
@@ -1686,6 +1882,17 @@ fn main() {
         }).collect();
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape2v2(r, &shapes);
+        return;
+    }
+    if args[1] == "shape4" {
+        let path = args.get(2).expect("shape file");
+        let txt = std::fs::read_to_string(path).expect("read shapes");
+        let shapes: Vec<[i128; 4]> = txt.lines().filter_map(|l| {
+            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
+            if v.len() == 4 { Some([v[0], v[1], v[2], v[3]]) } else { None }
+        }).collect();
+        let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
+        shape4(r, &shapes);
         return;
     }
     if args[1] == "shape2v3" {
