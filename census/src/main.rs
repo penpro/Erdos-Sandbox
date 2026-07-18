@@ -973,11 +973,13 @@ fn shape2v15(rho: i128, shapes: &[[i128; 3]]) {
 /// Row classes per entry: =2 (flagged), >=3 any (unflagged, no descriptor), =v
 /// (unflagged, descriptor names this row). Threaded over shape-sides.
 fn shape2v21(rho: i128, shapes: &[[i128; 3]]) {
-    println!("=== stage-2 v2.1: flags + value descriptors (rho<{}), {} shapes x (W, Wv) ===", rho, shapes.len());
+    println!("=== stage-2 v2.1: flags + value descriptors (rho<{}), {} dual shapes -> W^vee sides ===", rho, shapes.len());
     let jt: i128 = 40;
     // build task list of (shape, dualize)
+    // shapes file lists DUAL triples; the primal drift rows are W^vee only (Codex
+    // coordinate correction 2026-07-17). One side per shape.
     let mut sides: Vec<([i128;3], bool)> = Vec::new();
-    for w0 in shapes.iter() { sides.push((*w0, false)); sides.push((*w0, true)); }
+    for w0 in shapes.iter() { sides.push((*w0, true)); }
     let nthreads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
     let results: Vec<(i128, [i128;3], bool, i128)> = std::thread::scope(|s| {
         let handles: Vec<_> = (0..nthreads).map(|tid| {
