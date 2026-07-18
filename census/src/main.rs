@@ -437,10 +437,204 @@ fn cb(m: i128) {
              (min_crit.0 as f64)/(min_crit.1 as f64), min_crit.2);
 }
 
+// ---------------------------------------------------------------------------
+// DRIFT / EMIN certificate modes (executable certificates for the U2 chain, the
+// DRIFT-TRANSFER per-class constants, and the size-6 W0/W1/W2 retirement).
+// All exact: f(J)*60 is an integer (1/(1+X) has denominator <= 5); comparisons
+// are cross-multiplied i128. No floats anywhere in a decision.
+// ---------------------------------------------------------------------------
+
+fn lcm_of(ms: &[i128]) -> i128 { ms.iter().fold(1i128, |a, &b| lcm(a, b)) }
+
+/// enumerate k-multisets of values[lo..], calling f on each.
+fn multisets(values: &[i128], k: usize, cur: &mut Vec<i128>, start: usize, f: &mut dyn FnMut(&[i128])) {
+    if cur.len() == k { f(cur); return; }
+    for i in start..values.len() {
+        cur.push(values[i]);
+        multisets(values, k, cur, i, f);
+        cur.pop();
+    }
+}
+
+/// One-period drift scan for moduli ms with claimed f(J) >= (sp/sq) J - (dp/dq).
+/// Returns (ok_period_slope, ok_bound, worst_deficit_num, worst_deficit_J) where
+/// deficit = (sp/sq) J - f(J) as an exact fraction with denominator 60*sq (num tracked).
+fn drift_scan(ms: &[i128], sp: i128, sq: i128, dp: i128, dq: i128) -> (bool, bool, i128, i128) {
+    let l = lcm_of(ms);
+    let mut f60: i128 = 0; // f(J)*60
+    let mut worst_num: i128 = i128::MIN; // deficit numerator over denominator 60*sq
+    let mut worst_j: i128 = 0;
+    let mut ok_bound = true;
+    for j in 1..=l {
+        let x = ms.iter().filter(|&&m| j % m == 0).count() as i128;
+        f60 += 60 / (1 + x) - 30;
+        // deficit = spJ/sq - f = (60*sp*J - sq*f60)/(60*sq); claim: deficit <= dp/dq
+        let defnum = 60 * sp * j - sq * f60;
+        if defnum > worst_num { worst_num = defnum; worst_j = j; }
+        // bound check: defnum/(60 sq) <= dp/dq  <=>  defnum*dq <= dp*60*sq
+        if defnum * dq > dp * 60 * sq { ok_bound = false; }
+    }
+    // period slope: f(L)*60 = f60 must satisfy f(L) >= (sp/sq) L  <=> sq*f60 >= 60 sp L
+    let ok_slope = sq * f60 >= 60 * sp * l;
+    (ok_slope, ok_bound, worst_num, worst_j)
+}
+
+/// class filter: max number of entries equal to 2 (255 = unrestricted), min entry.
+fn class_values(lo: i128, hi: i128) -> Vec<i128> { (lo..=hi).collect() }
+
+fn drift_class(name: &str, k: usize, lo: i128, hi: i128, max_twos: usize,
+               sp: i128, sq: i128, dp: i128, dq: i128) -> bool {
+    let vals = class_values(lo, hi);
+    let mut cur = Vec::new();
+    let mut count = 0u64;
+    let mut all_ok = true;
+    let mut worst: (i128, Vec<i128>, i128) = (i128::MIN, vec![], 0);
+    multisets(&vals, k, &mut cur, 0, &mut |ms: &[i128]| {
+        if ms.iter().filter(|&&m| m == 2).count() > max_twos { return; }
+        count += 1;
+        let (s, b, wnum, wj) = drift_scan(ms, sp, sq, dp, dq);
+        if !(s && b) { all_ok = false; }
+        if wnum > worst.0 { worst = (wnum, ms.to_vec(), wj); }
+    });
+    // worst deficit as exact fraction num/(60*sq)
+    println!("  class {:14} k={} box=[{},{}] twos<={} kernels={:5} claim f>=({}/{})J-({}/{}) : {}   worst deficit {}/{} at {:?} J={}",
+             name, k, lo, hi, if max_twos==255 {"any".to_string()} else {max_twos.to_string()}, count,
+             sp, sq, dp, dq, if all_ok {"PASS"} else {"FAIL"}, worst.0, 60*sq, worst.1, worst.2);
+    all_ok
+}
+
+/// retirement arithmetic: peeling an entry m >= mstar from class level k to k-1:
+/// sigma_{k-1} - 1/(2 mstar) >= sigma_k  and  delta_k >= delta_{k-1}. Exact check.
+fn retire(name: &str, sp1: i128, sq1: i128, sp: i128, sq: i128, mstar: i128,
+          dp1: i128, dq1: i128, dp: i128, dq: i128) -> bool {
+    // sp1/sq1 - 1/(2 mstar) >= sp/sq  <=>  (2 mstar sp1 - sq1) * sq >= sp * 2 mstar sq1
+    let ok1 = (2 * mstar * sp1 - sq1) * sq >= sp * 2 * mstar * sq1;
+    let ok2 = dp * dq1 >= dp1 * dq; // delta_k >= delta_{k-1}
+    println!("  retire {:12} m*={}  slope-ok={} delta-mono={}", name, mstar, ok1, ok2);
+    ok1 && ok2
+}
+
+fn drift_certificates() {
+    println!("=== DRIFT certificates (exact; executable form of the U2 chain + DRIFT-TRANSFER classes) ===");
+    let mut ok = true;
+    println!("[U2 free chain]  (any entries >= 2)");
+    ok &= drift_class("free-1", 1, 2, 4, 255, 1, 4, 0, 1);
+    ok &= retire("free 1->2", 1, 4, 5, 36, 5, 0, 1, 1, 18);
+    ok &= drift_class("free-2", 2, 2, 4, 255, 5, 36, 1, 18);
+    ok &= retire("free 2->3", 5, 36, 5, 72, 8, 1, 18, 1, 9);
+    ok &= drift_class("free-3", 3, 2, 7, 255, 5, 72, 1, 9);
+    ok &= retire("free 3->4", 5, 72, 7, 300, 11, 1, 9, 7, 30);
+    ok &= drift_class("free-4 (U2)", 4, 2, 10, 255, 7, 300, 7, 30);
+    println!("[no-2 chain]  (all entries >= 3)");
+    ok &= drift_class("no2-1", 1, 3, 5, 0, 1, 3, 0, 1);
+    ok &= retire("no2 1->2", 1, 3, 17, 72, 6, 0, 1, 1, 8);
+    ok &= drift_class("no2-2", 2, 3, 5, 0, 17, 72, 1, 8);
+    ok &= retire("no2 2->3", 17, 72, 41, 240, 8, 1, 8, 19, 80);
+    ok &= drift_class("no2-3", 3, 3, 7, 0, 41, 240, 19, 80);
+    ok &= retire("no2 3->4", 41, 240, 457, 3600, 12, 19, 80, 2, 5);
+    ok &= drift_class("no2-4", 4, 3, 11, 0, 457, 3600, 2, 5);
+    println!("[<=one-2 chain]");
+    ok &= drift_class("le1two-1", 1, 2, 5, 1, 1, 4, 0, 1);
+    ok &= retire("le1 1->2", 1, 4, 5, 36, 5, 0, 1, 1, 9);
+    ok &= drift_class("le1two-2", 2, 2, 4, 1, 5, 36, 1, 9);
+    ok &= retire("le1 2->3", 5, 36, 31, 360, 10, 1, 9, 1, 4);
+    ok &= drift_class("le1two-3", 3, 2, 9, 1, 31, 360, 1, 4);
+    ok &= retire("le1 3->4", 31, 360, 29, 600, 14, 1, 4, 1, 2);
+    ok &= drift_class("le1two-4", 4, 2, 13, 1, 29, 600, 1, 2);
+    println!("RESULT: {}", if ok { "ALL PASS" } else { "FAILURES PRESENT" });
+}
+
+/// E_k over a multiset (exact fraction as (num, den)): E = sum_T (-1)^|T|/((|T|+1) lcm T).
+/// Fixed common denominator 60*lcm(ms): every term (k+1)*lcm_T divides it (k+1 <= 6 | 60,
+/// lcm_T | lcm(ms)). Numerators bounded by 2^n * 60*L — no overflow (L small in our boxes).
+fn e_of(ms: &[i128]) -> (i128, i128) {
+    let n = ms.len();
+    let l_all = lcm_of(ms);
+    let den0 = 60 * l_all;
+    let mut num: i128 = 0;
+    for mask in 0u32..(1 << n) {
+        let mut l = 1i128;
+        let mut k = 0i128;
+        for i in 0..n {
+            if mask & (1 << i) != 0 { l = lcm(l, ms[i]); k += 1; }
+        }
+        let sign = if k % 2 == 0 { 1 } else { -1 };
+        num += sign * (den0 / ((k + 1) * l));
+    }
+    let g = gcd(num.abs().max(1), den0);
+    (num / g, den0 / g)
+}
+
+fn emin_class(name: &str, k: usize, lo: i128, hi: i128, max_twos: usize,
+              claim_num: i128, claim_den: i128) -> bool {
+    let vals = class_values(lo, hi);
+    let mut cur = Vec::new();
+    let mut best: (i128, i128, Vec<i128>) = (0, 0, vec![]); // den=0 => unset (avoids MAX*d overflow)
+    let mut count = 0u64;
+    multisets(&vals, k, &mut cur, 0, &mut |ms: &[i128]| {
+        if ms.iter().filter(|&&m| m == 2).count() > max_twos { return; }
+        count += 1;
+        let (n, d) = e_of(ms);
+        if best.1 == 0 || n * best.1 < best.0 * d { best = (n, d, ms.to_vec()); }
+    });
+    let ok = best.0 * claim_den == claim_num * best.1;
+    println!("  {:10} k={} box=[{},{}] twos<={} candidates={:6}: min E = {}/{} at {:?}  (claim {}/{}) {}",
+             name, k, lo, hi, if max_twos==255 {"any".to_string()} else {max_twos.to_string()},
+             count, best.0, best.1, best.2, claim_num, claim_den, if ok {"PASS"} else {"FAIL"});
+    ok
+}
+
+/// size-6 W-retirement certificate: peel threshold M0 = 1/(2(V4 - W)) per class; verify
+/// exactly and confirm the box [2..25] used by audit_sext_density_lemma.py suffices.
+fn emin_certificates() {
+    println!("=== EMIN certificates (E-minima chains + size-6 W-retirement arithmetic, exact) ===");
+    let mut ok = true;
+    println!("[free chain E-minima]");
+    ok &= emin_class("E1", 1, 2, 8, 255, 3, 4);
+    ok &= emin_class("E2", 2, 2, 10, 255, 23, 36);
+    ok &= emin_class("E3", 3, 2, 12, 255, 41, 72);
+    ok &= emin_class("E4", 4, 2, 16, 255, 157, 300);
+    ok &= emin_class("E5=W0", 5, 2, 16, 255, 49, 100);
+    println!("[class E-minima at size 5 (the size-6 kernel W1/W2) and size 4 (drift classes)]");
+    ok &= emin_class("W1 no-2", 5, 3, 16, 0, 7423, 12600);
+    ok &= emin_class("W2 le1-2", 5, 2, 16, 1, 1087, 2100);
+    ok &= emin_class("E4 no-2", 4, 3, 16, 0, 2257, 3600);
+    ok &= emin_class("E4 le1-2", 4, 2, 16, 1, 329, 600);
+    println!("[retirement thresholds M0 = 1/(2(V4 - W)) per size-6 class, exact]");
+    // W0: V4 = 157/300, W0 = 49/100 -> M0 = 1/(2*(157/300-147/300)) = 300/20 = 15
+    // W1: V4 = 2257/3600, W1 = 7423/12600 -> V4-W1 = (7899.75-...) compute exactly below.
+    let cases: [(&str, (i128,i128), (i128,i128)); 3] = [
+        ("W0", (157,300), (49,100)),
+        ("W1", (2257,3600), (7423,12600)),
+        ("W2", (329,600), (1087,2100)),
+    ];
+    for (nm, (v4n,v4d), (wn,wd)) in cases {
+        // diff = v4n/v4d - wn/wd = (v4n*wd - wn*v4d)/(v4d*wd); M0 = v4d*wd/(2*(v4n*wd - wn*v4d))
+        let dn = v4n * wd - wn * v4d;
+        let dd = v4d * wd;
+        // M0 = dd/(2 dn) (exact rational); box sufficient iff ceil(M0) <= 25
+        let m0_ceil = (dd + 2 * dn - 1) / (2 * dn);
+        let good = dn > 0 && m0_ceil <= 25;
+        println!("  {}: V4-W = {}/{} > 0; peel threshold M0 = {}/{} (ceil {}), box [2..25] sufficient: {}",
+                 nm, dn, dd, dd, 2 * dn, m0_ceil, good);
+        ok &= good;
+    }
+    println!("RESULT: {}", if ok { "ALL PASS" } else { "FAILURES PRESENT" });
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin");
+        std::process::exit(2);
+    }
+    match args[1].as_str() {
+        "drift" => { drift_certificates(); return; }
+        "emin" => { emin_certificates(); return; }
+        _ => {}
+    }
     if args.len() < 3 {
-        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>");
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin");
         std::process::exit(2);
     }
     let n: i128 = args[2].parse().expect("arg must be an integer");

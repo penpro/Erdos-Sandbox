@@ -1,0 +1,47 @@
+# Executable certificates (census drift / census emin)
+# Generated 2026-07-17; reproduce: cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census/Cargo.toml -- drift|emin
+
+=== DRIFT certificates (exact; executable form of the U2 chain + DRIFT-TRANSFER classes) ===
+[U2 free chain]  (any entries >= 2)
+  class free-1         k=1 box=[2,4] twos<=any kernels=    3 claim f>=(1/4)J-(0/1) : PASS   worst deficit 0/240 at [2] J=2
+  retire free 1->2    m*=5  slope-ok=true delta-mono=true
+  class free-2         k=2 box=[2,4] twos<=any kernels=    6 claim f>=(5/36)J-(1/18) : PASS   worst deficit 120/2160 at [2, 3] J=4
+  retire free 2->3    m*=8  slope-ok=true delta-mono=true
+  class free-3         k=3 box=[2,7] twos<=any kernels=   56 claim f>=(5/72)J-(1/9) : PASS   worst deficit 480/4320 at [2, 2, 3] J=4
+  retire free 3->4    m*=11  slope-ok=true delta-mono=true
+  class free-4 (U2)    k=4 box=[2,10] twos<=any kernels=  495 claim f>=(7/300)J-(7/30) : PASS   worst deficit 4200/18000 at [2, 2, 3, 5] J=10
+[no-2 chain]  (all entries >= 3)
+  class no2-1          k=1 box=[3,5] twos<=0 kernels=    3 claim f>=(1/3)J-(0/1) : PASS   worst deficit 0/180 at [3] J=3
+  retire no2 1->2     m*=6  slope-ok=true delta-mono=true
+  class no2-2          k=2 box=[3,5] twos<=0 kernels=    6 claim f>=(17/72)J-(1/8) : PASS   worst deficit 540/4320 at [3, 4] J=9
+  retire no2 2->3     m*=8  slope-ok=true delta-mono=true
+  class no2-3          k=3 box=[3,7] twos<=0 kernels=   35 claim f>=(41/240)J-(19/80) : PASS   worst deficit 3420/14400 at [3, 4, 5] J=57
+  retire no2 3->4     m*=12  slope-ok=true delta-mono=true
+  class no2-4          k=4 box=[3,11] twos<=0 kernels=  495 claim f>=(457/3600)J-(2/5) : PASS   worst deficit 78720/216000 at [3, 4, 5, 7] J=16
+[<=one-2 chain]
+  class le1two-1       k=1 box=[2,5] twos<=1 kernels=    4 claim f>=(1/4)J-(0/1) : PASS   worst deficit 0/240 at [2] J=2
+  retire le1 1->2     m*=5  slope-ok=true delta-mono=true
+  class le1two-2       k=2 box=[2,4] twos<=1 kernels=    5 claim f>=(5/36)J-(1/9) : PASS   worst deficit 120/2160 at [2, 3] J=4
+  retire le1 2->3     m*=10  slope-ok=true delta-mono=true
+  class le1two-3       k=3 box=[2,9] twos<=1 kernels=  112 claim f>=(31/360)J-(1/4) : PASS   worst deficit 4200/21600 at [2, 3, 5] J=10
+  retire le1 3->4     m*=14  slope-ok=true delta-mono=true
+  class le1two-4       k=4 box=[2,13] twos<=1 kernels= 1287 claim f>=(29/600)J-(1/2) : PASS   worst deficit 11400/36000 at [2, 3, 5, 7] J=10
+RESULT: ALL PASS
+
+=== EMIN certificates (E-minima chains + size-6 W-retirement arithmetic, exact) ===
+[free chain E-minima]
+  E1         k=1 box=[2,8] twos<=any candidates=     7: min E = 3/4 at [2]  (claim 3/4) PASS
+  E2         k=2 box=[2,10] twos<=any candidates=    45: min E = 23/36 at [2, 3]  (claim 23/36) PASS
+  E3         k=3 box=[2,12] twos<=any candidates=   286: min E = 41/72 at [2, 2, 3]  (claim 41/72) PASS
+  E4         k=4 box=[2,16] twos<=any candidates=  3060: min E = 157/300 at [2, 2, 3, 5]  (claim 157/300) PASS
+  E5=W0      k=5 box=[2,16] twos<=any candidates= 11628: min E = 49/100 at [2, 2, 2, 3, 5]  (claim 49/100) PASS
+[class E-minima at size 5 (the size-6 kernel W1/W2) and size 4 (drift classes)]
+  W1 no-2    k=5 box=[3,16] twos<=0 candidates=  8568: min E = 7423/12600 at [3, 3, 4, 5, 7]  (claim 7423/12600) PASS
+  W2 le1-2   k=5 box=[2,16] twos<=1 candidates= 10948: min E = 1087/2100 at [2, 3, 3, 5, 7]  (claim 1087/2100) PASS
+  E4 no-2    k=4 box=[3,16] twos<=0 candidates=  2380: min E = 2257/3600 at [3, 3, 4, 5]  (claim 2257/3600) PASS
+  E4 le1-2   k=4 box=[2,16] twos<=1 candidates=  2940: min E = 329/600 at [2, 3, 3, 5]  (claim 329/600) PASS
+[retirement thresholds M0 = 1/(2(V4 - W)) per size-6 class, exact]
+  W0: V4-W = 1000/30000 > 0; peel threshold M0 = 30000/2000 (ceil 15), box [2..25] sufficient: true
+  W1: V4-W = 1715400/45360000 > 0; peel threshold M0 = 45360000/3430800 (ceil 14), box [2..25] sufficient: true
+  W2: V4-W = 38700/1260000 > 0; peel threshold M0 = 1260000/77400 (ceil 17), box [2..25] sufficient: true
+RESULT: ALL PASS

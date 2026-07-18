@@ -2,9 +2,11 @@
 
 Status: `W-FIN PROVED AT PAPER TIER` after Codex hostile review (2026-07-17).
 Claude's Section 7 gap-ladder proof is sound after the two display corrections
-recorded below. Section 8 gives a shorter proof; Section 9's reviewed forced-merge
-proof, including its bad-rich pattern refinement, improves the explicit cutoff to
-less than `2.72 * 10^14`. This is still unusable for enumeration, so full size 5 remains open.
+recorded below. Sections 8-9 give reviewed forced-merge proofs; Section 11's
+source-owned tree refinement gives the universal W-FIN cutoff below
+`2.562 * 10^12`. Section 12 uses the actual C-B residual inequality and
+improves its cutoff to below `7.193 * 10^8`. This is still unusable for
+enumeration, so full size 5 remains open.
 Tiers marked per claim. Companion to `quintuple_density_notes.md`
 ("The C-B reorganization") and `lean/ep488/Ep488/CB.lean`.
 
@@ -598,7 +600,7 @@ T = 4^6 (1107/7)^4 (2228/21)
 
 Status: `PROGRAM` + one `PROVED` seed lemma (Claude/Fable, 2026-07-17). Goal: the
 uniform residual window theorem — *window + `≤2`-good + `CRIT ≤ 7/2` ⟹ `2B(n) > nS`
-on `[2·max, bridge)`* — which makes even the proved `T < 2.72 * 10^14` irrelevant and
+on `[2·max, bridge)`* — which makes even the proved `T < 2.562 * 10^12` irrelevant and
 closes size-5 outright.
 
 **Why the bridge fails on the window, quantitatively.** Summing U2
@@ -649,52 +651,423 @@ pattern still under-repays at `n = 2max` (the bank's worst margin `22/9` sits in
 the low window, so slack is real but not huge). If it dies, the failure pattern
 feeds route (a) (stable-partition classification) instead.
 
-## 11. CLAIMED: window-coupled hosts + bad-owned seeds cut T to ~1.5×10^13
+## 11. Source-owned trees cut the cutoff to `T < 2.562 * 10^12`
 
-Status: `CLAIMED` (Claude/Fable, 2026-07-17) — needs Codex's referee knife before
-any status change. Verified Codex's §10-era refined table exactly first
-(`2.718029482335×10^14` at the `(4,1)` row ✓, all six rows reproduced).
+Status: `PROVED` at paper tier (Codex hostile review, 2026-07-17), strengthening
+Claude/Fable's claimed `1.49 * 10^13` host-geometry bound. The real-relaxation
+direction in the claim was safe, but its alleged binding case
+`4^6 x_1^2 x_2^3` took `x_2` to be the bridge source while failing to use that
+source's own seed-edge gain. The gain changes that expression to
+`4^6 x_1^2 x_2`. Thus the old number was a safe overestimate, not a false upper
+bound, but the geometry catalogue was unnecessary and its binding-case verdict
+was false.
 
-Two principles the current table does not fully exploit:
+**Tree-product lemma.** Let `T_C` be a spanning tree of a component `C`, let
+`q_e` be the gcd on edge `e`, and write `deg(v)` for tree degree. Then
 
-**P1 (window-coupled hosts).** The forced-merge rows charge every host at the
-global cap `U`, but hosts and the bridge source are *distinct-vertex sizes
-constrained by the window sum*: e.g. the `(4,1)` row's `U·U·W` host/source pattern
-needs `U + U + W ≈ 422 ≫ R ≈ 162` — infeasible. The correct charge is the maximum
-of the host-size product over `Σ(participating sizes) ≤ R − (#others)`, an exact
-AM-GM/Lagrange computation per geometry.
+```text
+h_C := gcd(d_v : v in C)
+    >= product_e q_e / product_v d_v^(deg(v)-1).
+```
 
-**P2 (bad-owned seeds).** Every bad vertex owns a heavy edge of quality
-`≥ d_i/4` — proportional to *its own size*. Choosing the spanning tree to start
-at (and route through) bad-owned edges makes those sizes appear in the
-*numerator* of the propagation, cancelling host losses (this is the mechanism of
-Codex's `(3,1,1)` refinement, applied systematically).
+To prove it, start with any tree edge and attach the remaining vertices away
+from that root edge. At an attachment through parent `u`, the usual lcm step
+loses at most a factor `d_u`. Each vertex is used as a parent exactly
+`deg(v)-1` times. This is the Section 9 propagation with the actual host sizes
+retained instead of replacing every host by `Ud`.
 
-**Worked `(4,1)` row** (`Z_full = 4⁶·(host₁·host₂)²·x_src / (seed-owner gains)`,
-geometry cases, real-relaxation upper bounds — safe direction):
-- (a) good-hub star, seed = source's own edge: `Z ≤ 4⁶·x_hub⁴/x_src ≤ 4⁶U⁴ ≈ 2.56×10^12`;
-- (b) bad-hub (= source, `≤ W`), seed cancels one hub loss: `Z ≤ 4⁶W³ ≈ 4.9×10^9`;
-- (c) distinct hosts, source separate: `max x₁²x₂²x_s` s.t. `Σ ≤ R−2` → `≈ 2.21×10^12`;
-- (e) source = one host (bad `≤ W`): `max x₁²x₂³` s.t. `x₁+x₂ ≤ R−2`, `x₂ ≤ W`:
-  interior optimum `(2s/5, 3s/5)` is feasible (`3s/5 ≈ 96.1 < W`), giving
-  **`Z ≤ 4⁶·(2s/5)²(3s/5)³ ≈ 1.491×10^13`** — the new binding case.
-  *(Process note: my first evaluation used the corner `x₂ = W` — wrong side of the
-  cap check; caught on the exact redo. Same class of slip as the display errors
-  Codex caught in §7 — constants want exact evaluation, always.)*
+**Initial `(4,1)` pattern.** Let `s` be a globally bad vertex that forces the
+last bridge, and normalize `d_v=x_v d`, where `d=min(D)` and
+`1 <= x_v <= U=1107/7`. Badness gives an incident edge
 
-**Claimed new table:** `(4,1)` v2 `≈ 1.491×10^13`; `(2,2,1)` pair-single old-safe
-`1.153×10^13` (untreated — expected to fall below `10^13` under P1/P2); others
-`≤ 1.3×10^12`. **Claimed `T ≈ 1.49×10^13`** (×18.2 vs `2.72×10^14`).
+```text
+q_s >= d_s/4 = x_s d/4.
+```
 
-**Referee targets for Codex:** (i) exhaustiveness of the geometry cases
-(a/b/c/e + the small mixed ones I checked at `≤ 2.5×10^9`); (ii) the tree-order
-claim behind P2 (any heavy edge can be first; the source's own edge is in-component
-because it is heavy); (iii) the real-relaxation direction (maxima over reals
-upper-bound the integer configurations); (iv) re-tabulate ALL rows under P1+P2 —
-the pair-single row is next.
+The initial singleton has every cross gcd `<d/4 <= d_s/4`, so this owned edge
+lies inside the four-component. Choose a seed spanning tree containing it; the
+other two tree edges have gcd at least `d/4`. Put
 
-**Honest plateau assessment (unchanged by this):** even at `10^13`, and even if
-P1/P2 push toward `10^11–12`, the bank cannot enumerate to `T`. Constant-polishing
-has earned its keep (10^(10^7) → 10^102 → 6.5×10^20 → 2.7×10^14 → claimed
-1.5×10^13 in four passes) but is plateauing; **DRIFT-TRANSFER (§10) remains the
-route that closes size-5**, because it avoids `T` entirely.
+```text
+H_T := product_{v in C} x_v^(deg(v)-1).
+```
+
+The degree exponents sum to `2`, so `H_T <= U^2`. The tree-product lemma gives
+
+```text
+h_4 >= d x_s/(4^3 H_T).
+```
+
+The final bridge has gcd `g >= h_4` and is sourced at `s`. Since both `h_4` and
+`g` divide `d_s=x_s d`, the full common gcd satisfies
+
+```text
+h_5 >= h_4 g/d_s
+    >= d x_s/(4^6 H_T^2)
+    >= d/(4^6 U^4).
+```
+
+Thus the entire initial `(4,1)` row is bounded by `4^6U^4`. This covers star and
+path trees simultaneously. In Claude's source-is-an-internal-host case, the
+source-owned edge contributes `x_s^2` after squaring `h_4`; the final lcm loss
+returns only one `x_s`, which is precisely the missing cancellation.
+
+**The pair-singleton path.** The previous Section 9 table left one
+`(2,2,1)` route at its coarse bound. Let the pair gcds be `q_A,q_B >= d/4`.
+Every globally bad pair vertex `i` has `d_i<3d/2`, because all three cross edges
+are `<d/4` and
+
+```text
+d_i <= q + cross_sum < d_i/2 + 3d/4.
+```
+
+Suppose the first forced bridge joins pair `A` to the singleton. It has
+`g_1>=q_A/3`, so the resulting triple common gcd is
+
+```text
+h_3 >= q_A g_1/d_i > d/72.
+```
+
+The remaining partition is this triple and pair `B`.
+
+- If the second bridge is sourced in the triple, then its source is an original
+  bad pair vertex, so `d_i<3d/2`, and `g_2>=h_3/2`. After adjoining its target
+  in pair `B`, the common gcd is greater than `d/15552`. Adjoining the target's
+  partner through `q_B`, with target size at most `Ud`, gives
+  `h_5>d/(62208U)`.
+- If the second bridge is sourced in pair `B`, then `g_2>=q_B/3`. Adjoining its
+  target in the triple gives common gcd greater than `d/72`. Both this divisor
+  and `h_3>d/72` divide the target, whose size is at most `Ud`; hence
+  `h_5>d/(5184U)`.
+
+Therefore the pair-singleton route has terminal denominator at most `62208U`,
+not `18U^4 4^5`.
+
+**Final exact table.** Combining these two refinements with the already reviewed
+Section 9 rows gives
+
+| Initial pattern | Terminal denominator bound |
+|---|---:|
+| `(5)` | `U^3 * 4^4` |
+| `(4,1)` | `4^6 * U^4` |
+| `(3,2)` | `2U^4 * 4^5` |
+| `(3,1,1)` | `4^9 * U^3` |
+| `(2,2,1)`, pair joins pair first | `(3/2)(288U)^2` |
+| `(2,2,1)`, pair joins singleton first | `62208U` |
+
+At `U=1107/7`, the `(4,1)` row is largest. Since `gcd(D)=1`, W-FIN holds with
+
+```text
+T = 4^6 (1107/7)^4
+  = 6151066630557696 / 2401
+  = 2.561876980657... * 10^12.
+```
+
+This is a factor `2228/21 = 106.095...` below the previous reviewed cutoff and
+about `5.82` below Claude's claimed value. It remains far beyond the residual
+bank. Full size 5 and full Erdos #488 remain open; DRIFT-TRANSFER remains the
+more relevant closing program.
+
+## 12. The residual inequality cuts the C-B cutoff to `T < 7.193 * 10^8`
+
+Status: `PROVED` at paper tier (Codex, 2026-07-17). This section is deliberately
+scoped more narrowly than W-FIN. In addition to the Section 11 hypotheses, use
+the C-B residual condition
+
+```text
+E := N/d
+   = sum_i (x_i - sum_{j != i} gamma_ij) <= 7/2,
+x_i := d_i/d,  gamma_ij := gcd(d_i,d_j)/d,
+```
+
+where `x_i >= 1`, `sum x_i <= R=1135/7`, and an edge of the initial graph means
+`gamma_ij >= 1/4`. For a divisibility antichain,
+`gamma_ij <= min(x_i,x_j)/2`. The universal cutoff in Section 11 remains valid
+without `E <= 7/2`; only the C-B residual gets the stronger number below.
+
+### Residual size bounds
+
+These bounds are consequences of the displayed inequalities, not a search.
+
+**Pattern `(4,1)`.** Let `y` be the singleton. Every edge from `y` is below
+`1/4`. A bad vertex `b` in the four-component satisfies
+
+```text
+b < (sum of the other three component sizes)/2 + 1/4,
+```
+
+so the window gives
+
+```text
+b < B := (R-1/2)/3 = 2263/42.
+```
+
+If the four-component has a good vertex `c` and three bad vertices of total
+size `K`, write `e_i=x_i-sum_j gamma_ij`. Then
+
+```text
+e_c > c-K/2-1/4,
+sum_bad e_i > -K/2-3/4,
+e_y > y-1.
+```
+
+Thus `E>c-K+y-2`. Combining `E<=7/2`, `K+c+y<=R`, and `y>=1` gives
+
+```text
+c < V := (R+7/2)/2 = 2319/28.
+```
+
+There is one much tighter sparse case. If the seed graph has no bad-bad edge,
+connectedness forces a star centered at the unique good vertex `c`. Each bad
+leaf then has `e_b>b/2-3/4`, so `E>c+y-7/2`; hence `c<6`.
+
+**Pattern `(3,2)`.** For a triple vertex `a`, `e_a>-1/2`; for a pair vertex
+`p`, `e_p>p/2-3/4`. Consequently every pair entry satisfies `p<12`. A bad
+triple entry is below `(R-1)/3`, while a good triple entry satisfies
+
+```text
+a < A := (R+9)/3 = 1198/21.
+```
+
+For the latter claim, if the other triple entries are `b,c` and the pair is
+`p,q`, then
+
+```text
+E > a-(b+c)/2+(p+q)/2-3
+  >= 3a/2-R/2-1.
+```
+
+**Pattern `(3,1,1)`.** Let the sorted triple sizes be `M>=m>=ell`. The seven
+cross-component gcds are below `1/4`, and twice the sum of the three internal
+gcds is at most `m+2ell`. Therefore
+
+```text
+E > M-ell-3/2,
+```
+
+so `M-ell<5`.
+
+**Pattern `(2,2,1)`.** Every pair entry `p` satisfies `p<10`: its own error is
+greater than `p/2-3/4`, the other three pair errors are each greater than
+`-1/4`, and the singleton error is positive. Every bad pair entry still has
+the stronger Section 11 bound `p<3/2`.
+
+### Sharpened merge rows
+
+The tree-product notation is that of Section 11. If the product of the
+size-gains on selected tree edges is `C_T`, then a four-tree gives
+
+```text
+h_4 >= d C_T/(4^3 H_T),
+h_5 >= d C_T^2/(4^6 H_T^2 x_s),
+```
+
+where `s` is the final bad bridge source.
+
+**The `(4,1)` row.** Choose an `s`-owned edge `e_s`. If there is no bad-bad
+seed edge, the sparse good-center star above gives terminal denominator less
+than `4^6*6^4`.
+
+Otherwise choose a tree containing `e_s` and a bad-bad edge. Some bad vertex
+`t` is internal. The usual one-edge exchange can retain `e_s`, make a
+`t`-owned edge `e_t` part of the tree, and keep `t` internal. If `e_t != e_s`,
+the two distinct gains give a denominator at most `4^6 V^2` (a star gives the
+smaller `4^6B^2`).
+
+If `e_t=e_s`, then this edge is owned by the two bad endpoints `s,t`. Let `r`
+be a third bad vertex and include an `r`-owned edge as well. A star, or a path
+with `e_s` as its middle edge, has denominator at most `4^6B^3`. The only
+remaining geometry is a path in which `e_s` is an end edge, the other internal
+vertex `u` is good, and `r` is the opposite bad leaf. Put
+`M=max(s,t)` and `m=min(s,t)`. Retaining the shared-edge gain `M` and the
+`r`-gain bounds the tree denominator by at most `4^6 M u^2/r^2`.
+
+Both `s` and `t` are bad. For the larger one, its four gcds are bounded by
+`m/2`, `M/2`, `r/2`, and `1/4`, respectively. Hence
+
+```text
+M < m+r+1/2,
+```
+
+and the terminal denominator is less than
+
+```text
+4^6 * (m+r+1/2) u^2/r^2.
+```
+
+The individual error bounds along this path are
+
+```text
+e_s+e_t > (M-m)/2-r-1/2,
+e_r > -r/2-1/4,
+e_u > u-(M+m+r)/2-1/4,
+e_y > y-1.
+```
+
+Thus `E>u+y-m-2r-2`, and residual plus window give
+
+```text
+u < min(m+2r+9/2, R-2m-r-1).
+```
+
+It remains to maximize the two-variable real relaxation
+
+```text
+G(m,r) = (m+r+1/2)/r^2
+         * min(m+2r+9/2, R-2m-r-1)^2.
+```
+
+For fixed `r`, the first branch increases in `m`. On the second branch its
+derivative has factors `D-2m` and `D-6m-4r-2`, where `D=R-r-1`; the branch
+meeting point lies to the right of the latter critical point. When the meeting
+point is feasible, it is therefore the maximum for that `r`; if it falls below
+`m=1`, the whole feasible second branch is decreasing and its boundary value is
+smaller. Thus the global maximum can be taken where the two bounds meet:
+
+```text
+m = R/3-r-11/6.
+```
+
+At that point `m+r+1/2=(R-4)/3=369/7` and
+`u=R/3+r+8/3`. The ratio `u/r=1+(R/3+8/3)/r` decreases with `r`, so the
+global maximum is at `r=1`, where `m=717/14` and `u=404/7`. Hence the
+`(4,1)` row is at most
+
+```text
+4^6 (369/7)(404/7)^2
+  = 246688579584/343
+  = 7.19208686834... * 10^8.
+```
+
+**The `(3,2)` row.** If the first source is in the triple, choose a source-owned
+seed edge. When the tree host is good, the bounds `host<A` and `target<12`
+give
+
+```text
+h_5 > d/(2048*12*A^2).
+```
+
+When the host is bad, its own edge is already one of the two triple-tree edges;
+the distinct/shared owner cases are smaller. If the first source is in the
+pair, combining the `d/72` pair-target divisor with the triple divisor gives
+`h_5>d/(1152A^2)`. Thus the row is at most
+
+```text
+24576 A^2 = 11757191168/147 = 7.99808922993... * 10^7.
+```
+
+**The `(3,1,1)` row.** The bad-owned triple tree used in Section 9 retains the
+smallest triple size and gives `h_3>ell*d/16`. Both bridge sources are at most
+`Md`, so
+
+```text
+h_5 > d ell^4/(4^9 M^3).
+```
+
+Since `M<ell+5` and `(ell+5)^3/ell^4` decreases for `ell>=1`, this row is less
+than `4^9*216=56623104`.
+
+**The `(2,2,1)` rows.** Replacing the old target cap `U` by `10` changes the
+pair-pair path to `(3/2)*2880^2=12441600`. The pair-singleton path is at most
+`622080`; its two final-source subcases give `622080` and `51840`.
+
+**The `(5)` row.** If the connected seed graph contains a bad-bad edge,
+choose a tree containing it. At least one bad endpoint is internal. A one-edge
+exchange includes an edge owned by that internal bad vertex while keeping it
+internal. The owned size factor cancels one of the three host exponents, so
+
+```text
+d <= 4^4 U^2 = 313714944/49.
+```
+
+Suppose instead that there is no bad-bad seed edge. Connectedness and at least
+three bad vertices leave either one or two good vertices. With one good vertex
+`c`, the seed graph is a good-center star; summing the errors gives
+`E>c-3`, hence `c<13/2`.
+
+With two good vertices `c,u` and three bad vertices of total size `K`, each
+bad error is greater than `-1/2`, while
+
+```text
+e_c+e_u >= max(c,u)-K.
+```
+
+Thus `E>max(c,u)-K-3/2`, so `max(c,u)<K+5`. Combining this with the window
+and the other good size being at least one gives
+
+```text
+max(c,u) < G := (R+4)/2 = 1163/14.
+```
+
+Every bad vertex is below `R/3<G`. Therefore any four-edge seed tree has
+`H_T<G^3`, even before using its bad-owned gains, and the no-bad-bad case is
+bounded by
+
+```text
+4^4 G^3 = 50337207904/343
+        = 1.46755708175... * 10^8.
+```
+
+### Exact residual table
+
+| Initial pattern | Residual terminal denominator bound |
+|---|---:|
+| `(5)` | `4^4 G^3 = 50337207904/343` |
+| `(4,1)` | `246688579584/343` |
+| `(3,2)` | `11757191168/147` |
+| `(3,1,1)` | `56623104` |
+| `(2,2,1)`, pair joins pair first | `12441600` |
+| `(2,2,1)`, pair joins singleton first | `622080` |
+
+The `(4,1)` shared-edge path is now the largest. Therefore the actual C-B
+residual satisfies
+
+```text
+d <= T_CB := 4^6(369/7)(404/7)^2
+           = 246688579584/343
+           = 7.192086868338... * 10^8.
+```
+
+This is a factor `4069716129/1142512 = 3562.0773...` below the universal
+Section 11 cutoff. It is still far beyond the current exact bank, so this does
+not close size 5 or Erdos #488. The next cutoff attack should either sharpen the
+shared `(4,1)` path or replace finite enumeration by a uniform certificate.
+
+## 12. DRIFT-TRANSFER lemma 1: per-class drift certificates — PROVED (executable)
+
+Status: `PROVED-BY-CERTIFICATE` (Claude, 2026-07-17). `census drift` + `census emin`
+(exact i128; `f·60` integral; retirement thresholds cross-multiplied) — output
+committed as `census/CERTIFICATES.txt`, reproducible in <1s. This simultaneously
+pays both standing reproducibility debts (the U2 kernel list and the size-6
+`W`-retirement) with strictly stronger, fully-boxed certificates.
+
+**Certified drift chains** (`f(J) ≥ σJ − δ` for ALL multisets of the class, any
+entries; kernels = boxed multisets, everything above the box retired by the exact
+peel `σ_{k−1} − 1/(2m*) ≥ σ_k` with `δ` monotone):
+
+| class | σ (slope) | δ (defect) | kernels | retire m* chain | tight at |
+|---|---|---|---|---|---|
+| free 1..4 (U2) | `1/4, 5/36, 5/72, 7/300` | `0, 1/18, 1/9, 7/30` | 3+6+56+495 | 5, 8, 11 | `(2,2,3,5)`, `J=10` (deficit exactly `7/30`) |
+| no-2 1..4 | `1/3, 17/72, 41/240, 457/3600` | `0, 1/8, 19/80, 2/5` | 3+6+35+495 | 6, 8, 12 | `(3,4,5,7)`, `J=16` |
+| ≤one-2 1..4 | `1/4, 5/36, 31/360, 29/600` | `0, 1/9, 1/4, 1/2` | 4+5+112+1287 | 5, 10, 14 | `(2,3,5,7)`, `J=10` |
+
+**Honest process notes.** The tool CORRECTED my claimed constants in two places
+(no-2 `δ₂ = 1/8` not `1/9`, `δ₃ = 19/80` not `1/5`; ≤one-2 retirement `m* = 10`
+not `9` — the exact check caught my by-hand threshold slip), and my first `e_of`
+implementation overflowed `i128` exactly as Codex's audit warned primal products
+could — rewritten with a fixed common denominator `60·lcm` (numerators bounded by
+`2⁵·60·L`, no overflow possible in these boxes).
+
+**Also certified (`census emin`):** the full E-minima chains (`3/4, 23/36, 41/72,
+157/300, 49/100`) and class minima (`W₁ = 7423/12600`, `W₂ = 1087/2100`,
+`E₄^{no2} = 2257/3600`, `E₄^{≤1·2} = 329/600`), plus the size-6 retirement
+arithmetic: peel thresholds `M₀ = 15, 14, 17` for `W₀, W₁, W₂` — proving the
+`[2..25]` box of `audit_sext_density_lemma.py` **sufficient** (the step its own
+scope-caution flagged as unproved).
+
+**What remains for DRIFT-TRANSFER (§10):** lemma 2 (class assignment on residual
+cores — the structural step, where DRIFT-1's forced odd moduli meet the certified
+slopes) and the assembly. The certified numbers to beat, on the window `n ≥ 2max`:
+defects total ≤ `2·Σδ ≤ 7/3`-ish + `(5−S)` fractional loss vs slope gains
+`2σ_K·⌊n/a⌋` per element — with `σ` now 2–5× the U2 baseline for every element
+DRIFT-1 pushes out of the extremal class.
