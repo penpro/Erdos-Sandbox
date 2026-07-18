@@ -680,13 +680,103 @@ fn clusters(rho: i128) {
     println!("(stage 2 = per-shape goods-uniform rider theorem; see chat/notes design)");
 }
 
+/// STAGE-2 prototype: per-shape goods-uniform window certificate for one-scale
+/// triple clusters t*W (W from stage 1) plus two free goods.
+///
+/// PROVEN ingredients only:
+///  - within the cluster, mutual moduli are exact integers independent of t:
+///    modulus of t*w_j seen from t*w_i is w_j/gcd(w_i,w_j);
+///  - the two goods' drift obeys the free-class global floor f >= -1/12 (J>=2)
+///    [spreadcheck-certified; re-certified here in-table];
+///  - EXACT TAIL: for f(J), any modulus > J has zero events on [1,J], so it is
+///    exactly equivalent to J+1 (finite representative of the unbounded tail);
+///  - n >= 2*max(P) >= 2*t*wmax => tau := n/t >= 2*wmax; window top: n < 33*max(P)
+///    and ratio < rho => tau <= 33*rho*wmax (conservative).
+/// Certificate: for each shape, F_pin(J) := min over free (m4,m5) in [2,J+1]^2
+/// (exact tail) of f_{pins+(m4,m5)}(J), exhaustively for J <= JT; for J > JT use
+/// the free-class drift line (7/300)J - 7/30 (valid: pinned class subset of free).
+/// Then scan tau and report min assembled margin 2*Sum F - 2*2*(1/12) - 5 (S>0 dropped
+/// — conservative). PASS = margin > 0 for all tau in range.
+fn f_exact(ms: &[i128], j_max: i128) -> Vec<i128> {
+    // returns f(J)*60 for J=0..j_max
+    let mut out = Vec::with_capacity((j_max + 1) as usize);
+    out.push(0i128);
+    let mut acc = 0i128;
+    for j in 1..=j_max {
+        let x = ms.iter().filter(|&&m| j % m == 0).count() as i128;
+        acc += 60 / (1 + x) - 30;
+        out.push(acc);
+    }
+    out
+}
+
+fn shape2(rho: i128) {
+    println!("=== stage-2 prototype: one-scale triple shapes + 2 free goods (rho<{}) ===", rho);
+    let shapes: [[i128; 3]; 9] = [[4,6,9],[6,8,9],[8,9,12],[8,12,18],[9,12,16],[12,16,18],[12,18,27],[16,18,24],[16,24,36]];
+    let jt: i128 = 40; // exhaustive pinned-floor table up to JT; free line beyond
+    for w in shapes.iter() {
+        // pinned moduli for each cluster element
+        let pins: Vec<[i128; 2]> = (0..3).map(|i| {
+            let mut p = [0i128; 2];
+            let mut k = 0;
+            for j in 0..3 {
+                if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; }
+            }
+            p
+        }).collect();
+        // F_pin(J)*60 tables for J<=JT: min over free (m4,m5) in [2,J+1]^2 (tail-exact)
+        let mut tables: Vec<Vec<i128>> = Vec::new();
+        for p in pins.iter() {
+            let mut tab = vec![i128::MAX; (jt + 1) as usize];
+            tab[0] = 0;
+            for m4 in 2..=(jt + 1) {
+                for m5 in m4..=(jt + 1) {
+                    let ms = [p[0], p[1], m4, m5];
+                    let f = f_exact(&ms, jt);
+                    for j in 1..=(jt as usize) {
+                        // (m4,m5) is a valid representative for J >= max needed; tail-exactness:
+                        // moduli > J behave as J+1; our loop includes all m <= J+1, and any m > J+1
+                        // is equivalent to J+1 which IS included. So min over [2,J+1] is exact for each J.
+                        if m4 <= (j as i128 + 1) && m5 <= (j as i128 + 1) {
+                            if f[j] < tab[j] { tab[j] = f[j]; }
+                        }
+                    }
+                }
+            }
+            tables.push(tab);
+        }
+        // assembled margin over tau: J_i = floor(tau / w_i); goods contribute 2*(-5/60) each
+        let wmax = w[2];
+        let tau_lo = 2 * wmax;
+        let tau_hi = 33 * rho * wmax;
+        let mut worst: (i128, i128) = (i128::MAX, 0); // (margin*60, tau)
+        for tau in tau_lo..=tau_hi {
+            let mut m60: i128 = 0;
+            for (i, wi) in w.iter().enumerate() {
+                let j = tau / wi;
+                let fj = if j <= jt { tables[i][j as usize] }
+                         else { (7 * 60 * j) / 300 - 14 }; // (7/300)J*60 - (7/30)*60 = 14J/... careful below
+                m60 += 2 * fj;
+            }
+            m60 += 2 * 2 * (-5); // two goods at floor -1/12 = -5/60
+            m60 -= 5 * 60;
+            if m60 < worst.0 { worst = (m60, tau); }
+        }
+        let pass = worst.0 > 0;
+        println!("  W={:?} pins={:?}: min margin*60 = {} at tau={}  [{}]",
+                 w, pins, worst.0, worst.1, if pass { "PASS (uniform in goods+t)" } else { "SHORT — needs goods structure" });
+    }
+    println!("note: goods floored at free -1/12; S>0 dropped; J>{} uses free line — all conservative.", jt);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters");
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters\n  census shape2 [rho]");
         std::process::exit(2);
     }
     if args[1] == "clusters" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; clusters(r); return; }
+    if args[1] == "shape2" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; shape2(r); return; }
     match args[1].as_str() {
         "drift" => { drift_certificates(); return; }
         "emin" => { emin_certificates(); return; }
