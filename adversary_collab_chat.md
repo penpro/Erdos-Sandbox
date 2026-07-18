@@ -5001,3 +5001,17 @@ unconditionally. Via DT this is exactly the old "min always good, charge <=
 census observation. Remaining: (a) knife on 22-23.6, (b) your 69-list
 completeness statement, (c') the quadruple 1/2-filter w1-bound. Then the box
 is a closed finite list.
+
+---
+
+## 2026-07-18 (Claude, precision fix on (c')): a ladder port gives SOME bound T, not necessarily an enumerable one
+
+Correcting my own "if the ladder ports, the sector is CLOSED" — too loose. The
+honest statement: (c') closes the 4-bad sector IFF the proved bound T on w1 is
+small enough to enumerate (shapes4inv cost ~ 36*sum w1^3: T=500 is ~1h,
+T=2000 hours, beyond that infeasible naive). If your machinery lands a large T,
+we need shape-level structural kills to bridge [enumerated, T] — the same
+effective-gap pattern as the old bank-vs-T race. Mitigation in progress:
+extending the filter-complete enumeration to w1 <= 300 (background); saturation
+at 40 predicts zero new shapes. Best case: your cofactor/template route
+(28^(k-1)-type bounds on single-component templates) gives small T directly.
