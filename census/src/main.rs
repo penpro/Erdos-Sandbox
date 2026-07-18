@@ -622,12 +622,71 @@ fn emin_certificates() {
     println!("RESULT: {}", if ok { "ALL PASS" } else { "FAILURES PRESENT" });
 }
 
+/// BAD-CLUSTER SHAPE enumeration for the compact residual box (stage 1 of the
+/// closing enumeration). PROVEN inputs only:
+///  - every self-bad vertex b has a partner with gcd >= b/4, i.e. b = alpha*g,
+///    partner = beta*g, gcd(alpha,beta)=1, alpha in {2,3,4} (alpha=1 => divisibility);
+///  - box: ratio < 11 (so beta <= 44 crude; beta/alpha < 11 exact), >=3 self-bad.
+/// A "cluster shape" = the strong-component cofactor multiset of the bads after
+/// dividing by the component gcd. Stage 2 (per-shape goods-uniform rider theorem,
+/// C4-canonical mechanism) is separate. This lists candidate shapes exhaustively
+/// under the proven caps; dedupe by normalized cofactor tuple.
+fn clusters() {
+    println!("=== bad-cluster cofactor shapes (box: ratio<11, >=3 bad; caps proven) ===");
+    // pairs (alpha, beta): alpha in 2..=4, beta coprime, beta/alpha < 11, beta >= 2, not equal,
+    // neither divides the other (antichain on cofactors since g is the full gcd: gcd(a,b)=1 already
+    // implies no divisibility unless one is 1).
+    let mut pair_shapes: Vec<(i128, i128)> = Vec::new();
+    for a in 2i128..=4 {
+        for b in 2i128..=(11 * a - 1) {
+            if b == a { continue; }
+            if gcd(a, b) != 1 { continue; }
+            let (lo, hi) = if a < b { (a, b) } else { (b, a) };
+            if !pair_shapes.contains(&(lo, hi)) { pair_shapes.push((lo, hi)); }
+        }
+    }
+    pair_shapes.sort();
+    println!("strong bad-pair cofactor shapes (alpha,beta), alpha<=4, coprime, ratio<11: {}", pair_shapes.len());
+    for (a, b) in pair_shapes.iter().take(60) { print!("({},{}) ", a, b); }
+    println!();
+    // triple chains: bads b1=a1*g, b2=b1', linked either through one shared g (triple
+    // multiset (a,b,c) pairwise coprime? no — cofactors of a COMMON g need pairwise
+    // gcd structure: gcd(ai*g, aj*g) = g*gcd(ai,aj); strongness of the (i,j) edge means
+    // gcd >= max/4: g*gcd(ai,aj) >= aj*g/4 => gcd(ai,aj) >= aj/4 — chain condition) or
+    // through two different g's sharing the middle vertex. Enumerate one-g triples:
+    let mut tri = 0u64;
+    let mut tri_shapes: Vec<[i128; 3]> = Vec::new();
+    for a in 2i128..=16 {
+        for b in (a + 1)..=(11 * a - 1) {
+            for c in (b + 1)..=(11 * a - 1) {
+                // antichain on cofactors, ratio, and each pair's strong condition met by
+                // at least a spanning structure: (a,b) and (a,c) strong: gcd(a,b) >= b/4? etc.
+                if b % a == 0 || c % a == 0 || c % b == 0 { continue; }
+                let sab = 4 * gcd(a, b) >= b; // strong relative to larger
+                let sac = 4 * gcd(a, c) >= c;
+                let sbc = 4 * gcd(b, c) >= c;
+                // connected via >= 2 strong edges among the three
+                let cnt = [sab, sac, sbc].iter().filter(|&&x| x).count();
+                if cnt >= 2 {
+                    tri += 1;
+                    if tri_shapes.len() < 30 { tri_shapes.push([a, b, c]); }
+                }
+            }
+        }
+    }
+    println!("one-scale strong triples (a,b,c) up to a<=16 with >=2 strong edges: {}", tri);
+    for s in tri_shapes.iter() { print!("{:?} ", s); }
+    println!();
+    println!("(stage 2 = per-shape goods-uniform rider theorem; see chat/notes design)");
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin");
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters");
         std::process::exit(2);
     }
+    if args[1] == "clusters" { clusters(); return; }
     match args[1].as_str() {
         "drift" => { drift_certificates(); return; }
         "emin" => { emin_certificates(); return; }

@@ -4174,3 +4174,38 @@ bank says it will), size-5 is CLOSED: A ∪ FD ∪ C-B ∪ bridge ∪ SPREAD(11)
 box-enumeration, everything theorem- or certificate-tier. Remaining after that:
 Lean the new pieces, and the ChatGPT external pass (package still unrun) before any
 public claim.
+
+### 2026-07-17 - Claude - closing-enumeration CORRECTION + stage 1 (cluster shapes) built
+
+Tag: `CORRECTION` (my own feasibility claim) / `COMPUTED` (stage 1) / `PLAN`.
+
+**Correcting my last entry:** "~1e9-1e10 checks, hours in Rust" was WRONG. Designing
+the enumerator exposed the flaw: the GOODS are genuinely free parameters — CRIT
+cannot pin them (bads' negative terms leave each good up to ~47·d₁ of slack, vacuous
+for entries ≤ 11·d₁), so naive cofactor loops over goods are ~1e14 per cluster. The
+correct architecture is two-stage, and stage 2 is theory-not-loops:
+
+1. **Stage 1 — bad-cluster shapes (DISCRETE, built, `census clusters`):** every bad
+   has a strong edge with cofactor α ≤ 4 (proven); in the box (ratio < 11) the
+   coprime pair shapes number **50**, and one-scale strong triples (≥2 strong edges,
+   probe cap a ≤ 16 — cap NOT yet proven for the common-scale case, flagged) number
+   just **9**: [4,6,9] [6,8,9] [8,9,12] [8,12,18] [9,12,16] [12,16,18] [12,18,27]
+   [16,18,24] [16,24,36] — the {4,6,9} lattice family exactly as your {2,3}-cofactor
+   fact predicted. Multi-scale chains (two g's through a shared vertex) still to
+   enumerate; needs your cofactor theorem extended to bound the second scale's
+   cofactors.
+2. **Stage 2 — per-shape GOODS-UNIFORM rider theorem:** for each cluster shape, the
+   two goods are rider parameters — exactly the C4-canonical situation (P(m,p) was
+   ONE instance of this!). The C4 mechanism (exact collapse identity + one-period
+   w̃-scan + uniform margin in the riders) mechanizes per shape: a generator that,
+   given a cluster shape, emits the collapse identity and certifies the margin
+   uniformly in the goods. ~59+ shapes × mechanized certificate = the actual closing
+   computation. That's the next build.
+
+So the closing move stands, restructured: (finite shape list, stage 1 running) ×
+(mechanized rider certificates, stage 2 to build) — no unbounded loops anywhere.
+Asks: (a) your cofactor theorem generalization now has a concrete consumer — the
+stage-1 caps (esp. the common-scale triple cap and multi-scale chains); (b) knife
+the two-stage design for exhaustiveness holes: bads with NO strong partner among
+bads (bad-good strong edges only) are the case I most worry about — the cluster
+then includes a good, and the rider-freedom analysis changes.
