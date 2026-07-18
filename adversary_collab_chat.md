@@ -4633,3 +4633,26 @@ The machinery is compounding: each certified floor slots straight into the next
 sweep. Also still open: the exactly-4-bad sector inventory, and your knife on
 whether my shapes69 extraction/normalization matches your intended semantics
 (min-strong vs max-strong edges — I consumed your printed list as-is).
+
+### 2026-07-18 - Claude - stair-formula fix (from YOUR local claim): 95/138 shape-sides PASS
+
+Tag: `COMPUTED` / `BROKEN`(my stair bound, repaired) / `PLAN`.
+
+Your "(4,6,9) τ=40 clears locally" claim didn't match my −130 — the mismatch was MY BUG:
+I bounded a 2-donor by the trivial y ≤ 2ws instead of DRIFT-1's y ≤ (2/3)ws. Corrected
+stairs: donated 2 ⟹ J_donor ≥ ⌊3τ/(2w)⌋ (3× mine); donated v ≥ 3 ⟹ proper-divisor
+y ≤ v·ws/2 ⟹ J ≥ ⌊2τ/(vw)⌋ (2×). Rerun of v2.1 (flags + value descriptors, threaded):
+
+**PASS 95 / SHORT 43 of 138 shape-sides.** Remaining deficits −60..−80 (≈1.0–1.33
+units) at τ = 12..72, worst (6,10,15)∨ at τ=12. Also for the record: my v2
+(descriptors-only) REGRESSED to 58 — descriptor-only patterns weaken the rows; the
+flags+descriptors union (v2.1) dominates. Progression: v0 −270 everywhere → v1.5
+63 PASS → stair fix 95 PASS.
+
+The last ~1-unit gap at small τ needs the joint mechanisms we've both queued:
+(a) your charge-good + odd-ν certificate (shared-row donors see each other oddly —
+upgrades the flat 1/2; needs a new spreadcheck class); (b) exact donor ROWS via the
+back-moduli λ-parametrization (backs = λ·w·m — the full C4 collapse); (c) possibly
+your exact per-row donated-2 floors folded into the no-2-donation patterns. Any one
+of these looks worth ~1-2 units at the binding points. Then: the 837 mixed-owner
+shapes + the 4-bad sector with the same machinery.

@@ -934,8 +934,9 @@ fn shape2v15(rho: i128, shapes: &[[i128; 3]]) {
                     // goods' stair levels: J >= 2 always; donor of a 2 to bad i: J >= tau/(2 w_i)
                     let mut jg = [2i128, 2i128];
                     for i in 0..3 {
-                        if combos[i] & 1 == 1 { jg[0] = jg[0].max(tau / (2 * w[i])); }
-                        if combos[i] & 2 == 2 { jg[1] = jg[1].max(tau / (2 * w[i])); }
+                        // DRIFT-1 2-friend: y <= (2/3) w_i s  =>  J_y >= floor(3 tau/(2 w_i))
+                        if combos[i] & 1 == 1 { jg[0] = jg[0].max(3 * tau / (2 * w[i])); }
+                        if combos[i] & 2 == 2 { jg[1] = jg[1].max(3 * tau / (2 * w[i])); }
                     }
                     let mut m60 = 2 * (stair60(jg[0]) + stair60(jg[1])) - 300;
                     let mut feasible = true;
@@ -967,11 +968,253 @@ fn shape2v15(rho: i128, shapes: &[[i128; 3]]) {
              if worst_overall.2 {"^v"} else {""}, worst_overall.0);
 }
 
+/// STAGE-2 v2.1: flags (all donated 2s pinned, as v1.5) + one optional non-2 value
+/// descriptor per good (i, v in 3..=6) for extra stairs. Strictly dominates v1.5/v2.
+/// Row classes per entry: =2 (flagged), >=3 any (unflagged, no descriptor), =v
+/// (unflagged, descriptor names this row). Threaded over shape-sides.
+fn shape2v21(rho: i128, shapes: &[[i128; 3]]) {
+    println!("=== stage-2 v2.1: flags + value descriptors (rho<{}), {} shapes x (W, Wv) ===", rho, shapes.len());
+    let jt: i128 = 40;
+    // build task list of (shape, dualize)
+    let mut sides: Vec<([i128;3], bool)> = Vec::new();
+    for w0 in shapes.iter() { sides.push((*w0, false)); sides.push((*w0, true)); }
+    let nthreads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
+    let results: Vec<(i128, [i128;3], bool, i128)> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads).map(|tid| {
+            let sides = &sides;
+            s.spawn(move || {
+                let mut out = Vec::new();
+                for (idx, (w0, dualize)) in sides.iter().enumerate() {
+                    if idx % nthreads != tid { continue; }
+                    let l = lcm(lcm(w0[0], w0[1]), w0[2]);
+                    let mut w = if *dualize { [l/w0[2], l/w0[1], l/w0[0]] } else { *w0 };
+                    let g = gcd(gcd(w[0], w[1]), w[2]);
+                    for x in w.iter_mut() { *x /= g; }
+                    let pins: Vec<[i128; 2]> = (0..3).map(|i| {
+                        let mut p = [0i128; 2]; let mut k = 0;
+                        for j in 0..3 { if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; } }
+                        p
+                    }).collect();
+                    // classes: 0 = "=2", 1 = ">=3 any", 2..=5 = "=3..=6"
+                    let cls_ok = |c: usize, m: i128| -> bool {
+                        match c { 0 => m == 2, 1 => m >= 3, k => m == (k as i128 + 1) }
+                    };
+                    let mut rowtab = vec![[[[i128::MAX; 41]; 6]; 6]; 3];
+                    for i in 0..3 {
+                        let p = pins[i];
+                        let needn = p[0]*p[1] - p[1] - p[0];
+                        let needd = p[0]*p[1];
+                        for m1 in 2..=(jt + 1) { for m2 in 2..=(jt + 1) {
+                            if (m1 + m2) * needd < needn * m1 * m2 { continue; }
+                            let ms = [p[0], p[1], m1, m2];
+                            let f = f_exact(&ms, jt);
+                            for c1 in 0..6usize {
+                                if !cls_ok(c1, m1) { continue; }
+                                for c2 in 0..6usize {
+                                    if !cls_ok(c2, m2) { continue; }
+                                    for j in 2..=(jt as usize) {
+                                        if m1 <= j as i128 + 1 && m2 <= j as i128 + 1
+                                           && f[j] < rowtab[i][c1][c2][j] {
+                                            rowtab[i][c1][c2][j] = f[j];
+                                        }
+                                    }
+                                }
+                            }
+                        }}
+                    }
+                    let wmax = *w.iter().max().unwrap();
+                    let (tau_lo, tau_hi) = (2 * wmax, 33 * rho * wmax);
+                    // pattern: 64 flag patterns x per-good optional descriptor.
+                    // descriptor for good j: 0 = none, else (i, v) with i not flagged-2 for j: 1+i*4+(v-3)
+                    let mut worst = (i128::MAX, 0i128);
+                    for pat in 0..64usize {
+                        let combos = [pat & 3, (pat >> 2) & 3, (pat >> 4) & 3];
+                        for d0 in 0..13usize { for d1 in 0..13usize {
+                            let dec = |d: usize| -> Option<(usize, i128)> {
+                                if d == 0 { None } else { Some(((d-1)/4, ((d-1)%4) as i128 + 3)) }
+                            };
+                            let de = [dec(d0), dec(d1)];
+                            // consistency: descriptor row must not be flagged 2 for that good
+                            let mut ok = true;
+                            for (jgood, dd) in de.iter().enumerate() {
+                                if let Some((bi, _)) = dd {
+                                    let flagged = if jgood == 0 { combos[*bi] & 1 == 1 } else { combos[*bi] & 2 == 2 };
+                                    if flagged { ok = false; }
+                                }
+                            }
+                            if !ok { continue; }
+                            for tau in tau_lo..=tau_hi {
+                                // stairs: from 2-flags and from descriptors
+                                let mut jg = [2i128, 2i128];
+                                for i in 0..3 {
+                                    // DRIFT-1: donated 2 => y <= (2/3) w s => J >= 3tau/(2w)
+                                    if combos[i] & 1 == 1 { jg[0] = jg[0].max(3 * tau / (2 * w[i])); }
+                                    if combos[i] & 2 == 2 { jg[1] = jg[1].max(3 * tau / (2 * w[i])); }
+                                }
+                                for (jgood, dd) in de.iter().enumerate() {
+                                    // proper divisor: y = v*d, d | w s, d != w s  =>  y <= v w s/2 => J >= 2tau/(v w)
+                                    if let Some((bi, v)) = dd { jg[jgood] = jg[jgood].max(2 * tau / (v * w[*bi])); }
+                                }
+                                let mut m60 = 2 * (stair60(jg[0]) + stair60(jg[1])) - 300;
+                                let mut feasible = true;
+                                for i in 0..3 {
+                                    let c1 = if combos[i] & 1 == 1 { 0 }
+                                             else if let Some((bi, v)) = de[0] { if bi == i { (v - 1) as usize } else { 1 } }
+                                             else { 1 };
+                                    let c2 = if combos[i] & 2 == 2 { 0 }
+                                             else if let Some((bi, v)) = de[1] { if bi == i { (v - 1) as usize } else { 1 } }
+                                             else { 1 };
+                                    let j = tau / w[i];
+                                    let fj = if j <= jt {
+                                        let vv = rowtab[i][c1][c2][j as usize];
+                                        if vv == i128::MAX { feasible = false; break; }
+                                        vv
+                                    } else { (420 * j) / 300 - 14 };
+                                    m60 += 2 * fj;
+                                }
+                                if !feasible { continue; }
+                                if m60 < worst.0 { worst = (m60, tau); }
+                            }
+                        }}
+                    }
+                    out.push((worst.0, *w0, *dualize, worst.1));
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let mut pass = 0; let mut short: Vec<_> = Vec::new();
+    for r in results.iter() { if r.0 > 0 { pass += 1; } else { short.push(*r); } }
+    short.sort();
+    for (m, w, d, tau) in short.iter().take(15) {
+        println!("  SHORT W={:?}{} margin*60={} tau={}", w, if *d {"^v"} else {""}, m, tau);
+    }
+    println!("PASS {} / SHORT {} (of {} shape-sides)", pass, short.len(), results.len());
+}
+
+/// STAGE-2 v2: donation-VALUE descriptors. Each good's stair source = its best
+/// donation (i, v), v in 2..=6 (v>=7 gives J-bound below the flat stair region —
+/// treated as none). Descriptor space 16x16; rows constrained only at the named
+/// entry (soundness: rows minimize over a superset of the true configurations, and
+/// the named donation y = v*d, d | w_i*s gives y <= v*w_i*s => J_good >= tau/(v*w_i)).
+fn shape2v2(rho: i128, shapes: &[[i128; 3]]) {
+    println!("=== stage-2 v2: donation-value descriptors (rho<{}), {} shapes x (W, Wv) ===", rho, shapes.len());
+    let jt: i128 = 40;
+    let mut pass_count = 0; let mut short_count = 0;
+    let mut worst_overall: (i128, [i128;3], bool) = (i128::MAX, [0;3], false);
+    let mut short_list: Vec<(i128,[i128;3],bool,i128)> = Vec::new();
+    for w0 in shapes.iter() {
+        for dualize in [false, true] {
+            let l = lcm(lcm(w0[0], w0[1]), w0[2]);
+            let mut w = if dualize { [l/w0[2], l/w0[1], l/w0[0]] } else { *w0 };
+            let g = gcd(gcd(w[0], w[1]), w[2]);
+            for x in w.iter_mut() { *x /= g; }
+            let pins: Vec<[i128; 2]> = (0..3).map(|i| {
+                let mut p = [0i128; 2]; let mut k = 0;
+                for j in 0..3 { if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; } }
+                p
+            }).collect();
+            // rowtab[i][c1][c2][J]: c in 0..=5: 0 = ANY (m>=2), 1..=5 = exact value m = c+1 (2..6)
+            let mut rowtab = vec![[[[i128::MAX; 41]; 6]; 6]; 3];
+            for i in 0..3 {
+                let p = pins[i];
+                let needn = p[0]*p[1] - p[1] - p[0];
+                let needd = p[0]*p[1];
+                for m1 in 2..=(jt + 1) { for m2 in 2..=(jt + 1) {
+                    if (m1 + m2) * needd < needn * m1 * m2 { continue; }
+                    let ms = [p[0], p[1], m1, m2];
+                    let f = f_exact(&ms, jt);
+                    for c1 in 0..6usize {
+                        if c1 != 0 && m1 != (c1 as i128 + 1) { continue; }
+                        for c2 in 0..6usize {
+                            if c2 != 0 && m2 != (c2 as i128 + 1) { continue; }
+                            for j in 2..=(jt as usize) {
+                                if m1 <= j as i128 + 1 && m2 <= j as i128 + 1
+                                   && f[j] < rowtab[i][c1][c2][j] {
+                                    rowtab[i][c1][c2][j] = f[j];
+                                }
+                            }
+                        }
+                    }
+                }}
+            }
+            let wmax = *w.iter().max().unwrap();
+            let (tau_lo, tau_hi) = (2 * wmax, 33 * rho * wmax);
+            // descriptors: 0 = none; else (bad i in 0..3, value v in 2..=6) => 1 + i*5 + (v-2)
+            let ndesc = 16usize;
+            let mut worst = (i128::MAX, 0i128, 0usize, 0usize);
+            for d0 in 0..ndesc { for d1 in 0..ndesc {
+                let dec = |d: usize| -> Option<(usize, i128)> {
+                    if d == 0 { None } else { Some(((d-1)/5, ((d-1)%5) as i128 + 2)) }
+                };
+                let de0 = dec(d0); let de1 = dec(d1);
+                for tau in tau_lo..=tau_hi {
+                    let jg = |de: Option<(usize,i128)>| -> i128 {
+                        match de { None => 2, Some((i,v)) => (tau / (v * w[i])).max(2) }
+                    };
+                    let mut m60 = 2 * (stair60(jg(de0)) + stair60(jg(de1))) - 300;
+                    let mut feasible = true;
+                    for i in 0..3 {
+                        let c1 = match de0 { Some((bi,v)) if bi == i => (v - 1) as usize, _ => 0 };
+                        let c2 = match de1 { Some((bi,v)) if bi == i => (v - 1) as usize, _ => 0 };
+                        let j = tau / w[i];
+                        let fj = if j <= jt {
+                            let vv = rowtab[i][c1][c2][j as usize];
+                            if vv == i128::MAX { feasible = false; break; }
+                            vv
+                        } else { (420 * j) / 300 - 14 };
+                        m60 += 2 * fj;
+                    }
+                    if !feasible { continue; }
+                    if m60 < worst.0 { worst = (m60, tau, d0, d1); }
+                }
+            }}
+            if worst.0 > 0 { pass_count += 1; } else {
+                short_count += 1;
+                short_list.push((worst.0, *w0, dualize, worst.1));
+                if worst.0 < worst_overall.0 { worst_overall = (worst.0, *w0, dualize); }
+            }
+        }
+    }
+    short_list.sort();
+    for (m, w, d, tau) in short_list.iter().take(15) {
+        println!("  SHORT W={:?}{} margin*60={} tau={}", w, if *d {"^v"} else {""}, m, tau);
+    }
+    println!("PASS {} / SHORT {} (of {} shape-sides); worst {:?}{} at {}",
+             pass_count, short_count, 2*shapes.len(), worst_overall.1,
+             if worst_overall.2 {"^v"} else {""}, worst_overall.0);
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters\n  census shape2 [rho]\n  census shape2v1 [rho]\n  census shape2v15 <shapefile> [rho]");
+        eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters\n  census shape2 [rho]\n  census shape2v1 [rho]\n  census shape2v15 <shapefile> [rho]\n  census shape2v2 <shapefile> [rho]");
         std::process::exit(2);
+    }
+    if args[1] == "shape2v2" {
+        let path = args.get(2).expect("shape file");
+        let txt = std::fs::read_to_string(path).expect("read shapes");
+        let shapes: Vec<[i128; 3]> = txt.lines().filter_map(|l| {
+            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
+            if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
+        }).collect();
+        let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
+        shape2v2(r, &shapes);
+        return;
+    }
+    if args[1] == "shape2v21" {
+        let path = args.get(2).expect("shape file");
+        let txt = std::fs::read_to_string(path).expect("read shapes");
+        let shapes: Vec<[i128; 3]> = txt.lines().filter_map(|l| {
+            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
+            if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
+        }).collect();
+        let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
+        shape2v21(r, &shapes);
+        return;
     }
     if args[1] == "shape2v15" {
         let path = args.get(2).expect("shape file");
