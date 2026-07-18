@@ -2315,3 +2315,26 @@ proof wants the W-FIN/gap-ladder machinery ported to the quadruple 1/2-filter:
 bounded ratio + gcd=1 + all-four-rows 1/2-entangled => bounded w1 — Codex, this
 is squarely your ladder). The `cb 360` sweep doubles as a live test: any new
 witness must land inside the 174 list.
+
+### 23.6 Obligation (d) is CLOSED: the k=5 ceiling is the min-good lemma
+
+Status: `PROVED` (elementary; it is the campaign's existing "min always good"
+asset, restated as a DT ceiling). For the maximum `d5` of ANY 5-element
+antichain: writing each smaller `d_j = k_j * d5/m_j` in lowest terms
+(`g_j = gcd(d5, d_j) = d5/m_j`, `k_j = d_j/g_j`), gcd-reduction forces
+`gcd(k_j, m_j) = 1`, and the antichain forces `k_j >= 2` (`k_j = 1` is
+`d_j | d5`). The four fractions `k_j/m_j` are distinct (the `d_j` are), and the
+available slots per denominator are `m=3: {2/3}`, `m=4: {3/4}`,
+`m=5: {2/5, 3/5, 4/5}`, ... so
+
+```text
+sum_j gcd(d5, d_j)/d5 = sum 1/m_j <= 1/3 + 1/4 + 1/5 + 1/5 = 59/60 < 1.
+```
+
+The dual maximum is NEVER self-bad: **at most 4 self-bad in any antichain
+quintuple, no ratio/window/gcd hypotheses at all**. By Duality Transport
+(dual max = primal min) this is precisely "the primal minimum is always good
+with charge <= 59/60, extremal cofactors {3,4,5,5}". Consequence: the compact
+box's bad-count inventory {3-bad, 4-bad} is a THEOREM, and the remaining
+obligations are only (a) the knife, (b) 3-bad 69-list completeness, and
+(c') the 4-bad w1-bound.
