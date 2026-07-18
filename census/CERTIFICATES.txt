@@ -260,3 +260,24 @@ PASS 174 (incl. 164 VACUOUS) / ZERO 0 / SHORT 0 (of 174 4-bad shapes)
 TOTAL 4-bad candidate shapes (w1 <= 300, filter-complete): 174 — IDENTICAL list to w1<=120,
 zero new shapes, largest w1 = 40. The 174/174 shape4 certificates therefore stand with
 completeness floor w1 <= 300 (7.5x above the observed maximum).
+
+=== cb 360: the live 4-bad inventory test 2026-07-18 ===
+C-B RESIDUAL (crit <= 7/2): 323 dual cores
+  4-BAD residual: D=[8, 10, 12, 18, 45]  P=[8, 20, 30, 36, 45]  comps=1 [5]
+  4-BAD residual: D=[8, 12, 20, 30, 45]  P=[8, 12, 18, 30, 45]  comps=1 [5]
+  4-BAD residual: D=[8, 12, 28, 42, 63]  P=[8, 12, 18, 42, 63]  comps=1 [5]
+  4-BAD residual: D=[8, 18, 20, 30, 45]  P=[8, 12, 18, 20, 45]  comps=1 [5]
+  4-BAD residual: D=[12, 18, 20, 30, 45]  P=[4, 6, 9, 10, 15]  comps=1 [5]
+  4-BAD residual: D=[20, 28, 42, 70, 105]  P=[4, 6, 10, 15, 21]  comps=1 [5]
+  4-BAD residual: D=[20, 36, 54, 90, 135]  P=[4, 6, 10, 15, 27]  comps=1 [5]
+  4-BAD residual: D=[84, 90, 140, 210, 315]  P=[4, 6, 9, 14, 15]  comps=1 [5]
+  4-BAD residual: D=[24, 40, 60, 90, 135]  P=[8, 12, 18, 27, 45]  comps=1 [5]
+  4-BAD residual: D=[28, 30, 42, 70, 105]  P=[4, 6, 10, 14, 15]  comps=1 [5]
+  4-BAD residual: D=[60, 84, 140, 210, 315]  P=[4, 6, 9, 15, 21]  comps=1 [5]
+  4-BAD residual: D=[30, 42, 70, 105, 175]  P=[6, 10, 15, 25, 35]  comps=1 [5]
+  self-bad counts: {3: 311, 4: 12}
+  residual DUAL entries: max min(D) = 90 (at [90, 126, 140, 210, 315]), max max(D) = 360 [M=360]
+    -> if max min(D) << M and stable across M, residual dual-min is bounded => finite
+-> 12 witnesses, 11 unique shapes = the 10 known + (6,9,14,15), which shapes4inv had
+   PREDICTED (shape4 margin 240) before any witness realized it. Both new witnesses
+   inside the 174 inventory. Prediction confirmed; zero shapes outside the list.

@@ -5023,3 +5023,15 @@ at 40 predicts zero new shapes. Best case: your cofactor/template route
 Zero new shapes in [121, 300]; largest w1 remains 40. The 4-bad certificate set
 (174/174) now carries a filter-complete floor of w1 <= 300. Any (c') bound
 T <= 300 closes the sector outright with zero further computation.
+
+---
+
+## 2026-07-18 (Claude, data): cb 360 CONFIRMS the inventory — and the predicted shape (6,9,14,15) is realized
+
+M=360 residual: 323 cores, self-bad {3:311, 4:12}. The two new 4-bad witnesses:
+P=[4,6,9,15,21] (shape (2,3,5,7), scale 3 — already certified, margin 360) and
+P=[4,6,9,14,15] — **the shape (6,9,14,15) that shapes4inv predicted and shape4
+certified (margin 240) before any witness existed**. Both inside the 174 list;
+zero outliers; max min(D) = 90 << 360; tower bank 0 failures. The
+filter-complete inventory is now validated prospectively, not just
+retrospectively. Standing asks unchanged: knife, (b), (c').
