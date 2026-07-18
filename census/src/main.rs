@@ -631,14 +631,14 @@ fn emin_certificates() {
 /// dividing by the component gcd. Stage 2 (per-shape goods-uniform rider theorem,
 /// C4-canonical mechanism) is separate. This lists candidate shapes exhaustively
 /// under the proven caps; dedupe by normalized cofactor tuple.
-fn clusters() {
-    println!("=== bad-cluster cofactor shapes (box: ratio<11, >=3 bad; caps proven) ===");
+fn clusters(rho: i128) {
+    println!("=== bad-cluster cofactor shapes (box: ratio<{}, >=3 bad; caps proven) ===", rho);
     // pairs (alpha, beta): alpha in 2..=4, beta coprime, beta/alpha < 11, beta >= 2, not equal,
     // neither divides the other (antichain on cofactors since g is the full gcd: gcd(a,b)=1 already
     // implies no divisibility unless one is 1).
     let mut pair_shapes: Vec<(i128, i128)> = Vec::new();
     for a in 2i128..=4 {
-        for b in 2i128..=(11 * a - 1) {
+        for b in 2i128..=(rho * a - 1) {
             if b == a { continue; }
             if gcd(a, b) != 1 { continue; }
             let (lo, hi) = if a < b { (a, b) } else { (b, a) };
@@ -646,7 +646,7 @@ fn clusters() {
         }
     }
     pair_shapes.sort();
-    println!("strong bad-pair cofactor shapes (alpha,beta), alpha<=4, coprime, ratio<11: {}", pair_shapes.len());
+    println!("strong bad-pair cofactor shapes (alpha,beta), alpha<=4, coprime, ratio<{}: {}", rho, pair_shapes.len());
     for (a, b) in pair_shapes.iter().take(60) { print!("({},{}) ", a, b); }
     println!();
     // triple chains: bads b1=a1*g, b2=b1', linked either through one shared g (triple
@@ -657,8 +657,8 @@ fn clusters() {
     let mut tri = 0u64;
     let mut tri_shapes: Vec<[i128; 3]> = Vec::new();
     for a in 2i128..=16 {
-        for b in (a + 1)..=(11 * a - 1) {
-            for c in (b + 1)..=(11 * a - 1) {
+        for b in (a + 1)..=(rho * a - 1) {
+            for c in (b + 1)..=(rho * a - 1) {
                 // antichain on cofactors, ratio, and each pair's strong condition met by
                 // at least a spanning structure: (a,b) and (a,c) strong: gcd(a,b) >= b/4? etc.
                 if b % a == 0 || c % a == 0 || c % b == 0 { continue; }
@@ -686,7 +686,7 @@ fn main() {
         eprintln!("usage:\n  census quints <N> [--all-min]\n  census dual <M>\n  census cb <M>\n  census drift\n  census emin\n  census clusters");
         std::process::exit(2);
     }
-    if args[1] == "clusters" { clusters(); return; }
+    if args[1] == "clusters" { let r: i128 = if args.len() > 2 { args[2].parse().unwrap_or(7) } else { 7 }; clusters(r); return; }
     match args[1].as_str() {
         "drift" => { drift_certificates(); return; }
         "emin" => { emin_certificates(); return; }
