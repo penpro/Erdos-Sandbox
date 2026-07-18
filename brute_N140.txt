@@ -1,0 +1,2 @@
+C:\Users\penum\AppData\Local\Microsoft\WindowsApps\python.exe: can't open file 'D:\\Erdos Sandbox\\brute2.py': [Errno 2] No such file or directory
+DONE140

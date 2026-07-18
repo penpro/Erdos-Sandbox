@@ -1,0 +1,197 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\floor}[1]{\left\lfloor #1\right\rfloor}
+\newcommand{\lcm}{\operatorname{lcm}}
+
+\title{A charge addendum for Erd\H{o}s Problem 488: primitive quadruples}
+\author{Sandbox note (Claude + Codex collaboration)}
+\date{7 July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This addendum extends the elementary charge argument for Erd\H{o}s Problem 488
+from primitive triples to primitive quadruples.  The claim is local and
+unaudited: it should be read as a proof candidate pending adversarial, human, and
+literature review; see \texttt{REFEREE\_QUADRUPLES.md} and
+\texttt{audit\_quadruple\_charge.py} for a first local audit.  The key observation is that, for four generators, two
+positive charges suffice once the triple and quadruple intersection terms are
+kept.  We then show every primitive quadruple has at least two positive charges.
+\end{abstract}
+
+\section{Setup}
+
+Let \(P=\{a,b,c,d\}\) be primitive with \(a<b<c<d\), and let
+\[
+  S={1\over a}+{1\over b}+{1\over c}+{1\over d}.
+\]
+For \(e\in P\), define
+\[
+  X_e(n)=\floor{n/e}-\sum_{f\in P,\ f\ne e}\floor{n/\lcm(e,f)}.
+\]
+Call \(e\) good if
+\[
+  \sum_{f\in P,\ f\ne e}{\gcd(e,f)\over f}<1. \tag{G_e}
+\]
+If \(e\) is good and \(n\ge d\), then \(X_e(n)\ge1\): writing
+\(t=\floor{n/e}\ge1\) and using
+\(\floor{n/\lcm(e,f)}=\floor{t/(f/\gcd(e,f))}\), we have
+\[
+X_e(n)\ge t\left(1-\sum_{f\ne e}{\gcd(e,f)\over f}\right)>0,
+\]
+and \(X_e(n)\) is an integer.
+
+Write
+\[
+ s(n)=\sum_{e\in P}\floor{n/e},\qquad
+ P_2(n)=\sum_{\{e,f\}\subset P}\floor{n/\lcm(e,f)},
+\]
+\[
+ T_3(n)=\sum_{\{e,f,g\}\subset P}\floor{n/\lcm(e,f,g)},\qquad
+ T_4(n)=\floor{n/\lcm(a,b,c,d)}.
+\]
+Exact inclusion-exclusion gives
+\[
+  B(n)=s(n)-P_2(n)+T_3(n)-T_4(n).
+\]
+Also \(2s(n)>nS+s(n)-4\).  Hence it is enough to prove
+\[
+  H(n):=s(n)-2P_2(n)+2T_3(n)-2T_4(n)\ge4,
+\]
+because then
+\[
+  2B(n)>nS+H(n)-4\ge nS.
+\]
+
+\section{Two good charges suffice}
+
+\begin{proposition}
+If at least two elements of \(P\) are good, then \(2B(n)>nS\) for every
+\(n\ge d\). Consequently \(B(m)/m\le S<2B(n)/n\) for all \(m\ge1,n\ge d\).
+\end{proposition}
+
+\begin{proof}
+Let \(G\subset P\) be two good elements and let \(H_0=P\setminus G\).  The good
+charges contribute
+\[
+  \sum_{g\in G}X_g(n)\ge2.
+\]
+Now group the other two generators:
+\[
+  Y(n)=\sum_{h\in H_0}X_h(n)+2T_3(n)-2T_4(n).
+\]
+We claim \(Y(n)\ge2\).  Check pointwise.  For \(k\le n\), let \(p\) be the number
+of elements of \(H_0\) dividing \(k\), and \(q\) the number of elements of \(G\)
+dividing \(k\).  Only points with \(p>0\) contribute to \(Y\).  Their weights are
+\[
+\begin{array}{c|ccc}
+ & q=0&q=1&q=2\\ \hline
+p=1&1&0&1\\
+p=2&0&0&2
+\end{array}
+\]
+so all contributions are nonnegative.  Since \(P\) is primitive and \(n\ge d\),
+each of the two generators in \(H_0\) itself contributes with \(p=1,q=0\), hence
+\(Y(n)\ge2\).  Therefore
+\[
+H(n)=\sum_{g\in G}X_g(n)+Y(n)\ge4,
+\]
+and the setup above gives \(2B(n)>nS\).  The union bound gives
+\(B(m)/m\le S\).
+\end{proof}
+
+\section{Every primitive quadruple has two good charges}
+
+\begin{lemma}
+The least element \(a\) is good.
+\end{lemma}
+
+\begin{proof}
+For \(y\in\{b,c,d\}\), put \(q_y=y/\gcd(a,y)\).  Primitivity gives \(q_y\ge3\).
+If \(q_y=3\), then \(y=3g\) with \(g=\gcd(a,y)\).  Since \(y>a\), \(g>a/3\), so
+\(a/g<3\).  Also \(a/g\ne1\), else \(a\mid y\).  Thus \(a/g=2\), and
+\(y=3a/2\).  This can happen for at most one \(y\).  The other two terms are
+therefore at most \(1/4\), so the charge at \(a\) is at most
+\[
+  {1\over3}+{1\over4}+{1\over4}<1.
+\]
+\end{proof}
+
+\begin{lemma}
+If \(b\) is bad, then \(c\) is good.
+\end{lemma}
+
+\begin{proof}
+Put
+\[
+q={a\over\gcd(a,b)},\qquad u={c\over\gcd(b,c)},\qquad
+v={d\over\gcd(b,d)}.
+\]
+Primitivity gives \(q\ge2\) and \(u,v\ge3\).  Badness of \(b\) says
+\[
+  {1\over q}+{1\over u}+{1\over v}\ge1. \tag{1}
+\]
+If \(q\ge3\), then (1) forces \(u=v=3\); otherwise the sum is at most
+\(1/3+1/3+1/4<1\).  But \(u=3\) forces \(c=3b/2\), and \(v=3\) forces
+\(d=3b/2\), contradicting \(c<d\).  Hence \(q=2\), so \(b/a=w/2\) with \(w\)
+odd, and
+\[
+  {1\over u}+{1\over v}\ge {1\over2}. \tag{2}
+\]
+
+Write the reduced fractions \(c/b=u/r\) and \(d/b=v/s\).  The constraints
+\(2\le r<u\), \(2\le s<v\), \(c<d\), and (2) leave only five possibilities:
+\[
+(c/b,d/b)\in
+\left\{\left({3\over2},{5\over3}\right),
+\left({3\over2},{5\over2}\right),
+\left({4\over3},{3\over2}\right),
+\left({5\over4},{3\over2}\right),
+\left({6\over5},{3\over2}\right)\right\}.
+\]
+Indeed, if neither \(u\) nor \(v\) is \(3\), then (2) forces \(u=v=4\), and
+both ratios equal \(4/3\), impossible.  If \(u=3\), then \(c/b=3/2\) and
+\(v\le6\); the order \(d/b>3/2\) leaves only \(5/3\) and \(5/2\).  If \(v=3\),
+then \(d/b=3/2\), and the order \(c/b<3/2\) leaves only \(4/3,5/4,6/5\).
+
+In these five cases the charge at \(c\) is bounded respectively by
+\[
+{1\over4}+{1\over2}+{1\over10},\quad
+{1\over4}+{1\over2}+{1\over5},\quad
+{1\over3}+{1\over3}+{1\over9},\quad
+{1\over8}+{1\over4}+{1\over6},\quad
+{1\over5}+{1\over5}+{1\over5},
+\]
+all of which are \(<1\).  Thus \(c\) is good.
+\end{proof}
+
+\begin{theorem}
+For every primitive quadruple \(P=\{a,b,c,d\}\), \(2B(n)>nS\) for all \(n\ge d\).
+Consequently Erd\H{o}s Problem 488 holds for every finite set whose primitive
+core has size at most \(4\).
+\end{theorem}
+
+\begin{proof}
+The least element \(a\) is good.  If \(b\) is good, then \(a,b\) are two good
+charges.  If \(b\) is bad, then \(c\) is good, so \(a,c\) are two good charges.
+The proposition applies.  Passing from a set to its primitive core preserves
+\(B\) and does not increase the maximum element.
+\end{proof}
+
+\begin{remark}
+This addendum is not yet priority- or literature-audited.  It should not be
+presented publicly as a new result until the proof has survived adversarial and
+human review.
+\end{remark}
+
+\end{document}

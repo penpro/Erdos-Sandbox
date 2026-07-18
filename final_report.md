@@ -4,6 +4,29 @@
 
 Partial result, not a full solution.
 
+**Current state (2026-07-17).** The strongest local theorem is the sorry-free
+Lean proof for primitive-core size `≤4`. The size-5 density inequality
+`2δ>S` and the finite-`n` C-B covering criterion are proved at their stated
+tiers. A hostilely reviewed W-FIN argument now proves the C-B residual is finite.
+The universal W-FIN cutoff is below `2.562 * 10^12`; using `CRIT <= 7/2` and
+exact bad-edge cofactors sharpens the actual residual cutoff to below
+`2.494 * 10^6`. The independently audited SPREAD certificate proves the full
+separator whenever `max/min >= 7`. Full size 5 is still open only in the
+compact residual box `min < 3054109696/1225`, `max/min < 7`, `max < 17452056`,
+together with the existing goodness/window/CRIT constraints; this is still
+beyond the exact Rust bank. A new OUTSIDE-DONOR certificate plus the exact
+non-strong divisor bound proves that every compact residual has at most two
+strong-gcd components. Consequently it has a finite-block two-scale normal form
+`D=tW union sV`, `gcd(t,s)=1`. A coordinate-correct dual scale bound makes both
+scales explicitly finite per compact block pair, leaving a potentially large
+finite bank that is not yet generated or covered. The committed v2.1 triple
+relaxation has 45 positive families; a temporary exact shared-donor parity audit
+covers 58 of 69 after retaining `+S`, leaving 11 negatives and not full residual
+coverage. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
+cross-element transfer proof, bounded exact audits, and executable retirement
+certificates that rerun cleanly. Nothing in
+this report should be read as a solution of full #488.
+
 The #728 formulation audit has been archived separately in
 `problem_728_formulation_audit/`. The active publishable-track target is now
 Erdős Problem #488.
@@ -167,19 +190,36 @@ triples with least element at most `20`. The worst certified ratio is
 `{a,a+1,a+2}`.~~ DONE — subsumed by Theorem 9 (see update above and
 `consecutive_triples_notes.md`).
 
-The next open frontier is primitive cores with `|P| ≥ 4`. Known constraints
-from the audit: the per-n criterion is false in general (shared-factor
-families), so the attack must combine (i) a charge-type argument where lcm
-ratios allow, (ii) the dense half, (iii) a scaling/recursion mechanism for
-shared-factor structure (e.g. all elements even reduces to a smaller problem
-at scale x/2). The public record at |P| ≥ 4 has only Chojecki's Conjecture 4.8
-reduction and MalekZ's tripod family. Also worth doing regardless: Lean-
-formalize Theorem 9 (elementary; squarely in Aristotle's demonstrated range),
-which would give the first sorry-free formal proof of the size-≤3 case.
+The next open frontier after the local size-4 addendum is primitive cores with
+`|P| ≥ 5`, plus the immediate audit/formalization work for the new `|P|<=4`
+proof. Known constraints from the audit: the per-n criterion is false in
+general (shared-factor families), so any larger-core attack must combine (i) a
+charge-type argument where lcm ratios allow, (ii) the dense half, (iii) a
+scaling/recursion mechanism for shared-factor structure (e.g. all elements even
+reduces to a smaller problem at scale x/2). The public record at `|P| ≥ 4` has
+only Chojecki's Conjecture 4.8 reduction and MalekZ's tripod family. Also worth
+doing regardless: Lean-formalize Theorem 9 (elementary; squarely in Aristotle's
+demonstrated range), which would give the first sorry-free formal proof of the
+size-≤3 case.
 
-Post-update progress: `quadruple_charge_notes.md` proves a conditional size-4
-lemma: any primitive quadruple with at least two good charges satisfies the
-ordering-free #488 inequality. `fastcheck` verified that every primitive
-quadruple with entries `<=150` has at least two good charges. The sharp next
-task is to prove or refute that closing charge lemma for all primitive
-quadruples.
+Post-update progress: `quadruple_charge_notes.md` now gives a local proof for
+primitive cores of size `<=4`. The key size-4 theorem is: every primitive
+quadruple has at least two good charges, and two good charges imply
+`2B(n)>nS` for every `n>=max(P)` by exact four-set inclusion-exclusion. Codex
+added `REFEREE_QUADRUPLES.md` and `audit_quadruple_charge.py`; the script passes
+through entries `<=80` and checks the pointwise weight table, five-shape
+classification, and five charge estimates exactly. This is still not
+human-refereed or literature-audited, so treat it as a strong internal result
+pending external review.
+
+First size-5 note: `quintuple_charge_notes.md` records a conditional lemma
+(three good charges suffice for a primitive quintuple) and the immediate
+obstruction to closing it (`{3,4,10,14,22}` has only two good charges, though it
+is safely exact-certified). Codex added `sweep-quint-cert`; the sweep through
+entries `<=100` checked 43,291,981 primitive quintuples, peeled off the literal
+`2 in A` theorem plus thirty-three exact scaled-family audits, left 950 residuals, and
+exact-certified all residuals with the union-bound separator still passing. The
+scaled families are exact-certified by `audit_scaled_quint_families.py`; the
+current worst remaining residual is `{40,48,60,72,90}` with certificate ratio
+`1883/1440`. This points the next search toward structural separators rather
+than a naive good-charge count.

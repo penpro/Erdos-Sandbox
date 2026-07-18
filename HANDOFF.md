@@ -8,16 +8,37 @@ job, in order.
 We wrote a short, correct proof of one (already-known) case of a famous open
 problem (Erdős #488), checked it by computer on many cases and by several AI
 review passes, and started a machine-checked ("Lean") version — the substantive
-arithmetic step is done and verified, but the counting half is *not yet*
-formalized. It's all public at **https://github.com/penpro/Erdos-Sandbox**. It's
+ordered primitive-triple statement is now covered in Claude's Lean files; the
+remaining wrapper work is singleton/pair cleanup plus primitive-core
+bookkeeping. It's all public at **https://github.com/penpro/Erdos-Sandbox**. It's
 an honest, modest contribution: we are **not** claiming a new theorem, a new
 method, or a solution to #488 — just a clean, correct,
 computer-checkable proof of a case where the experts are currently stuck.
 
 ## Current research thread after posting
 
-The public update has been posted. The active internal frontier is now
-`|P| >= 4`.
+**Status update (2026-07-17).** The size-`≤4` result is now sorry-free in Lean.
+For size 5, the density and C-B covering theorems are proved, and the reviewed
+W-FIN argument proves the C-B residual is finite. The universal source-owned
+cutoff is below `2.562 * 10^12`; the residual-specific `CRIT` audit and exact
+bad-edge cofactors cut this to `2.494 * 10^6`. Full size 5 is still open because
+SPREAD covers every primitive quintuple with `max/min >= 7`; the
+remaining compact residual box has `min < 3054109696/1225`, `max/min < 7`, and
+`max < 17452056`, still beyond the exact Rust bank. OUTSIDE-DONOR and the
+two-pair obstruction now prove that every compact residual has at most two
+strong-gcd components, giving a finite-block two-scale form
+`D=tW union sV`, `gcd(t,s)=1`. This removes the unrestricted four-bad inventory
+as the organizing problem. A dual-coordinate scale bound now makes both compact
+scales finite for each block pair, so the remaining global job is a potentially
+large finite bank, not an unbounded rider theorem. The committed v2.1 scan has
+45 positive all-internal triple families; a temporary exact shared-donor parity
+audit covers 58 of 69 after retaining `+S`, leaving 11 negatives. The remaining
+task is block-library generation plus bank coverage. Start with `REFEREE_WFIN.md`,
+Sections 15b and 18-21 of `cbfin_reduction_notes.md`, and the latest entry in
+`adversary_collab_chat.md`. The older narrative below is retained as history.
+
+The public update has been posted. The active internal frontier is now:
+audit the local `|P|<=4` proof candidate, then push toward `|P|>=5`.
 
 Claude started `fastcheck/` as a Rust bounded-window searcher, and Codex added
 an exact periodic-certificate layer (`classify`, `cert`, `sweep-quad-cert`).
@@ -27,27 +48,35 @@ The strongest new computation so far:
 cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 3000000
 ```
 
-This checked 15,591,140 primitive quadruples with entries `<=150`. The new
-conditional lemma in `quadruple_charge_notes.md` says that if at least two
-generator charges are good, exact four-set inclusion-exclusion proves
-`2B(n)>nS` for all `n>=max(P)`. In the sweep, every primitive quadruple up to
-150 satisfied this two-good-charge condition:
+This checked 15,591,140 primitive quadruples with entries `<=150`. The new note
+`quadruple_charge_notes.md` now gives a local proof of the size-4 case: every
+primitive quadruple has at least two good charges, and two good charges plus
+exact four-set inclusion-exclusion prove `2B(n)>nS` for all `n>=max(P)`.
+The sweep agrees:
 
 ```text
 two-good-charge rescue condition applies: 15,591,140
 residual after those regimes: 0
 ```
 
-The least element is now proved good in `quadruple_charge_notes.md`, so the next
-mathematical lead is the sharper closing arithmetic lemma:
+Next mathematical task: continue the external audit. Codex's first local audit
+passed (`REFEREE_QUADRUPLES.md`, `audit_quadruple_charge.py`), checking the
+five-shape classification when `b` is bad, the `a`-term reductions in the five
+estimates for `charge(c)`, and the pointwise weight table in the
+two-good-charge proposition. The proof still needs Claude/human review and a
+literature/thread audit before anyone calls it new. See
+`quadruple_charge_notes.md`, `adversary_collab_chat.md`, and
+`computational_results.md` R11/R12.
 
-```text
-In every primitive quadruple a<b<c<d, at least one of b,c,d is good.
-```
-
-If true, the conditional lemma proves #488 for every primitive core of size 4.
-See `quadruple_charge_notes.md`, `adversary_collab_chat.md`, and
-`computational_results.md` R11.
+First size-5 lead: `quintuple_charge_notes.md` shows three good charges would
+suffice for a primitive quintuple, but the naive claim that every primitive
+quintuple has three good charges is false. Codex added `sweep-quint-cert`; up to
+entries `<=100`, after the `2 in A`/sparse/three-good symbolic regimes and
+thirty-three exact scaled-family audits, 950 residual quintuples exact-certify and still
+satisfy the union-bound separator. The scaled-family audits live in
+`audit_scaled_quint_families.py` and `quintuple_charge_notes.md`; the current
+worst remaining residual is `{40,48,60,72,90}` with ratio `1883/1440`. The next
+tool/proof upgrade should classify the remaining structural size-5 regimes.
 
 ## What "handing off" means
 

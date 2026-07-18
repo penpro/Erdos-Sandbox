@@ -1960,3 +1960,252 @@ to block-internal charges (blocks are antichains, DT ceilings apply — check th
 strong-component blocks are antichains: subsets of the antichain `P` ✓ trivially);
 (ii) Codex's component-cofactor `28^{k−1}` library bound (his, paper tier);
 (iii) the mechanical program's admissibility filters. Nothing else.
+
+## 15b. CORRECTION: scale bounding belongs in dual coordinates; no compact riders remain
+
+Status: `BROKEN` (the Section 15 primal-coordinate split and "opposite scale"
+wording) / `PROVED` (dual-coordinate replacement and finite-bank consequence) /
+`OPEN` (practical block-library generation and bank coverage). Full size 5 is
+not closed by this structural reduction alone.
+
+The strong components and two-scale normal form were proved for the **dual**
+core
+
+```text
+D = tW union sV,  gcd(t,s)=1,
+```
+
+not for a primal union with the same block templates. Dualization uses the lcm
+of the entire core and does not preserve that displayed primal block union.
+Consequently Section 15's exact primal charge split and flagship example do not
+justify its claimed application to the component decomposition.
+
+There is, however, a simpler dual repair. For `w in W`, put
+
+```text
+c_W(w) = sum_{w' in W, w'!=w} gcd(w,w')/w.
+```
+
+By CROSS, `gcd(tw,sv)<=wv`, so the full dual self-charge satisfies
+
+```text
+sum_{d'!=tw} gcd(tw,d')/(tw)
+ <= c_W(w) + (sum_{v in V} v)/t.
+```
+
+Therefore, if `tw` is globally bad but not internally bad, then its **own**
+component scale is bounded:
+
+```text
+t <= (sum V)/(1-c_W(w)).
+```
+
+The denominator is effective: `c_W(w)` is an integer multiple of `1/w`, so
+`1-c_W(w)>=1/w` whenever positive.
+
+This yields a stronger compact conclusion than the rider split:
+
+- In pattern `(3,2)`, the pair component has at most one globally bad vertex.
+  Indeed, a bad pair vertex `x` receives at most `3x/5` across components, so
+  its partner gcd must be `x/2`; both pair endpoints cannot satisfy this.
+  Hence the triple contains at least two global bads, at least one of which is
+  not internally bad (the size-3 ceiling is one), bounding the triple scale.
+  If the pair has one bad, its scale is also bounded. If it has none, all three
+  triple vertices are bad and both pair vertices good, contradicting
+  OUTSIDE-DONOR because distinct strong components have no bad-good strong edge.
+  Thus **both scales are bounded**.
+- In pattern `(4,1)`, the singleton is globally good, since its four non-strong
+  gcds sum to at most `4x/5`. At least three vertices of the four-block are bad,
+  while at most two are internally bad. A noninternally-bad four-block vertex
+  bounds the four-block scale. The compact ratio `<7` then bounds the singleton
+  scale as well.
+- In pattern `(5)`, the sole component scale is `1` because `gcd(D)=1`.
+
+Thus every compact residual lies in a finite, explicitly bounded scale box for
+a pair of finite normalized blocks. There are no unbounded compact rider
+families; if one scale tried to escape with the other fixed, SPREAD/ratio `<7`
+would already remove it. This is a cleaner finite-bank architecture, but the
+block libraries and all scale boxes may still be too large for naive
+enumeration. A generated bank or a uniform block-pair certificate is still
+required before full size 5 can be called solved.
+
+## 21. Shared donated-2 compatibility cuts the oriented v2.1 residual to 11 negatives
+
+Status: `PROVED` (the 2-adic compatibility lemma) / `COMPUTED` (temporary exact
+Rust audit) / `PLAUSIBLE` until folded into and reproduced from the shared
+`census` crate.
+
+The current committed `shape2v21` has adopted the dual-input orientation. With
+`clustercheck/shapes69.csv`, it gives
+
+```text
+PASS 45 / SHORT 24 (of 69 relevant W^vee sides).
+```
+
+Its log headline `95/138` is stale. Extracting the binding flag patterns shows
+that all 24 minima use donated modulus `2`; value descriptors are all `none`.
+
+**Shared-2 lemma.** If the same good primal element `y` supplies modulus `2`
+to bad primal elements `p_i`, then
+
+```text
+y/gcd(y,p_i)=2  =>  v_2(p_i)=v_2(y)-1.
+```
+
+Hence all bad coefficients receiving that same `2` must have equal 2-adic
+valuation. For a scaled primal triple `p_i=u w_i`, this is equivalent to the
+corresponding `v_2(w_i)` being equal. The condition is exact and scale-free.
+
+A temporary copy of v2.1 was strengthened by (i) the mandatory OUTSIDE-DONOR
+modulus in `{2,3,4}`, (ii) the exact coprime return stair for a named modulus
+`v`, and (iii) this shared-2 compatibility. The first two do not change the
+subtotal; the third gives
+
+```text
+positive margin: 49 families
+zero constant margin, hence positive after retained +S: 9 families
+genuinely negative: 11 families
+total covered: 58/69
+```
+
+The 11 negative dual shapes and margins (`*60`) are
+
+```text
+(6,10,15):-50, (9,10,15):-50,
+(4,6,9):-40, (8,9,12):-40,
+(6,8,9):-20, (6,14,21):-20, (8,10,15):-20,
+(9,14,21):-20, (10,12,15):-20, (12,14,21):-20,
+(12,15,20):-20.
+```
+
+The zero cases are valid because the assembly is
+`2 sum f - 5 + S`, with `S>0`; the shared code's strict `margin>0` display is a
+conservative undercount. The next exact parameter is the return cofactor for a
+donated `2`: compact spread and coprimality give
+`q in {3,5,7,9,11,13}` and `y=2p_i/q`. The remaining 11 binders use only one or
+two donated 2s, so this finite q-coupling is the targeted next certificate.
+
+## 22. The q-coupling closes ALL 69 shapes: v2.2 (donated-2, Section 21 spec) and v3 (full slot-matrix exactness) — 69/69, 55 VACUOUS
+
+Status: `PROVED` (the pinning identities and soundness lemmas below) /
+`COMPUTED` (`census shape2v22`, `census shape2v3` on `clustercheck/shapes69.csv`,
+rho=7; both in the shared crate, seconds of runtime) / `NEEDS-REFEREE` (Codex
+knife requested on the italicized soundness points). Claude, 2026-07-18.
+
+### 22.1 v2.2 — Section 21's donated-2 coupling, implemented exactly
+
+For a good `y` donating modulus 2 to bad `p_i0 = w_i0*s`: `y = 2*p_i0/q` with
+return cofactor `q = p_i0/gcd(y,p_i0)` ODD (the Section 21 2-adic lemma), `>= 3`
+(antichain), and — sharper than `q <= 13` — the two-sided spread bounds
+
+```text
+q*wmax < 2*rho*w_i0     (from y > max(P)/rho >= wmax*s/rho, strict)
+q*rho*wmin > 2*w_i0     (from y < rho*min(P) <= rho*wmin*s, strict).
+```
+
+The donor's every gcd is then an s-free template constant: for `q | A` one has
+`gcd(A/q, B) = gcd(A, qB)/q` (per-prime check), so with `g_j = gcd(2*w_i0, q*w_j)`
+
+```text
+y's modulus in bad row j     = 2*w_i0/g_j    (an integer; forced slot),
+row-y's modulus from bad p_j = q*w_j/g_j     (an integer).
+```
+
+Flag consistency (forced slot `== 2` exactly on flagged rows, `>= 3` on
+unflagged; `= 1` is an antichain violation) partitions configuration space and
+SUBSUMES the shared-2 compatibility of Section 21. When both goods are pinned
+their mutual moduli are exact too: `gcd(A/q, B/r) = gcd(Ar, Bq)/(qr)` for
+`q|A, r|B`, giving `G = gcd(2*w_a*q1, 2*w_b*q0)`, slots `2*w_b*q0/G` and
+`2*w_a*q1/G`. Pinned goods get (i) an exact goodness test (sum of known
+reciprocals `< 1`, else the branch is vacuous), and (ii) an exact drift row
+`f_exact([q, q*w_j1/g_j1, q*w_j2/g_j2, m_free])` minimized over the
+goodness-feasible free slot, evaluated at `J in [q*tau/(2w_i0),
+q*(tau+1)/(2w_i0)]` and MINIMIZED over that interval (*f is not monotone in J;
+single-point evaluation at the floor would be unsound*), floored by `stair60`.
+Forced bad-row slots use exact-value row classes (clamped to `41 = JT+1`,
+tail-exact for `J <= JT`; badness tested at clamped values — conservative
+inclusion only).
+
+Result (`census shape2v22 clustercheck/shapes69.csv 7`):
+
+```text
+PASS 67 / ZERO 1 / SHORT 1   (of 69 W^vee sides), 25 of the passes VACUOUS
+ZERO  (4,6,9)   margin 0 at tau=18, pattern 000001, q0=3  (passes via +S)
+SHORT (6,10,15) margin -30 at tau=20, pattern 000000 (NO donated 2s)
+```
+
+All 11 Section-21 negatives close except `(4,6,9)` (zero, valid) and
+`(6,10,15)`, whose binder has no donated 2 at all — outside the v2.2 mechanism.
+
+### 22.2 The generalization: every donation value pins its donor
+
+The donated-2 lemma is the `v = 2` case of: if `y`'s modulus in row `i` is
+exactly `v` (i.e. `y/gcd(y,p_i) = v`), then with `q = p_i/gcd(y,p_i)`:
+`y = v*p_i/q`, and `gcd(v, q) = 1` — because `(y/g, p_i/g)` is a coprime pair.
+("q odd" for `v = 2` is exactly this coprimality.) The same spread bounds hold
+with `2 -> v`, the same s-free identities give forced slots
+`v*w_i/gcd(v*w_i, q*w_j)` and returns `q*w_j/gcd(v*w_i, q*w_j)`, and `q >= 2`
+(`q = 1` is `p_i | y`).
+
+**v3 certificate** (`census shape2v3`): partition ALL of configuration space by
+the CLASS MATRIX — for each of the 6 (row, good) slots, declare either an exact
+value in `2..=6` or `BIG` (`>= 7`). Per-row badness prefilter (BIG capped at
+`1/7` — includes every true configuration). Every good with an exact slot
+anywhere is pinned through its first exact slot and branched over the finite
+q-range; ALL its six gcds are then forced and checked against the declared
+classes (exact match, or `>= 7` for BIG, `sy >= 2` antichain, exact goodness,
+exact drift row as in v2.2). Goods with all-BIG columns are free (base stair).
+Descriptors and the ">= 3 any" class are gone — the partition replaces them.
+
+Soundness points (*the knife surface*):
+1. *Partition completeness*: every true slot value maps to exactly one class;
+   every true config to exactly one matrix; pinned branches enumerate its true
+   `q`. Exclusion tests (class mismatch, `sy < 2`, goodness `>= 1`, badness
+   impossible, mutual slot `< 2`) are all consequences of true-config axioms.
+2. *BIG representatives in the row table*: for `J`-entry `j`, BIG-slot
+   representatives are `m in [7, j+1]`, PLUS `m = j+1` when `j < 6` — any
+   modulus `> j` has no divisibility events on `[1, j]`, so `f[j]` is identical
+   for all of them, and badness at the representative is `>=` truth
+   (conservative inclusion).
+3. *Forced slots finer than declared*: on BIG-declared rows a pinned good's
+   forced value (`>= 7`, possibly huge, clamped to 41) replaces the BIG class in
+   the row lookup — exact, tail-valid for `J <= 40`.
+4. The `-300` assembly, `tau`-range `[2*wmax, 33*rho*wmax]`, `stair60`, bad-row
+   tail line `(420J)/300 - 14`, and W^vee orientation are IDENTICAL to v2.1 —
+   only the branch structure changed.
+
+### 22.3 Result: the 3-bad shape program is CLOSED
+
+```text
+census shape2v3 clustercheck/shapes69.csv 7:
+PASS 69 (incl. 55 VACUOUS) / ZERO 0 / SHORT 0   (of 69 W^vee sides)
+```
+
+14 shapes carry uniform positive margins; **55 admit NO 3-bad configuration at
+all within the stage-2 model** (common-scale bad triple, two goods, ratio < 7,
+tau in the certified window; the tau-independent kills — antichain, goodness,
+class consistency — are in fact position-free). Two vacuities hand-verified
+end-to-end, including one of Section 21's negatives:
+
+- `(9,12,16)` dual `[9,12,16]`: row `w=9` needs a donated 2 with partner
+  `<= 5`; `q=3` donors divide `12s` (antichain), `q=5,7` donors force slot 9
+  into row `w=16`, whose remaining need then demands a second 2 that no
+  in-range donor can supply (`q = 9` needed, spread-excluded). Every corner dies.
+- `(6,8,9)` dual `[8,9,12]` (Section 21 margin -20): rows `w=8` (need 5/9) and
+  `w=9` (need 5/8) both require small slots; any 2-donor to one forces slot 16
+  into the other (`gcd(16, 9q) = 1`, `gcd(18, 8q) <= 2` for feasible odd q),
+  starving it; the `(3,3)` alternative for row `w=9` forces 27s into row `w=8`.
+  Vacuous.
+
+Consequences:
+- The 24-SHORT v2.1 backlog and all 11 Section-21 negatives are retired.
+- Given the 906 -> 69 relevance filter (Codex's clustercheck) and the stage-2
+  regime conventions, the 3-BAD SECTOR of the compact box is fully certified.
+- The exactness mechanism (donation value + return cofactor + spread = donor
+  determined up to a bounded integer) is the shapes-route incarnation of the
+  Section 15b scale-bounding: both say a bad's benefactor is pinned to finitely
+  many templates. The 4-BAD sector remains: either via Section 15b's bank
+  architecture (which never assumes exactly 3 bads) or a 4-shape inventory +
+  the v3 analogue (3 bads + 2 goods -> 4 bads + 1 good; the class matrix
+  becomes 4x1 with richer pins). This is now the only open sector of the
+  compact box on the shapes route.

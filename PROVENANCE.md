@@ -8,6 +8,17 @@
 > hypothesis (verified on 924 sets, sizes 3–6); (ii) a proposed |P|=4 boundary
 > rescue conjecture was **falsified** (`{6,10,15,25}`). Standalone note:
 > `writeup/erdos488_triples.{tex,pdf}`.
+>
+> **Postscript (Codex, 2026-07-07).** A still-later internal addendum now gives a
+> local proof candidate for primitive cores of size `<=4`; see
+> `quadruple_charge_notes.md`, `REFEREE_QUADRUPLES.md`, and
+> `audit_quadruple_charge.py`. It is not human/literature audited and should not
+> be treated as a priority claim.
+>
+> **Postscript (Codex, 2026-07-08).** Size-5 work added
+> `sweep-quint-cert` in `fastcheck` and `audit_scaled_quint_families.py`. These
+> are exploratory/exact-audit tools: they certify thirty-three scaled residual families
+> but do not solve the size-5 case.
 
 ---
 
@@ -159,8 +170,8 @@ The workflow launched a 5th subagent (**Sub:adversary-verify**, `a369bd6b`, `cla
 
 ---
 
-### Net standing (per `final_report.md` verdict)
+### Net standing (per `final_report.md` verdict, with postscript)
 
-Full solution of #488 is **not** claimed. Sorry-free elementary proof of the `|P| ≤ 3` case (Theorem 9) is real and confirmed, but its *result* is publicly claimed by Chojecki Cor 4.7 (Lean modulo one `sorry`); defensible framing is **independent, sorry-free proof of the size-≤3 case by a different method**. `|P| ≥ 4` is open (needs ≥3 regimes). Any public posting is Wes's call per protocol — not the agents'.
+Full solution of #488 is **not** claimed. Sorry-free elementary proof of the `|P| ≤ 3` case (Theorem 9) is real and confirmed, but its *result* is publicly claimed by Chojecki Cor 4.7 (Lean modulo one `sorry`); defensible framing is **independent, sorry-free proof of the size-≤3 case by a different method**. The local size-4 addendum, if it survives external audit, moves the internal frontier to `|P|>=5`; until then, it is an unaudited proof candidate, not a public claim. Any public posting is Wes's call per protocol — not the agents'.
 
 **Key artifact paths:** `D:\Erdos Sandbox\{adversary_collab_chat.md, triples_writeup.md, proof_attempt.md, final_report.md, literature_notes.md, computational_results.md, attack_triples.py, verify_triples_min_leq.py, verify_min3_triples.py, sweep_criterion.py, counterexample_search.py}`; subagent reports `D:\Erdos Sandbox\tmp\wf_result_*.md`; workflow journal `C:\Users\penum\.claude\projects\D--Erdos-Sandbox\5beb6959-3c2f-44d6-b933-83c1b60f5734\subagents\workflows\wf_046c451b-656\{journal.jsonl, agent-*.jsonl}`.

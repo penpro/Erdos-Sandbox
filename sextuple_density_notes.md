@@ -74,6 +74,19 @@ realizability analysis, no enumeration of deficient tuples**.
   0 violations; deficiency-targeted enumeration to `a ≤ 630`, 0 violations; worst
   realizable per-element term `−71/94500` at `a=15` in `{6,7,9,10,15,25}`, repaid ~285×.)
 
+**Codex audit (2026-07-10).** Added `audit_sext_density_lemma.py` as an independent
+exact-rational backstop for the boxed kernels and arithmetic. The run
+
+```text
+python audit_sext_density_lemma.py --bound 25 --friend-limit 3000 --peel-bound 16
+```
+
+reproduces `W0 = 49/100` at `(2,2,2,3,5)`, `W1 = 7423/12600` at `(3,3,4,5,7)`,
+and `W2 = 1087/2100` at `(2,3,3,5,7)`, checks the 2-friend lemma through `3000`,
+checks the peel inequality through `16`, and verifies
+`eps1 + eps2 - 2/75 = 1009/12600`. Scope caution: this audits the finite boxed
+checks and algebra, not the retirement proof that makes `[2..25]` sufficient.
+
 ## The size-6 skeleton (from `size6:lift`, PARTIAL)
 
 With `2δ > S` proved, size-6 gets the same regime tree as size-5:

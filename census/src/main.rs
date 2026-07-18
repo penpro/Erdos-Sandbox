@@ -1097,6 +1097,487 @@ fn shape2v21(rho: i128, shapes: &[[i128; 3]]) {
     println!("PASS {} / SHORT {} (of {} shape-sides)", pass, short.len(), results.len());
 }
 
+/// STAGE-2 v2.2: exact donated-2 return-cofactor coupling (Codex Section 21 spec).
+/// Any good donating a 2 to bad p_i0 = w_i0*s is PINNED: y = 2*p_i0/q, where the
+/// return cofactor q = p_i0/gcd(y,p_i0) is ODD (2-adic lemma: v2(p)=v2(y)-1),
+/// >= 3 (antichain), and ratio<rho both ways gives q*wmax < 2*rho*w_i0 and
+/// q*rho*wmin > 2*w_i0. All of y's gcds are then s-free template constants: with
+/// g_j = gcd(2*w_i0, q*w_j) [identity gcd(A/q,B) = gcd(A,qB)/q for q|A; s cancels],
+///   y's modulus in bad row j     = 2*w_i0/g_j   (forced slot),
+///   p_j's modulus in y's own row = q*w_j/g_j.
+/// Flag consistency (forced slot == 2 iff flagged) partitions configuration space
+/// and subsumes the shared-2 2-adic compatibility. If both goods are pinned, their
+/// mutual moduli are exact too: G = gcd(2*w_a*q1, 2*w_b*q0), y0's row receives
+/// 2*w_b*q0/G, y1's row 2*w_a*q1/G [identity gcd(A/q,B/r) = gcd(Ar,Bq)/(qr)].
+/// Pinned goods get exact drift rows f_exact([q*w_j/g_j...], free slot minimized
+/// under the exact goodness test), evaluated at J in [q*tau/(2w_i0),
+/// q*(tau+1)/(2w_i0)] (min over the interval — f is not monotone), floored by
+/// stair60. Free goods keep the v2.1 stair + optional value descriptor. Bad rows'
+/// forced slots use exact-value classes (clamped to 41 = JT+1, tail-exact for
+/// J <= JT; badness tested at clamped values — conservative inclusion). Branches
+/// whose forced moduli make some bad row unable to be bad, or the donor good, are
+/// vacuous and skipped (their configs do not exist).
+fn shape2v22(rho: i128, shapes: &[[i128; 3]]) {
+    println!("=== stage-2 v2.2: donated-2 q-coupling (rho<{}), {} dual shapes -> W^vee sides ===", rho, shapes.len());
+    let jt: i128 = 40;
+    let mc: i128 = 41; // clamp: any modulus >= 41 is tail-exact as 41 for J <= 40
+    let sides: Vec<[i128; 3]> = shapes.to_vec();
+    let nthreads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
+    // (margin, shape, tau, pat, q0, q1)
+    let results: Vec<(i128, [i128; 3], i128, usize, i128, i128)> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads).map(|tid| {
+            let sides = &sides;
+            s.spawn(move || {
+                let mut out = Vec::new();
+                for (idx, w0) in sides.iter().enumerate() {
+                    if idx % nthreads != tid { continue; }
+                    let l = lcm(lcm(w0[0], w0[1]), w0[2]);
+                    let mut w = [l / w0[2], l / w0[1], l / w0[0]];
+                    let g = gcd(gcd(w[0], w[1]), w[2]);
+                    for x in w.iter_mut() { *x /= g; }
+                    let wmax = *w.iter().max().unwrap();
+                    let wmin = *w.iter().min().unwrap();
+                    let pins: Vec<[i128; 2]> = (0..3).map(|i| {
+                        let mut p = [0i128; 2]; let mut k = 0;
+                        for j in 0..3 { if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; } }
+                        p
+                    }).collect();
+                    // rowtab[i][c1][c2][j]: c = 0 free (m>=3), c in 1..=40 exact m = c+1
+                    let rti = |i: usize, c1: usize, c2: usize, j: usize| ((i * 41 + c1) * 41 + c2) * 41 + j;
+                    let mut rowtab = vec![i128::MAX; 3 * 41 * 41 * 41];
+                    let mut needs = [[0i128; 2]; 3];
+                    for i in 0..3 {
+                        let p = pins[i];
+                        needs[i] = [p[0] * p[1] - p[1] - p[0], p[0] * p[1]];
+                        for m1 in 2..=mc { for m2 in 2..=mc {
+                            if (m1 + m2) * needs[i][1] < needs[i][0] * m1 * m2 { continue; } // row not bad
+                            let f = f_exact(&[p[0], p[1], m1, m2], jt);
+                            let (c1e, c2e) = (m1 as usize - 1, m2 as usize - 1);
+                            for j in 2..=(jt as usize) {
+                                let v = f[j];
+                                let ji = j as i128;
+                                // exact-exact: true value's f is exact at every j (no gate)
+                                if v < rowtab[rti(i, c1e, c2e, j)] { rowtab[rti(i, c1e, c2e, j)] = v; }
+                                // free-class cells: representative must be in range (m <= j+1)
+                                let ok1 = m1 >= 3 && m1 <= ji + 1;
+                                let ok2 = m2 >= 3 && m2 <= ji + 1;
+                                if ok1 && v < rowtab[rti(i, 0, c2e, j)] { rowtab[rti(i, 0, c2e, j)] = v; }
+                                if ok2 && v < rowtab[rti(i, c1e, 0, j)] { rowtab[rti(i, c1e, 0, j)] = v; }
+                                if ok1 && ok2 && v < rowtab[rti(i, 0, 0, j)] { rowtab[rti(i, 0, 0, j)] = v; }
+                            }
+                        }}
+                    }
+                    let (tau_lo, tau_hi) = (2 * wmax, 33 * rho * wmax);
+                    let clamp = |m: i128| -> i128 { if m > mc { mc } else { m } };
+                    let mut worst = (i128::MAX, 0i128, 0usize, 0i128, 0i128);
+                    for pat in 0..64usize {
+                        let combos = [pat & 3, (pat >> 2) & 3, (pat >> 4) & 3];
+                        let mut r0: Vec<usize> = Vec::new(); let mut r1: Vec<usize> = Vec::new();
+                        for i in 0..3 {
+                            if combos[i] & 1 == 1 { r0.push(i); }
+                            if combos[i] & 2 == 2 { r1.push(i); }
+                        }
+                        let qset = |r: &Vec<usize>| -> Vec<i128> {
+                            if r.is_empty() { return vec![0]; }
+                            let i0 = r[0];
+                            let mut v = Vec::new();
+                            let mut q = 3i128;
+                            while q <= 2 * rho - 1 {
+                                if q * wmax < 2 * rho * w[i0] && q * rho * wmin > 2 * w[i0] { v.push(q); }
+                                q += 2;
+                            }
+                            v
+                        };
+                        let qs0 = qset(&r0); let qs1 = qset(&r1);
+                        for &q0 in qs0.iter() { 'branch: for &q1 in qs1.iter() {
+                            // forced slots: srow[g][i] = y_g's modulus in row i (0 = free good);
+                            // sy[g][i] = p_i's modulus in y_g's row
+                            let mut srow = [[0i128; 3]; 2];
+                            let mut sy = [[0i128; 3]; 2];
+                            for (g, (r, q)) in [(&r0, q0), (&r1, q1)].into_iter().enumerate() {
+                                if r.is_empty() { continue; }
+                                let i0 = r[0];
+                                for j in 0..3 {
+                                    let gj = gcd(2 * w[i0], q * w[j]);
+                                    srow[g][j] = 2 * w[i0] / gj;
+                                    sy[g][j] = q * w[j] / gj;
+                                    if r.contains(&j) {
+                                        // flagged: slot must be 2; coupled return cofactor >= 3
+                                        if srow[g][j] != 2 || sy[g][j] < 3 { continue 'branch; }
+                                    } else {
+                                        // =1: antichain violation; =2: belongs to the flagged pattern
+                                        if srow[g][j] <= 2 || sy[g][j] < 2 { continue 'branch; }
+                                    }
+                                }
+                            }
+                            let both = !r0.is_empty() && !r1.is_empty();
+                            let (mut mg0, mut mg1) = (0i128, 0i128); // other good's modulus in y_g's row; 0 = free
+                            if both {
+                                let (a, b) = (r0[0], r1[0]);
+                                let gg = gcd(2 * w[a] * q1, 2 * w[b] * q0);
+                                mg0 = 2 * w[b] * q0 / gg;
+                                mg1 = 2 * w[a] * q1 / gg;
+                                if mg0 < 2 || mg1 < 2 { continue 'branch; } // divisibility/equality among goods
+                            }
+                            // pinned goods: exact goodness test + exact drift row
+                            let mut rowyf: [Vec<i128>; 2] = [Vec::new(), Vec::new()];
+                            for g in 0..2 {
+                                let (r, other_m) = if g == 0 { (&r0, mg0) } else { (&r1, mg1) };
+                                if r.is_empty() { continue; }
+                                let known = [sy[g][0], sy[g][1], sy[g][2]];
+                                let mut p: i128 = known.iter().product();
+                                let mut num: i128 = known.iter().map(|&m| p / m).sum();
+                                if other_m > 0 { num = num * other_m + p; p *= other_m; }
+                                if num >= p { continue 'branch; } // y_g cannot be good
+                                if other_m > 0 {
+                                    rowyf[g] = f_exact(&[clamp(known[0]), clamp(known[1]), clamp(known[2]), clamp(other_m)], jt);
+                                } else {
+                                    // free slot: min over m in 2..=41 (41 = tail rep of [41,oo):
+                                    // its goodness term vanishes in the limit, so only num<p is required)
+                                    let mut acc = vec![i128::MAX; (jt + 1) as usize];
+                                    for mf in 2..=mc {
+                                        let feas = if mf == mc { true } else { num * mf + p < p * mf };
+                                        if !feas { continue; }
+                                        let f = f_exact(&[clamp(known[0]), clamp(known[1]), clamp(known[2]), mf], jt);
+                                        for j in 0..acc.len() { if f[j] < acc[j] { acc[j] = f[j]; } }
+                                    }
+                                    rowyf[g] = acc;
+                                }
+                            }
+                            let d0n = if r0.is_empty() { 13 } else { 1 };
+                            let d1n = if r1.is_empty() { 13 } else { 1 };
+                            for d0 in 0..d0n { for d1 in 0..d1n {
+                                let dec = |d: usize| -> Option<(usize, i128)> {
+                                    if d == 0 { None } else { Some(((d - 1) / 4, ((d - 1) % 4) as i128 + 3)) }
+                                };
+                                let de = [dec(d0), dec(d1)];
+                                let mut cls = [[0usize; 2]; 3];
+                                let mut dead = false;
+                                for i in 0..3 {
+                                    for gg in 0..2 {
+                                        cls[i][gg] = if srow[gg][i] > 0 { clamp(srow[gg][i]) as usize - 1 }
+                                                     else if let Some((bi, v)) = de[gg] { if bi == i { (v - 1) as usize } else { 0 } }
+                                                     else { 0 };
+                                    }
+                                    // branch-level badness feasibility (free slot -> 3 maximizes charge)
+                                    let a = if cls[i][0] == 0 { 3 } else { cls[i][0] as i128 + 1 };
+                                    let b = if cls[i][1] == 0 { 3 } else { cls[i][1] as i128 + 1 };
+                                    if (a + b) * needs[i][1] < needs[i][0] * a * b { dead = true; break; }
+                                }
+                                if dead { continue; }
+                                for tau in tau_lo..=tau_hi {
+                                    let mut m60 = -300i128;
+                                    for g in 0..2 {
+                                        let r = if g == 0 { &r0 } else { &r1 };
+                                        if r.is_empty() {
+                                            let jg = match de[g] { None => 2, Some((bi, v)) => (2 * tau / (v * w[bi])).max(2) };
+                                            m60 += 2 * stair60(jg);
+                                        } else {
+                                            let q = if g == 0 { q0 } else { q1 };
+                                            let i0 = r[0];
+                                            let jlo = q * tau / (2 * w[i0]);
+                                            let jhi = q * (tau + 1) / (2 * w[i0]);
+                                            let mut best = i128::MAX;
+                                            let mut jy = jlo;
+                                            while jy <= jhi {
+                                                let v = if jy <= jt {
+                                                    let e = rowyf[g][jy as usize];
+                                                    let st = stair60(jy);
+                                                    if e > st { e } else { st }
+                                                } else { 90 };
+                                                if v < best { best = v; }
+                                                jy += 1;
+                                            }
+                                            m60 += 2 * best;
+                                        }
+                                    }
+                                    let mut feasible = true;
+                                    for i in 0..3 {
+                                        let j = tau / w[i];
+                                        let fj = if j <= jt {
+                                            let v = rowtab[rti(i, cls[i][0], cls[i][1], j as usize)];
+                                            if v == i128::MAX { feasible = false; break; }
+                                            v
+                                        } else { (420 * j) / 300 - 14 };
+                                        m60 += 2 * fj;
+                                    }
+                                    if !feasible { continue; }
+                                    if m60 < worst.0 { worst = (m60, tau, pat, q0, q1); }
+                                }
+                            }}
+                        }}
+                    }
+                    out.push((worst.0, *w0, worst.1, worst.2, worst.3, worst.4));
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let mut pass = 0; let mut zero: Vec<_> = Vec::new(); let mut short: Vec<_> = Vec::new();
+    for r in results.iter() {
+        if r.0 == i128::MAX { println!("  VACUOUS(all patterns) W={:?}", r.1); pass += 1; }
+        else if r.0 > 0 { pass += 1; }
+        else if r.0 == 0 { zero.push(*r); }
+        else { short.push(*r); }
+    }
+    short.sort();
+    for (m, w, tau, pat, q0, q1) in short.iter() {
+        println!("  SHORT W={:?}^v margin*60={} tau={} pat={:06b} q0={} q1={}", w, m, tau, pat, q0, q1);
+    }
+    for (_, w, tau, pat, q0, q1) in zero.iter() {
+        println!("  ZERO  W={:?}^v (passes via retained +S) tau={} pat={:06b} q0={} q1={}", w, tau, pat, q0, q1);
+    }
+    println!("PASS {} / ZERO {} (pass via +S) / SHORT {} (of {} W^vee sides)",
+             pass, zero.len(), short.len(), results.len());
+}
+
+/// STAGE-2 v3: exact slot-matrix partition with generalized return-cofactor
+/// coupling (subsumes v2.2's donated-2 machinery, Codex Section 21 spec, at every
+/// donation value). Configuration space is partitioned by the CLASS MATRIX: for
+/// each bad row i and each good g, the slot y_g/gcd(y_g, p_i) is declared either
+/// an exact value v in 2..=6 or BIG (>= 7). Any exact slot (i*, v*) PINS its good:
+///   y = v* * w_i* * s / q,   q = p_i*/gcd = return cofactor,
+/// with gcd(v*, q) = 1 (slot and cofactor are the coprime pair y/g, p/g), q >= 2
+/// (q = 1 is p | y, antichain), and ratio < rho both ways:
+///   q*wmax < v*rho*w_i*   and   q*rho*wmin > v*w_i*.
+/// All the pinned good's gcds are then s-free template constants: with
+/// g_j = gcd(v*w_i*, q*w_j),
+///   slot in row j     = v*w_i*/g_j   (must match row j's declared class),
+///   y's row receives  = q*w_j/g_j    (>= 2, antichain).
+/// Both goods pinned => mutual moduli exact: G = gcd(v0*w_a*q1, v1*w_b*q0),
+/// y0's row receives v1*w_b*q0/G, y1's row v0*w_a*q1/G. Pinned goods get the
+/// exact goodness test (kills branches) and exact drift rows f_exact evaluated at
+/// J in [q*tau/(v*w_i*), q*(tau+1)/(v*w_i*)] (min over interval; f not monotone),
+/// floored by stair60. Free goods (all-BIG column) get the base stair. Bad rows
+/// use exact-value cells (clamped to 41, tail-exact for J <= 40) or the BIG class
+/// (badness capped at 1/7 — conservative). Branches whose forced values contradict
+/// the declared classes, the antichain, goodness, or badness are vacuous: their
+/// configurations do not exist. VACUOUS shapes admit no 3-bad configuration at all.
+fn shape2v3(rho: i128, shapes: &[[i128; 3]]) {
+    println!("=== stage-2 v3: exact slot-matrix + generalized q-coupling (rho<{}), {} dual shapes -> W^vee sides ===", rho, shapes.len());
+    let jt: i128 = 40;
+    let mc: i128 = 41;
+    let sides: Vec<[i128; 3]> = shapes.to_vec();
+    let nthreads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
+    // (margin, shape, tau, class-matrix digest, q0, q1)
+    let results: Vec<(i128, [i128; 3], i128, u64, i128, i128)> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads).map(|tid| {
+            let sides = &sides;
+            s.spawn(move || {
+                let mut out = Vec::new();
+                for (idx, w0) in sides.iter().enumerate() {
+                    if idx % nthreads != tid { continue; }
+                    let l = lcm(lcm(w0[0], w0[1]), w0[2]);
+                    let mut w = [l / w0[2], l / w0[1], l / w0[0]];
+                    let g = gcd(gcd(w[0], w[1]), w[2]);
+                    for x in w.iter_mut() { *x /= g; }
+                    let wmax = *w.iter().max().unwrap();
+                    let wmin = *w.iter().min().unwrap();
+                    let pins: Vec<[i128; 2]> = (0..3).map(|i| {
+                        let mut p = [0i128; 2]; let mut k = 0;
+                        for j in 0..3 { if j != i { p[k] = w[j] / gcd(w[i], w[j]); k += 1; } }
+                        p
+                    }).collect();
+                    // rowtab[i][c1][c2][j]: c = 0 BIG (m >= 7), c = m-1 for exact m in 2..=41
+                    let rti = |i: usize, c1: usize, c2: usize, j: usize| ((i * 42 + c1) * 42 + c2) * 41 + j;
+                    let mut rowtab = vec![i128::MAX; 3 * 42 * 42 * 41];
+                    let mut needs = [[0i128; 2]; 3];
+                    for i in 0..3 {
+                        let p = pins[i];
+                        needs[i] = [p[0] * p[1] - p[1] - p[0], p[0] * p[1]];
+                        for m1 in 2..=mc { for m2 in 2..=mc {
+                            if (m1 + m2) * needs[i][1] < needs[i][0] * m1 * m2 { continue; }
+                            let f = f_exact(&[p[0], p[1], m1, m2], jt);
+                            let (c1e, c2e) = (m1 as usize - 1, m2 as usize - 1);
+                            for j in 2..=(jt as usize) {
+                                let v = f[j];
+                                let ji = j as i128;
+                                if v < rowtab[rti(i, c1e, c2e, j)] { rowtab[rti(i, c1e, c2e, j)] = v; }
+                                // BIG representative: m >= 7 in range, or the prefix-equivalent m == j+1
+                                let ok1 = (m1 >= 7 && m1 <= ji + 1) || (ji < 6 && m1 == ji + 1);
+                                let ok2 = (m2 >= 7 && m2 <= ji + 1) || (ji < 6 && m2 == ji + 1);
+                                if ok1 && v < rowtab[rti(i, 0, c2e, j)] { rowtab[rti(i, 0, c2e, j)] = v; }
+                                if ok2 && v < rowtab[rti(i, c1e, 0, j)] { rowtab[rti(i, c1e, 0, j)] = v; }
+                                if ok1 && ok2 && v < rowtab[rti(i, 0, 0, j)] { rowtab[rti(i, 0, 0, j)] = v; }
+                            }
+                        }}
+                    }
+                    // per-row feasible class pairs: values 0 (BIG) or 2..=6 exact
+                    let cap = |c: i128| if c == 0 { 7 } else { c };
+                    let mut rowpairs: [Vec<(i128, i128)>; 3] = [Vec::new(), Vec::new(), Vec::new()];
+                    for i in 0..3 {
+                        for a in [0i128, 2, 3, 4, 5, 6] { for b in [0i128, 2, 3, 4, 5, 6] {
+                            let (x, y) = (cap(a), cap(b));
+                            if (x + y) * needs[i][1] >= needs[i][0] * x * y { rowpairs[i].push((a, b)); }
+                        }}
+                    }
+                    let (tau_lo, tau_hi) = (2 * wmax, 33 * rho * wmax);
+                    let clamp = |m: i128| -> i128 { if m > mc { mc } else { m } };
+                    let mut worst = (i128::MAX, 0i128, 0u64, 0i128, 0i128);
+                    for &(a0, b0) in rowpairs[0].iter() {
+                    for &(a1, b1) in rowpairs[1].iter() {
+                    for &(a2, b2) in rowpairs[2].iter() {
+                        let colg = [[a0, a1, a2], [b0, b1, b2]]; // colg[g][i] = declared class
+                        // digest for reporting: 6 slots base-8
+                        let dig: u64 = [a0, b0, a1, b1, a2, b2].iter().fold(0u64, |acc, &c| acc * 8 + c as u64);
+                        // pinned goods: first exact slot
+                        let pin_of = |g: usize| -> Option<(usize, i128)> {
+                            (0..3).find(|&i| colg[g][i] >= 2).map(|i| (i, colg[g][i]))
+                        };
+                        let pin = [pin_of(0), pin_of(1)];
+                        let qset = |p: &Option<(usize, i128)>| -> Vec<i128> {
+                            match p {
+                                None => vec![0],
+                                Some((istar, vstar)) => {
+                                    let mut v = Vec::new();
+                                    let mut q = 2i128;
+                                    while q * wmax < vstar * rho * w[*istar] {
+                                        if gcd(q, *vstar) == 1 && q * rho * wmin > vstar * w[*istar] { v.push(q); }
+                                        q += 1;
+                                    }
+                                    v
+                                }
+                            }
+                        };
+                        let qs0 = qset(&pin[0]); let qs1 = qset(&pin[1]);
+                        for &q0 in qs0.iter() { 'branch: for &q1 in qs1.iter() {
+                            let qq = [q0, q1];
+                            // forced slots for pinned goods; check against declared classes
+                            let mut srow = [[0i128; 3]; 2]; // 0 = free slot (BIG, unpinned good)
+                            let mut sy = [[0i128; 3]; 2];
+                            for g in 0..2 {
+                                if let Some((istar, vstar)) = pin[g] {
+                                    for j in 0..3 {
+                                        let gj = gcd(vstar * w[istar], qq[g] * w[j]);
+                                        srow[g][j] = vstar * w[istar] / gj;
+                                        sy[g][j] = qq[g] * w[j] / gj;
+                                        let c = colg[g][j];
+                                        if c >= 2 { if srow[g][j] != c { continue 'branch; } }
+                                        else { if srow[g][j] < 7 { continue 'branch; } }
+                                        if sy[g][j] < 2 { continue 'branch; } // p_j | y
+                                    }
+                                }
+                            }
+                            let both = pin[0].is_some() && pin[1].is_some();
+                            let (mut mg0, mut mg1) = (0i128, 0i128);
+                            if both {
+                                let (ia, va) = pin[0].unwrap(); let (ib, vb) = pin[1].unwrap();
+                                let gg = gcd(va * w[ia] * q1, vb * w[ib] * q0);
+                                mg0 = vb * w[ib] * q0 / gg;
+                                mg1 = va * w[ia] * q1 / gg;
+                                if mg0 < 2 || mg1 < 2 { continue 'branch; }
+                            }
+                            let mut rowyf: [Vec<i128>; 2] = [Vec::new(), Vec::new()];
+                            for g in 0..2 {
+                                if pin[g].is_none() { continue; }
+                                let other_m = if g == 0 { mg0 } else { mg1 };
+                                let known = [sy[g][0], sy[g][1], sy[g][2]];
+                                let mut p: i128 = known.iter().product();
+                                let mut num: i128 = known.iter().map(|&m| p / m).sum();
+                                if other_m > 0 { num = num * other_m + p; p *= other_m; }
+                                if num >= p { continue 'branch; } // pinned good cannot be good
+                                if other_m > 0 {
+                                    rowyf[g] = f_exact(&[clamp(known[0]), clamp(known[1]), clamp(known[2]), clamp(other_m)], jt);
+                                } else {
+                                    let mut acc = vec![i128::MAX; (jt + 1) as usize];
+                                    for mf in 2..=mc {
+                                        let feas = if mf == mc { true } else { num * mf + p < p * mf };
+                                        if !feas { continue; }
+                                        let f = f_exact(&[clamp(known[0]), clamp(known[1]), clamp(known[2]), mf], jt);
+                                        for j in 0..acc.len() { if f[j] < acc[j] { acc[j] = f[j]; } }
+                                    }
+                                    rowyf[g] = acc;
+                                }
+                            }
+                            // row lookup classes: forced exact (clamped) beats declared BIG
+                            let mut cls = [[0usize; 2]; 3];
+                            let mut dead = false;
+                            for i in 0..3 {
+                                for g in 0..2 {
+                                    cls[i][g] = if srow[g][i] > 0 { clamp(srow[g][i]) as usize - 1 }
+                                                else if colg[g][i] >= 2 { colg[g][i] as usize - 1 }
+                                                else { 0 };
+                                }
+                                let a = if cls[i][0] == 0 { 7 } else { cls[i][0] as i128 + 1 };
+                                let b = if cls[i][1] == 0 { 7 } else { cls[i][1] as i128 + 1 };
+                                if (a + b) * needs[i][1] < needs[i][0] * a * b { dead = true; break; }
+                            }
+                            if dead { continue; }
+                            for tau in tau_lo..=tau_hi {
+                                let mut m60 = -300i128;
+                                for g in 0..2 {
+                                    match pin[g] {
+                                        None => { m60 += 2 * stair60(2); }
+                                        Some((istar, vstar)) => {
+                                            let jlo = qq[g] * tau / (vstar * w[istar]);
+                                            let jhi = qq[g] * (tau + 1) / (vstar * w[istar]);
+                                            let mut best = i128::MAX;
+                                            let mut jy = jlo;
+                                            while jy <= jhi {
+                                                let v = if jy <= jt {
+                                                    let e = rowyf[g][jy as usize];
+                                                    let st = stair60(jy);
+                                                    if e > st { e } else { st }
+                                                } else { 90 };
+                                                if v < best { best = v; }
+                                                jy += 1;
+                                            }
+                                            m60 += 2 * best;
+                                        }
+                                    }
+                                }
+                                let mut feasible = true;
+                                for i in 0..3 {
+                                    let j = tau / w[i];
+                                    let fj = if j <= jt {
+                                        let v = rowtab[rti(i, cls[i][0], cls[i][1], j as usize)];
+                                        if v == i128::MAX { feasible = false; break; }
+                                        v
+                                    } else { (420 * j) / 300 - 14 };
+                                    m60 += 2 * fj;
+                                }
+                                if !feasible { continue; }
+                                if m60 < worst.0 { worst = (m60, tau, dig, q0, q1); }
+                            }
+                        }}
+                    }}}
+                    out.push((worst.0, *w0, worst.1, worst.2, worst.3, worst.4));
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let mut pass = 0; let mut vac = 0; let mut zero: Vec<_> = Vec::new(); let mut short: Vec<_> = Vec::new();
+    for r in results.iter() {
+        if r.0 == i128::MAX { vac += 1; println!("  VACUOUS W={:?} (no 3-bad configuration exists)", r.1); }
+        else if r.0 > 0 { pass += 1; }
+        else if r.0 == 0 { zero.push(*r); }
+        else { short.push(*r); }
+    }
+    short.sort();
+    let decode = |d: u64| -> String {
+        let mut cs = [0u64; 6];
+        let mut x = d;
+        for k in (0..6).rev() { cs[k] = x % 8; x /= 8; }
+        format!("[{}]", cs.iter().map(|&c| if c == 0 { "B".to_string() } else { c.to_string() })
+                .collect::<Vec<_>>().join(","))
+    };
+    for (m, w, tau, dig, q0, q1) in short.iter() {
+        println!("  SHORT W={:?}^v margin*60={} tau={} cls={} q0={} q1={}", w, m, tau, decode(*dig), q0, q1);
+    }
+    for (_, w, tau, dig, q0, q1) in zero.iter() {
+        println!("  ZERO  W={:?}^v (passes via retained +S) tau={} cls={} q0={} q1={}", w, tau, decode(*dig), q0, q1);
+    }
+    println!("PASS {} (incl. {} VACUOUS) / ZERO {} (pass via +S) / SHORT {} (of {} W^vee sides)",
+             pass + vac, vac, zero.len(), short.len(), results.len());
+}
+
 /// STAGE-2 v2: donation-VALUE descriptors. Each good's stair source = its best
 /// donation (i, v), v in 2..=6 (v>=7 gives J-bound below the flat stair region —
 /// treated as none). Descriptor space 16x16; rows constrained only at the named
@@ -1205,6 +1686,28 @@ fn main() {
         }).collect();
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape2v2(r, &shapes);
+        return;
+    }
+    if args[1] == "shape2v3" {
+        let path = args.get(2).expect("shape file");
+        let txt = std::fs::read_to_string(path).expect("read shapes");
+        let shapes: Vec<[i128; 3]> = txt.lines().filter_map(|l| {
+            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
+            if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
+        }).collect();
+        let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
+        shape2v3(r, &shapes);
+        return;
+    }
+    if args[1] == "shape2v22" {
+        let path = args.get(2).expect("shape file");
+        let txt = std::fs::read_to_string(path).expect("read shapes");
+        let shapes: Vec<[i128; 3]> = txt.lines().filter_map(|l| {
+            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
+            if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
+        }).collect();
+        let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
+        shape2v22(r, &shapes);
         return;
     }
     if args[1] == "shape2v21" {

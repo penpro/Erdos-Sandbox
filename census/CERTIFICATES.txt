@@ -45,3 +45,93 @@ RESULT: ALL PASS
   W1: V4-W = 1715400/45360000 > 0; peel threshold M0 = 45360000/3430800 (ceil 14), box [2..25] sufficient: true
   W2: V4-W = 38700/1260000 > 0; peel threshold M0 = 1260000/77400 (ceil 17), box [2..25] sufficient: true
 RESULT: ALL PASS
+
+=== shape2v22 (donated-2 q-coupling, Section 21 spec) 2026-07-18 ===
+=== stage-2 v2.2: donated-2 q-coupling (rho<7), 69 dual shapes -> W^vee sides ===
+  VACUOUS(all patterns) W=[9, 24, 32]
+  VACUOUS(all patterns) W=[16, 57, 76]
+  VACUOUS(all patterns) W=[16, 63, 84]
+  VACUOUS(all patterns) W=[16, 69, 92]
+  VACUOUS(all patterns) W=[9, 30, 40]
+  VACUOUS(all patterns) W=[16, 75, 100]
+  VACUOUS(all patterns) W=[16, 81, 108]
+  VACUOUS(all patterns) W=[9, 33, 44]
+  VACUOUS(all patterns) W=[6, 21, 28]
+  VACUOUS(all patterns) W=[9, 39, 52]
+  VACUOUS(all patterns) W=[9, 42, 56]
+  VACUOUS(all patterns) W=[12, 39, 52]
+  VACUOUS(all patterns) W=[8, 39, 52]
+  VACUOUS(all patterns) W=[12, 51, 68]
+  VACUOUS(all patterns) W=[12, 57, 76]
+  VACUOUS(all patterns) W=[9, 12, 16]
+  VACUOUS(all patterns) W=[15, 16, 20]
+  VACUOUS(all patterns) W=[16, 21, 28]
+  VACUOUS(all patterns) W=[9, 15, 20]
+  VACUOUS(all patterns) W=[16, 27, 36]
+  VACUOUS(all patterns) W=[16, 33, 44]
+  VACUOUS(all patterns) W=[16, 39, 52]
+  VACUOUS(all patterns) W=[9, 21, 28]
+  VACUOUS(all patterns) W=[16, 45, 60]
+  VACUOUS(all patterns) W=[16, 51, 68]
+  SHORT W=[6, 10, 15]^v margin*60=-30 tau=20 pat=000000 q0=0 q1=0
+  ZERO  W=[4, 6, 9]^v (passes via retained +S) tau=18 pat=000001 q0=3 q1=0
+PASS 67 / ZERO 1 (pass via +S) / SHORT 1 (of 69 W^vee sides)
+
+=== shape2v3 (exact slot-matrix, generalized q-coupling) 2026-07-18 ===
+=== stage-2 v3: exact slot-matrix + generalized q-coupling (rho<7), 69 dual shapes -> W^vee sides ===
+  VACUOUS W=[9, 24, 32] (no 3-bad configuration exists)
+  VACUOUS W=[16, 57, 76] (no 3-bad configuration exists)
+  VACUOUS W=[16, 63, 84] (no 3-bad configuration exists)
+  VACUOUS W=[4, 14, 21] (no 3-bad configuration exists)
+  VACUOUS W=[9, 28, 42] (no 3-bad configuration exists)
+  VACUOUS W=[16, 69, 92] (no 3-bad configuration exists)
+  VACUOUS W=[4, 18, 27] (no 3-bad configuration exists)
+  VACUOUS W=[9, 30, 40] (no 3-bad configuration exists)
+  VACUOUS W=[16, 75, 100] (no 3-bad configuration exists)
+  VACUOUS W=[6, 8, 9] (no 3-bad configuration exists)
+  VACUOUS W=[9, 32, 48] (no 3-bad configuration exists)
+  VACUOUS W=[16, 81, 108] (no 3-bad configuration exists)
+  VACUOUS W=[9, 33, 44] (no 3-bad configuration exists)
+  VACUOUS W=[9, 34, 51] (no 3-bad configuration exists)
+  VACUOUS W=[6, 15, 20] (no 3-bad configuration exists)
+  VACUOUS W=[9, 38, 57] (no 3-bad configuration exists)
+  VACUOUS W=[6, 21, 28] (no 3-bad configuration exists)
+  VACUOUS W=[9, 39, 52] (no 3-bad configuration exists)
+  VACUOUS W=[6, 22, 33] (no 3-bad configuration exists)
+  VACUOUS W=[9, 40, 60] (no 3-bad configuration exists)
+  VACUOUS W=[6, 26, 39] (no 3-bad configuration exists)
+  VACUOUS W=[9, 42, 56] (no 3-bad configuration exists)
+  VACUOUS W=[8, 10, 15] (no 3-bad configuration exists)
+  VACUOUS W=[8, 14, 21] (no 3-bad configuration exists)
+  VACUOUS W=[12, 21, 28] (no 3-bad configuration exists)
+  VACUOUS W=[8, 18, 27] (no 3-bad configuration exists)
+  VACUOUS W=[12, 22, 33] (no 3-bad configuration exists)
+  VACUOUS W=[8, 21, 28] (no 3-bad configuration exists)
+  VACUOUS W=[12, 26, 39] (no 3-bad configuration exists)
+  VACUOUS W=[8, 22, 33] (no 3-bad configuration exists)
+  VACUOUS W=[12, 33, 44] (no 3-bad configuration exists)
+  VACUOUS W=[8, 26, 39] (no 3-bad configuration exists)
+  VACUOUS W=[12, 34, 51] (no 3-bad configuration exists)
+  VACUOUS W=[8, 27, 36] (no 3-bad configuration exists)
+  VACUOUS W=[12, 38, 57] (no 3-bad configuration exists)
+  VACUOUS W=[8, 30, 45] (no 3-bad configuration exists)
+  VACUOUS W=[12, 39, 52] (no 3-bad configuration exists)
+  VACUOUS W=[8, 33, 44] (no 3-bad configuration exists)
+  VACUOUS W=[12, 46, 69] (no 3-bad configuration exists)
+  VACUOUS W=[8, 34, 51] (no 3-bad configuration exists)
+  VACUOUS W=[12, 50, 75] (no 3-bad configuration exists)
+  VACUOUS W=[8, 39, 52] (no 3-bad configuration exists)
+  VACUOUS W=[12, 51, 68] (no 3-bad configuration exists)
+  VACUOUS W=[12, 57, 76] (no 3-bad configuration exists)
+  VACUOUS W=[9, 12, 16] (no 3-bad configuration exists)
+  VACUOUS W=[15, 16, 20] (no 3-bad configuration exists)
+  VACUOUS W=[16, 21, 28] (no 3-bad configuration exists)
+  VACUOUS W=[9, 15, 20] (no 3-bad configuration exists)
+  VACUOUS W=[16, 27, 36] (no 3-bad configuration exists)
+  VACUOUS W=[9, 16, 24] (no 3-bad configuration exists)
+  VACUOUS W=[16, 33, 44] (no 3-bad configuration exists)
+  VACUOUS W=[16, 39, 52] (no 3-bad configuration exists)
+  VACUOUS W=[9, 21, 28] (no 3-bad configuration exists)
+  VACUOUS W=[16, 45, 60] (no 3-bad configuration exists)
+  VACUOUS W=[16, 51, 68] (no 3-bad configuration exists)
+PASS 69 (incl. 55 VACUOUS) / ZERO 0 (pass via +S) / SHORT 0 (of 69 W^vee sides)

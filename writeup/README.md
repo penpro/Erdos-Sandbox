@@ -4,6 +4,10 @@
 that Erdős Problem 488 holds for every finite set whose primitive core has at
 most three elements (in particular all `|A| ≤ 3`).
 
+**`erdos488_quadruples_addendum.tex`** — a post-update local proof candidate for
+primitive cores of size at most four. It has not yet been human/literature
+audited and no PDF has been built in this shell (`pdflatex` is not on PATH here).
+
 ## What it is, honestly
 
 - **The *statement* is not new.** It is Corollary 4.7 of P. Chojecki's

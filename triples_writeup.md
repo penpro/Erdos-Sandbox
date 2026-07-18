@@ -240,12 +240,16 @@ pairwise-coprime set the reciprocals of whose **three smallest elements** sum to
 `{3,4,5,7}` (verified: all four charges `≥ 1` over a full period). NB the phrasing
 "three smallest reciprocals" would be wrong — `{2,3,5,7}` has `1/3+1/5+1/7 < 1`
 yet fails the hypothesis at `e=7` (`1/2+1/3+1/5 > 1`).
-It does **not** close `|P|=4`: for a clustered set the largest element collects
+This triple note by itself does **not** close `|P|=4`: for a clustered set the largest element collects
 weak-side ratios summing to `≥ 1/2+1/2 = 1` (e.g. `{2,3,5,7}`: charge sum for `7`
 is `1/2+1/3+1/5 > 1`), and no size-4 analogue of Lemma 4 rescues the boundary —
 the natural conjecture "charge-sum `= 1` ⇒ covered zone" is **false**
 (`{6,10,15,25}`: charge sum for `25` is `1`, yet `1/10+1/15+1/25 = 0.207 > 1/6`;
 37 of 49 boundary quadruples with `a ≤ 25` violate it). See §7.
+
+Later update: `quadruple_charge_notes.md` gives a different four-set
+inclusion-exclusion rescue and a local proof candidate for all primitive
+quadruples; audit that note before treating `|P|=4` as settled.
 
 ## 6. All triples; all `A` with a small core
 
