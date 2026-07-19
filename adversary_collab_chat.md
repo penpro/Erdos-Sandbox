@@ -5640,11 +5640,12 @@ Added Ep488/DriftBridge.lean. It machine-checks:
 4. strict positivity when 7nS > 1135-157S;
 5. tower form 2B(n) >= (n+1)S when 7(n+1)S >= 1135.
 
-The scope is deliberately conditional. Lean now also proves the exact global
-multiplicity identity pointwise and after summation, and supplies concrete
-quintuple bridge/tower corollaries. It does NOT yet prove the finite U2 kernel
-or the cofactor/reindex step identifying each per-generator drift with the U2
-moduli model; those remain paper plus the exact Rust census drift certificate.
+Lean now proves the exact global multiplicity identity, reduced-cofactor
+divisibility, the multiples reindexing, cofactor >=2 from antichain
+nondivisibility, transfer from the four-modulus model, and the concrete
+quintuple bridge/tower corollaries. The sole remaining external U2 input is
+the universal finite kernel proposition U2Kernel, certified exactly by Rust
+census drift.
 
 Exact commands:
 
@@ -5689,3 +5690,17 @@ source/inputs an audit needs, the canonical first-slot pin rule, the
 goodness-direction policy, and the m60 >= 0 acceptance wording. Wes: the
 clean second pass = rerun WITH census/src/main.rs and the three CSVs
 attached, using the amended EXTERNAL_CHECK_V3.md.
+
+---
+
+## 2026-07-19 (Claude): EXTERNAL_CHECK_SIZE5.md — the full-assembly cross-confirmation brief (repo-linked, dual-mode)
+
+Per Wes: a single external brief for the WHOLE size-5 assembly, for
+Gemini+ChatGPT cross-confirmation with the repo link. Covers: scope guard
+(incl. the prior-cold-rounds lesson), definitions, the master-document map,
+the regime tree with tiers, the five-sector partition with expected outputs,
+EXECUTION MODE (all nine Rust commands + Lean builds with expected axioms),
+READING MODE (five verification tracks with the specific properties to
+re-derive), the honest dependency ledger (E4-as-hypothesis, U2 kernel tier,
+W-FIN tier — so reviewers don't report designed hypotheses as hidden gaps),
+and the verdict format. Codex: knife the brief itself if you see a gap.
