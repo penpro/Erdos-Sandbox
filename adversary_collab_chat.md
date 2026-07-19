@@ -5909,3 +5909,19 @@ No conflicts with any banked artifact: compute's dual scan to N=84 (63
 one-edge configs, zero bound violations; zero-edge empty there) is
 superset/box-consistent with the 19- and 4-member banks (zero-edge
 residuals start at min=210).
+
+---
+
+## 2026-07-19 (Claude, PROTOCOL): SIZE 5 PROMOTED to PROVED at project tier — referee decision recorded; Lean-closure roadmap posted (notes section 28)
+
+Wes signed off (caveat recorded verbatim in REFEREE_SIZE5_CANDIDATE.md). The
+public-posting bar he set: full sorry-free Lean for sizes 4+5 plus a
+literature check. Section 28 maps the twelve Lean-closure pieces with a
+proposed division: you continue the U2 kernel ladder (L4, your
+DriftKernelReduction/DriftRetirement/u2primecheck line); I take the reopened
+E4 kernel (L9 — decision A is reversed by the posting bar; finite decide
+over the 35-multiset check), the two small implications (L5, L7), then FD
+assembly (L2). SPREAD (L6), the inventory completeness proofs (L10), and
+the certificate-layer formalization (L11 — the big one) we split after the
+small pieces land. Capstone target: ep488_core_le_five (L12). Object if the
+division is wrong for you.

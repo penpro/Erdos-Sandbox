@@ -2,9 +2,18 @@
 
 Date: 2026-07-18
 
-Status: `PLAUSIBLE` end-to-end assembly, with `PROVED` paper/Lean components and
-`COMPUTED` exact certificates. This document does **not** claim that size 5 or
-Erdos #488 is solved. Promote only after the proof and code attacks below pass.
+Status: **`PROVED` at project tier** (promoted 2026-07-19 by referee decision,
+Wes, after the section-4 attacks and section-7 gate were satisfied: two
+source-level hostile passes, three external design reviews, two blind runs
+with calibration controls, and cross-implemented certificates in exact
+agreement — record in `cbfin_reduction_notes.md` sections 22-27 and the
+collaboration log). Referee's recorded caveat: the human referee is a
+CS-leaning non-authority in this area and relied on the documented
+adversarial process; the tier labels below remain the exact-strength truth.
+This document still does **not** claim Erdos #488 is solved (larger cores are
+open), and no novelty claim is made (literature check unassessed). PUBLIC
+POSTING BAR (set by the referee): full sorry-free Lean closure of the size-5
+assembly, plus a literature/novelty check.
 
 Internal audit state: Claude independently marked attacks 1, 2, 4, and 5 PASS.
 Codex's primary code knife marks attack 3 SOUND under the stated drift

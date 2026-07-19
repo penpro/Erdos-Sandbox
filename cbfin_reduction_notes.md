@@ -3144,3 +3144,32 @@ With Codex's tower-calibration confirmation (26.5, now including the Lean
 `quintuple_drift_bridge_tower`) this closes every open finding from every
 review round. The gate now consists solely of Wes's promotion decision plus
 whatever the still-running external blind projects return.
+
+## 28. SIZE-5 PROMOTED (2026-07-19) — and the full-Lean closure roadmap (the public-posting bar)
+
+Wes's referee decision (recorded with his caveat in the referee doc): size 5
+is PROVED at project tier. His bar for public posting: sorry-free Lean for
+sizes 4 and 5. Size 4 already meets it. The size-5 Lean-closure map, by
+current tier:
+
+| # | Piece | Now | To close |
+|---|---|---|---|
+| L1 | A regime | LEAN | — |
+| L2 | FD | LEAN + paper assembly | Lean the FD assembly identity (small) |
+| L3 | Bridge algebra + multiplicity | LEAN (DriftBridge, quintuple_* incl. tower) | — |
+| L4 | U2 kernel + staircase | Rust cert + paper; Codex actively porting (DriftKernelReduction/DriftRetirement/u2primecheck) | finish the kernel ladder in Lean |
+| L5 | C-B | LEAN conditional | Lean the CRIT>7/2 => s >= 2P2+5 implication (small) |
+| L6 | SPREAD | paper + certs | Lean the class assignment + drift chains (medium) |
+| L7 | C0 | LEAN tower seam | Lean the scaling recursion B_{tP}(n) = B_P(floor(n/t)) (small) |
+| L8 | k=5 ceiling, DT | LEAN | — |
+| L9 | E4 kernel 157/300 | explicit hypothesis (decision A) | decision A is REOPENED by the posting bar: discharge via finite enumeration in Lean (decide over the 35-multiset check + Route B lemmas) |
+| L10 | Box inventories (906 cap, one-edge boxes, zero-edge surjectivity, 4-bad routes) | paper + triple implementations | Lean the four completeness arguments (medium-large) |
+| L11 | Certificate layer (v3/shape4/banks semantics + runs) | Rust exact, audited | the big one: formalize the F4 drift semantics + replay the enumerations (native_decide-style) or re-prove the 37 non-vacuous margins and vacuities inside Lean |
+| L12 | Assembly theorem | referee docs | the capstone: one Lean theorem ep488_core_le_five chaining L1-L11 |
+
+W-FIN is NOT on the critical path (the sector partition never uses its
+cutoff) — it stays paper-tier as historical scaffolding. Proposed division:
+Codex continues L4 (in flight); Claude takes L9 (reopened kernel — finite
+decide) and L5/L7 (small), then L2; L6/L10/L11 split after. Publication
+checklist beyond Lean: literature/novelty check, thread-comment draft, and
+Wes's final posting decision.
