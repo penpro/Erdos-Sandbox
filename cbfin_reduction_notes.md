@@ -2935,3 +2935,13 @@ Every (P, n) with n >= max(P) lands in at least one certified regime; the
 overlaps are benign (all statements are the same inequality 2B > nS or its
 tower strengthening). This is the assembly half of attack 6; the joint pass
 should merge this with referee section 5's statements verbatim.
+
+### 23.6a The k = 5 ceiling is now LEAN tier
+
+`lean/ep488/Ep488/Ceiling.lean` (2026-07-19): `slot_trichotomy` (per element:
+`60*gcd <= 12e`, or the `(m,k) = (3,2)` slot with `3x = 2e`, or `(4,3)` with
+`4x = 3e`), `ceiling_max` (`sum gcd(e,x) < e` over any 4 distinct smaller
+non-divisors — via at-most-one-per-slot and `59e/60`), and `no_five_self_bad`
+(antichain 5-set: the max is never self-bad). Sorry-free; axioms = the standard
+trio (ceiling-axioms.txt); CeilingCheck.lean added to the CI audit list. The
+"5-bad impossible" row of the partition table is machine-checked.

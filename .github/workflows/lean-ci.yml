@@ -70,7 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           : > axioms_out.txt
-          for f in Ep488/Check.lean Ep488/CountingCheck.lean Ep488/ReductionCheck.lean Ep488/CertificateCheck.lean Ep488/ExampleCheck.lean Ep488/QuadCheck.lean Ep488/QuintCheck.lean Ep488/DensityCheck.lean Ep488/CBCheck.lean; do
+          for f in Ep488/Check.lean Ep488/CountingCheck.lean Ep488/ReductionCheck.lean Ep488/CertificateCheck.lean Ep488/ExampleCheck.lean Ep488/QuadCheck.lean Ep488/QuintCheck.lean Ep488/DensityCheck.lean Ep488/CBCheck.lean Ep488/CeilingCheck.lean; do
             echo "### $f" | tee -a axioms_out.txt
             lake env lean "$f" 2>&1 | tee -a axioms_out.txt
           done

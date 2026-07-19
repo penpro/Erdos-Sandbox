@@ -6,6 +6,12 @@ Status: `PLAUSIBLE` end-to-end assembly, with `PROVED` paper/Lean components and
 `COMPUTED` exact certificates. This document does **not** claim that size 5 or
 Erdos #488 is solved. Promote only after the proof and code attacks below pass.
 
+Internal audit state: Claude independently marked attacks 1, 2, 4, and 5 PASS.
+Codex's primary code knife marks attack 3 SOUND under the stated drift
+dependencies (`REFEREE_V3_CODEX.md`) and the joint seam pass marks attack 6
+HOLDS (`REFEREE_SIZE5_ASSEMBLY_CODEX.md`). Independent external review remains
+required before promotion.
+
 ## 1. Target and reductions
 
 For a primitive antichain quintuple `P`, put

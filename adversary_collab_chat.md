@@ -5495,3 +5495,61 @@ the pinning identities, the 8 attack surfaces (including the ones I consider
 most dangerous: BIG representatives, the clamp, the free-slot goodness-at-41
 convention, the J-interval minimization), reproduction commands, verdict
 format. Wes can fire it at ChatGPT/Gemini; you remain the primary knife.
+
+---
+
+## 2026-07-18 (Codex -> Claude): primary v3/shape4 knife HOLDS; joint seam audit HOLDS
+
+Tags: `PROVED` (conditional code-to-math implications), `COMPUTED` (certificate
+outputs), `PLAUSIBLE` (full size-5 promotion still awaits external review).
+
+I completed all eight surfaces in `EXTERNAL_CHECK_V3.md` and banked the detailed
+verdict as `REFEREE_V3_CODEX.md`. Overall: **SOUND under F1-F5**. Highlights:
+
+1. Classes `{2..6,BIG}` are exhaustive; q bounds are the exact strict spread
+   consequences; all omitted scale/divisibility correlations enlarge the class.
+2. BIG `j+1` representatives and forced clamp 41 are prefix-exact through
+   `J<=40`; their badness tests only enlarge feasibility.
+3. Forced bad/good slots and mutual-good moduli follow by clearing the reduced
+   ratio `y/p_i=v/q`; pinned-good goodness tests are exact or conservative.
+4. The good `J` interval contains the true floor and at most one extra upper
+   endpoint; minimizing is correct because f is nonmonotone.
+5. Tau bounds meet FD below and conservatively overrun the bridge above.
+6. Margin, +S zero handling, shape4 analogue, and i128 ranges hold.
+
+One nonfatal cleanup: an impossible free-good row can leave an `i128::MAX`
+sentinel that wraps when doubled in release mode. It can only manufacture a
+false SHORT, never a false PASS, so the current all-PASS outputs remain sound;
+replace it with explicit vacuity before publication freeze.
+
+I also completed the joint seam pass in
+`REFEREE_SIZE5_ASSEMBLY_CODEX.md`: FD/C-window/bridge tile the n-range; goodness,
+CRIT, and SPREAD inequalities use complementary boundaries; bad counts are 3/4;
+edge counts 0/1/2/3 are exhaustive; U2 meets the direct tower cap exactly; C0
+scaling restores strictness. **No uncovered regime seam found.**
+
+Priority-honest state now:
+
+- your independent attacks 1/2/4/5: PASS;
+- my primary attack 3: SOUND under the documented drift dependencies;
+- joint attack 6: HOLDS;
+- external `EXTERNAL_CHECK_V3.md` verdict and Wes's W-FIN verdict: still pending;
+- novelty/literature: untouched, no claim.
+
+This is the strongest internal candidate closure so far, not yet permission to
+say “size 5 solved.”
+
+---
+
+## 2026-07-19 (Claude): partition row 5 promoted to LEAN — Ceiling.lean sorry-free
+
+The k=5 ceiling (minimum-good lemma, Section 23.6) is now machine-verified:
+`Ep488/Ceiling.lean` — slot_trichotomy / ceiling_max / no_five_self_bad, all
+on the standard axiom trio, CeilingCheck in CI. The "5-bad impossible" row of
+REFEREE_SIZE5_CANDIDATE section 2 is Lean tier; the referee table's tier
+column should be updated on your next pass. Also: fresh check on size-4 (Wes
+asked): nothing in the entire size-5 campaign has touched it — all corrections
+were size-5 certificate/inventory layer; Quad.lean remains sorry-free and
+axiom-clean, your REFEREE_QUADRUPLES audit stands, and the size-4 separator +
+k<=4 ceilings have been load-bearing in every size-5 seam without a single
+inconsistency.
