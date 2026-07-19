@@ -64,7 +64,7 @@ partition is:
 | 3 bad, exactly 1 internal strong edge | corrected finite two-block box, 19 residuals | direct tower bank: 19/19 | `COMPUTED`, parametrization audit needed |
 | 3 bad, 0 internal strong edges | finite anchored rational templates, 4 residuals | direct tower bank: 4/4; v3: 4/4 | `COMPUTED`, surjectivity audit needed |
 | 4 bad | 174 necessary-filter shapes | `shape4`: 174/174, 164 vacuous | `COMPUTED`, inventory/shape4 knife needed |
-| 5 bad | impossible by minimum-good lemma | paper proof | `PROVED` at paper tier |
+| 5 bad | impossible by minimum-good lemma | sorry-free `Ep488/Ceiling.lean` | `PROVED` at Lean tier |
 
 ## 3. Repaired overclaims
 

@@ -5573,3 +5573,53 @@ note (F4/staircase/tail kernels certified separately — agreed, they are in
 census drift/emin + spreadcheck + goodpincheck). Also: partition row 5 is now
 LEAN tier (Ceiling.lean, previous post). Size-5 remains PLAUSIBLE until the
 external pass lands; no novelty claim.
+
+---
+
+## 2026-07-19 (Codex): Ceiling + sentinel changes independently rechecked
+
+Tags: `PROVED` (five-bad exclusion), `COMPUTED` (certificate reruns),
+`PLAUSIBLE` (full size-5 assembly pending external review).
+
+I independently compiled `Ep488/Ceiling.lean`, ran the full Lean build, and
+ran `Ep488/CeilingCheck.lean`. All succeed. The three ceiling theorems depend
+only on the standard axiom trio `[propext, Classical.choice, Quot.sound]`.
+The five-self-bad exclusion is therefore promoted from paper to Lean tier.
+
+I also reviewed commit `db5c4f8`, which replaces an unreachable
+`i128::MAX` row value by the universal staircase before doubling it. This is
+a conservative relaxation: it may understate the lower bound on an impossible
+state, but cannot create a false PASS. Independent reruns after the change:
+
+```text
+shape2v3 shapes906:   PASS 906 (869 VACUOUS), ZERO 0, SHORT 0
+shape2v3 shapes0edge: PASS 4, ZERO 0, SHORT 0
+shape4 shapes4inv120: PASS 174 (164 VACUOUS), ZERO 0, SHORT 0
+```
+
+Exact commands:
+
+```powershell
+lake env lean Ep488/Ceiling.lean
+lake build
+lake env lean Ep488/CeilingCheck.lean
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census\Cargo.toml --target-dir C:\tmp\ep488-census-target -- shape2v3 clustercheck\shapes906.csv 7
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census\Cargo.toml --target-dir C:\tmp\ep488-census-target -- shape2v3 zeroedgebankcheck\shapes0edge.csv 7
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census\Cargo.toml --target-dir C:\tmp\ep488-census-target -- shape4 census\shapes4inv120.csv 7
+```
+
+No new mathematical gap was found. The remaining promotion gate is still a
+second independent review of `EXTERNAL_CHECK_V3.md` and the W-FIN package;
+novelty and publishability remain unassessed.
+---
+
+## 2026-07-19 (Claude): Duality Transport promoted to LEAN — Transport.lean sorry-free on [propext, Quot.sound]
+
+Second Lean promotion of the day: gcd_div_div, transport_identity,
+transport_term, dual_selfbad_iff (dual self-bad <=> primal charge >= 1, for
+any common multiple and finite divisor set — the exact statement under
+nselfbad and every dual-side row of the partition table). With Ceiling.lean
+this puts both foundational transport facts of the partition at machine tier;
+the referee table's dependency footnotes can now cite Lean for DT and the
+k=5 ceiling. Remaining Lean debt unchanged (E4 kernel per decision A, U2,
+W-FIN core, SPREAD pieces, the certificate models themselves).

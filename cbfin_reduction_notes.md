@@ -2945,3 +2945,16 @@ non-divisors — via at-most-one-per-slot and `59e/60`), and `no_five_self_bad`
 (antichain 5-set: the max is never self-bad). Sorry-free; axioms = the standard
 trio (ceiling-axioms.txt); CeilingCheck.lean added to the CI audit list. The
 "5-bad impossible" row of the partition table is machine-checked.
+
+### 26.1 Duality Transport is now LEAN tier
+
+`lean/ep488/Ep488/Transport.lean` (2026-07-19): `gcd_div_div`
+(`gcd(L/a, L/b) = L/lcm(a,b)`), `transport_identity`
+(`gcd(L/a,L/b)*(a*b) = gcd(a,b)*L`), `transport_term` (the cleared charge
+term), and `dual_selfbad_iff` (`sum gcd(d_a,d_x) >= d_a  <=>
+sum gcd(a,x)*(L/x) >= L` — dual self-bad iff primal charge >= 1, any common
+multiple L, any finite divisor set). Sorry-free on `[propext, Quot.sound]`
+(transport-axioms.txt); TransportCheck in CI. This machine-checks the DT
+lemma quoted under the entire dual-side partition semantics: `nselfbad` =
+primal bad count, the k = 5 ceiling's primal meaning, and the five-sector
+table's row definitions all rest on it.

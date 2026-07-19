@@ -1,0 +1,4 @@
+'Erdos488.gcd_div_div' depends on axioms: [propext, Quot.sound]
+'Erdos488.transport_identity' depends on axioms: [propext, Quot.sound]
+'Erdos488.transport_term' depends on axioms: [propext, Quot.sound]
+'Erdos488.dual_selfbad_iff' depends on axioms: [propext, Quot.sound]
