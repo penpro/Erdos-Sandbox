@@ -330,3 +330,21 @@ RESULT: ALL PASS — the one-edge family is closed by this finite bank
   member D=[42, 68, 102, 238, 357]
   member D=[70, 84, 126, 180, 315]
 validation: all 19 cb-240 one-edge witnesses contained (0 missing)
+
+=== bank1edge 7 FIXED (spread filter per Codex check 1) 2026-07-18 ===
+raw candidate tuples (deduped): 91001163
+  spread-covered (ratio>=7, excluded): D=[20, 44, 66, 110, 165]
+  spread-covered (ratio>=7, excluded): D=[20, 52, 78, 130, 195]
+  spread-covered (ratio>=7, excluded): D=[28, 90, 126, 210, 315]
+  spread-covered (ratio>=7, excluded): D=[30, 68, 102, 170, 255]
+  spread-covered (ratio>=7, excluded): D=[30, 76, 114, 190, 285]
+  spread-covered (ratio>=7, excluded): D=[42, 68, 102, 238, 357]
+one-edge exactly-3-bad C-B residual bank members: 19
+tower failures: 0 ; overflow-skipped: 0
+worst margin (2B-(m+1)S) ~ 2.8889 at m=59 D=[10, 12, 15, 18, 27]
+RESULT: ALL PASS — the one-edge family is closed by this finite bank
+set comparison vs oneedgebankcheck/bank19.csv: EXACT MATCH
+
+=== zeroedgebankcheck reproduction + shape2v3 on shapes0edge.csv 2026-07-18 ===
+4 members (first = dual of primal {2,3,5,7,11}), tower failures 0, ALL PASS [reproduced]
+shape2v3 zeroedgebankcheck/shapes0edge.csv 7: PASS 4 / ZERO 0 / SHORT 0

@@ -2075,6 +2075,8 @@ fn bank1edge(rho: i128) {
             if 4 * gcd(a, b) >= a.min(b) { ne += 1; }
         }}
         if ne != 1 { continue; }
+        // compact box only: ratio < 7 (ratio >= 7 is SPREAD's regime, not the bank's)
+        if dd[4] >= 7 * dd[0] { println!("  spread-covered (ratio>=7, excluded): D={:?}", dd); continue; }
         bank.push(*dd);
     }
     println!("one-edge exactly-3-bad C-B residual bank members: {}", bank.len());
