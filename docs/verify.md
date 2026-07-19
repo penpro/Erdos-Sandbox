@@ -14,6 +14,14 @@ Total time: about **15–30 minutes**, most of it waiting for downloads.
 
 [← back to the main write-up](https://penpro.github.io/Erdos-Sandbox/)
 
+> **Scope note.** This guide verifies the fully machine-checked `|core| ≤ 4`
+> theorem (plus the size-5 Lean spine that builds with it). The size-5 case as
+> a whole is closed at *project tier* with exact-arithmetic certificates and is
+> only partially Lean-verified so far — its record and status are described on
+> the [main page](https://penpro.github.io/Erdos-Sandbox/) and in the
+> repository's `REFEREE_SIZE5_CANDIDATE.md`; nothing in this guide asks you to
+> trust it.
+
 ---
 
 ## What "checking" means here

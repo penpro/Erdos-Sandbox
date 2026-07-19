@@ -24,9 +24,18 @@ Every lemma in the chain is `#print axioms`-clean — it depends only on
 [`certificate-axioms.txt`](certificate-axioms.txt) (Certificate),
 [`quad-axioms.txt`](quad-axioms.txt) (Quad — incl. `ep488_core_le_four`,
 `ep488_quad_prim`, and the Lemma B chain), [`quint-axioms.txt`](quint-axioms.txt)
-(Quint — the size-5 three-good proposition), and
+(Quint — the size-5 three-good proposition),
 [`density-axioms.txt`](density-axioms.txt) (Density — the size-5 `2δ>S`
-reduction). The root CI regenerates all of these on every push and enforces a
+reduction), [`cb-axioms.txt`](cb-axioms.txt) (CB — the C-B covering criterion),
+[`ceiling-axioms.txt`](ceiling-axioms.txt) (Ceiling — the k=5 self-bad
+ceiling: no antichain quintuple has five bad elements),
+[`transport-axioms.txt`](transport-axioms.txt) (Transport — the Duality
+Transport identity: dual self-bad ⟺ primal bad),
+[`drift-bridge-axioms.txt`](drift-bridge-axioms.txt) (DriftBridge — the U2
+bridge algebra, the concrete quintuple bridge, and the tower-form seam), and
+the drift-kernel audits ([`drift-kernel-reduction-axioms.txt`](drift-kernel-reduction-axioms.txt),
+[`drift-retirement-axioms.txt`](drift-retirement-axioms.txt) — the U2 kernel
+ladder port, in progress). The root CI regenerates all of these on every push and enforces a
 **positive allowlist** — it fails if any checked theorem depends on *any* axiom
 outside `{propext, Classical.choice, Quot.sound}` (not just a `sorryAx` grep),
 which also rules out a stray `native_decide` (`Lean.ofReduceBool`).
@@ -165,11 +174,18 @@ Lean-formalized** — Lean certifies the *reduction* around it. See
 
 ## Honest scope
 
-This formalizes the `|primitive core| ≤ 4` case, plus two **partial** size-5
-results (the three-good proposition, and the `2δ > S` reduction with a banked
-kernel). The general Erdős #488 (**arbitrary** finite `A`, i.e. `|core| ≥ 5`)
-**remains open** — it is not proved here or, to our knowledge, anywhere; even the
-full size-5 case is open (the `≤ 2`-good small-`n` window is unresolved).
+This formalizes the `|primitive core| ≤ 4` case completely, plus the size-5
+**Lean spine**: the three-good proposition, the `2δ > S` reduction (kernel as
+explicit hypothesis), the C-B covering criterion, the k=5 self-bad ceiling,
+the Duality Transport identity, and the U2 bridge algebra with the concrete
+quintuple bridge and tower seam (kernel ladder port in progress). The size-5
+case as a whole is closed at **project tier** (regime assembly + five-sector
+partition + exact Rust certificates, adversarially audited — see
+`../../REFEREE_SIZE5_CANDIDATE.md` for the promotion record and its caveat);
+it is **not yet fully Lean-verified** — the remaining port is mapped in
+`../../cbfin_reduction_notes.md` section 28. The general Erdős #488
+(`|core| ≥ 6` and the unrestricted statement) **remains open** — not proved
+here or, to our knowledge, anywhere.
 
 - The `≤ 3` result is Chojecki's claimed Cor 4.7 (his Lean bundle gates it behind
   one `sorry`); the method backbone is the classical **Heilbronn–Rohrbach

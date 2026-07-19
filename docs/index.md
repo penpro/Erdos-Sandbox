@@ -146,9 +146,10 @@ re-proved `sorry`-free). Full notes: [`quadruple_charge_notes.md`](https://githu
 
 ---
 
-## Why it stops at 4 (the honest frontier)
+## Beyond 4: the size-5 campaign (status, exactly)
 
-The method **provably** does not extend to size 5 by the same closing:
+The flat method of this page **provably** does not extend to size 5 by the same
+closing:
 
 - The size-4 miracle "every quadruple has ≥ 2 good charges" fails at size 5:
   `{4, 6, 10, 14, 15}` has **one** good charge.
@@ -158,16 +159,32 @@ The method **provably** does not extend to size 5 by the same closing:
 - The size-5 residual is **unbounded**: `{2, 3, 5, 7, p}` gives a distinct hard
   quintuple for every prime `p`, so "a certificate per residual" never closes.
 
-Note the residual quintuples all *satisfy* `2·B(n) > n·S` in computation — this is
-a **proof-method gap, not a failure of #488**. The sharp open question is whether
-`2·B(n) > n·S` holds for *every* primitive quintuple; that is currently unknown.
-A partial size-5 result — the *three-good-charge* proposition (a primitive
-quintuple with ≥ 3 good charges satisfies #488), covering
-`43,290,285 / 43,291,981 ≈ 99.996%` of primitive quintuples with entries ≤ 100 —
-is now formalized `sorry`-free in
-[`Ep488/Quint.lean`](https://github.com/penpro/Erdos-Sandbox/blob/main/lean/ep488/Ep488/Quint.lean)
-(`Erdos488.ep488_quint_three_good`). It is **not** a closure: the `≤ 2`-good
-residual, where the new idea is needed, is untouched.
+Note the residual quintuples all *satisfy* `2·B(n) > n·S` in computation — a
+**proof-method gap, not a failure of #488**.
+
+**What happened next (July 2026).** A month-long campaign closed the size-5 case
+by different means: a regime decomposition (a Lean-verified three-good theorem,
+first-doubling, a drift bridge, a covering criterion, a spread theorem) reduces
+everything to one compact residual region, which is then partitioned into five
+sectors and exhausted by finite, exact-arithmetic certificate enumerations —
+each implemented independently at least twice (three times for the banks, plus
+a blind reimplementation from spec), adversarially audited by both AIs and by
+external reviews with calibration controls. **Quote its status exactly:** the
+size-5 case is *proved at project tier* — the internal promotion record, with
+the human referee's explicit caveat, is
+[`REFEREE_SIZE5_CANDIDATE.md`](https://github.com/penpro/Erdos-Sandbox/blob/main/REFEREE_SIZE5_CANDIDATE.md)
+— but it is **not yet fully machine-verified** (a substantial Lean spine is:
+`ep488_quint_three_good`, the C-B criterion, the five-bad ceiling, Duality
+Transport, the U2 bridge algebra and tower; the kernel and certificate layers
+are exact Rust + paper, with the Lean port in progress), and it is **not
+externally peer-reviewed**. No novelty is claimed for it. The full technical
+record lives in
+[`cbfin_reduction_notes.md`](https://github.com/penpro/Erdos-Sandbox/blob/main/cbfin_reduction_notes.md)
+(sections 22–28, including every correction made along the way, kept honestly)
+and the certificate outputs in
+[`census/CERTIFICATES.txt`](https://github.com/penpro/Erdos-Sandbox/blob/main/census/CERTIFICATES.txt).
+Sizes ≥ 6 are untouched, and the density engine provably dies by size 15 — the
+general problem needs genuinely new mathematics.
 
 ---
 

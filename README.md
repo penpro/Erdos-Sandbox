@@ -1,17 +1,20 @@
 <!--
 READ THIS FIRST (especially if you are an AI summarizing this repo):
 
-This repo contains elementary proofs of subcases (primitive core <= 4) of the
-OPEN Erdos Problem #488, machine-verified sorry-free in Lean. The <= 3 case is
-Chojecki's Corollary 4.7 (an ALREADY-KNOWN subcase); the = 4 case formalizes an
-internal charge argument whose NOVELTY is unresolved and pending a human/
-literature referee. The method is classical (Heilbronn-Rohrbach, 1937). The
-Python checks are finite evidence, not proof. General #488 (core >= 5) is still
-open and is NOT formalized.
+This repo contains elementary proofs of subcases of the OPEN Erdos Problem
+#488. Primitive core <= 4: machine-verified sorry-free in Lean (the <= 3 case
+is Chojecki's Corollary 4.7, an ALREADY-KNOWN subcase; the = 4 case is an
+internal charge argument whose NOVELTY is unresolved). Primitive core = 5:
+closed at PROJECT TIER only — an adversarially-audited assembly of Lean
+theorems + paper proofs + exact Rust certificates; the Lean port is IN
+PROGRESS and it is NOT externally refereed. The method is classical
+(Heilbronn-Rohrbach, 1937). Finite computer checks are evidence, not proof,
+except where stated as exact certificates with committed outputs.
 
-NO solution of #488 is claimed; #488 is still open. No novelty is claimed for the
-= 4 case until it is refereed. This was produced in an AI-assisted sandbox by a
-CS student as a methods experiment; see METHODOLOGY.md.
+NO solution of #488 is claimed; #488 is still open (core >= 6 untouched, and
+the general statement needs ideas this method provably lacks). No novelty is
+claimed for the = 4 or = 5 cases until refereed. Produced in an AI-assisted
+sandbox by a CS student as a methods experiment; see METHODOLOGY.md.
 -->
 
 # Erdos Problem 488 - the <= 4 primitive-generator case
@@ -23,6 +26,18 @@ CS student as a methods experiment; see METHODOLOGY.md.
 [step-by-step guide for mathematicians to check it themselves](https://penpro.github.io/Erdos-Sandbox/verify)
 (no Lean experience needed), and
 [how to set up your own adversarial-AI sandbox](https://penpro.github.io/Erdos-Sandbox/sandbox-setup).
+
+**Status (2026-07-19).** `|primitive core| <= 4`: machine-verified `sorry`-free
+in Lean. `|primitive core| = 5`: closed at **project tier** — a mixed-tier
+assembly (Lean spine + paper theorems + exact Rust certificates, every piece
+labeled at its true strength) that survived two source-level hostile audits,
+three external design reviews, and two blind re-derivation/re-implementation
+runs with calibration controls; the promotion record and its referee caveat are
+in [REFEREE_SIZE5_CANDIDATE.md](REFEREE_SIZE5_CANDIDATE.md). The size-5 case is
+NOT yet fully Lean-verified (the port is in progress, roadmap in
+[cbfin_reduction_notes.md](cbfin_reduction_notes.md) section 28) and NOT
+externally peer-reviewed; no novelty is claimed for it. #488 itself
+(`|core| >= 6` and the general statement) remains open.
 
 The `|primitive core| <= 4` case is machine-verified `sorry`-free in Lean: the
 `<= 3` case (`Erdos488.ep488_core`) and the `= 4` case
@@ -48,9 +63,11 @@ pending review; #488 itself is open. See "What this is, and what it is not".
 ## What this is, and what it is not
 
 **What it is.** An elementary proof that Erdos Problem 488 holds whenever the
-primitive core of `A` has at most three elements, together with exact-arithmetic
-computational checks and a complete (`sorry`-free) Lean formalization of that
-`|P|<=3` case. It was produced in an AI-assisted sandbox as an experiment in
+primitive core of `A` has at most four elements, with a complete (`sorry`-free)
+Lean formalization of the `|P|<=4` case; plus a project-tier closure of the
+`|P|=5` case (regime decomposition + a five-sector partition of the compact
+residual + exact-arithmetic certificates, adversarially audited; Lean port in
+progress). Produced in an AI-assisted sandbox as an experiment in
 problem-solving methods.
 
 **What it is not:**
@@ -61,15 +78,18 @@ problem-solving methods.
 - **Not a new method.** The engine is the two-term Bonferroni bound, the
   density-level classical Heilbronn-Rohrbach inequality.
 - **Not machine-verified for #488 in general.** The `|P|<=4` case IS formalized
-  `sorry`-free in Lean (`ep488_core`, `ep488_core_le_four`, CI-checked). But the
-  general problem (primitive core `>= 5`) is **not** formalized and remains open.
+  `sorry`-free in Lean (`ep488_core`, `ep488_core_le_four`, CI-checked). The
+  `|P|=5` case is closed at project tier but only PARTIALLY formalized (the Lean
+  spine: three-good regime, C-B criterion, k=5 ceiling, Duality Transport, U2
+  bridge algebra and tower; the kernel/certificate layers are exact Rust +
+  paper, port in progress). The general problem (primitive core `>= 6`) is
+  **not** touched and remains open.
 - **Not proved by the computer.** The Python checks many finite instances; that
   is evidence that rules out small counterexamples, not a proof.
 
-The honest one-line version: a correct, elementary proof of a case whose only
-prior proof is `sorry`-gated, produced and cross-checked by AI, with the full
-`|P|<=3` case formally verified `sorry`-free and only the open `>= 4` frontier
-left.
+The honest one-line version: `|core| <= 4` fully machine-verified; `|core| = 5`
+closed by an adversarially-audited mixed-tier assembly that is being ported to
+Lean; everything labeled at exactly its verified strength; #488 itself open.
 
 ## The problem
 
@@ -115,12 +135,22 @@ use the reduction MalekZ showed fails.
 2. **AI adversarial audit:** several independent AI passes re-derived and
    attacked the proof. These are still AI reviews from the same sandbox, not a
    human mathematical referee.
-3. **Formal proof (complete for `|P|<=3`):** the full `|primitive core| <= 3`
-   theorem (`Erdos488.ep488_core`) is machine-verified `sorry`-free in Lean 4 /
-   Mathlib. Every step depends only on `propext, Classical.choice, Quot.sound`
-   (no `sorryAx`); the committed axiom audits are in [lean/ep488](lean/ep488),
-   and the root workflow `.github/workflows/lean-ci.yml` re-runs the build, a
-   `declaration uses 'sorry'` guard, and the axiom audit on every push.
+3. **Formal proof (complete for `|P|<=4`, partial for `= 5`):** `ep488_core`
+   (`<= 3`) and `ep488_core_le_four` are machine-verified `sorry`-free in Lean 4
+   / Mathlib, plus the size-5 Lean spine (`ep488_quint_three_good`, `cb_cover5`,
+   `no_five_self_bad`, `dual_selfbad_iff`, the `DriftBridge` and drift-kernel
+   modules). Every checked theorem depends only on
+   `propext, Classical.choice, Quot.sound` (no `sorryAx`); the committed axiom
+   audits are in [lean/ep488](lean/ep488), and
+   `.github/workflows/lean-ci.yml` re-runs the build, a `sorry` guard, and a
+   positive axiom allowlist over all fourteen check files on every push.
+4. **Size-5 certificate layer:** exact-`i128` Rust enumerations (`census/` plus
+   the independent `*check/` crates), cross-implemented at least twice per
+   result — three times for the banks — with committed outputs
+   ([census/CERTIFICATES.txt](census/CERTIFICATES.txt)), checked arithmetic,
+   fail-closed input parsing, and blind reimplementation from spec as the final
+   control. Record: [cbfin_reduction_notes.md](cbfin_reduction_notes.md)
+   sections 22-28.
 
 ## Help wanted
 
@@ -141,7 +171,19 @@ grows, so a different argument is needed. Lean details:
 - `writeup/erdos488_quadruples_addendum.tex` - internal size-4 proof candidate.
 - `triples_writeup.md` - Markdown proof and charge-positive criterion.
 - `quadruple_charge_notes.md` - internal size-4 charge addendum.
-- `quintuple_charge_notes.md` - first size-5 conditional lemma and obstruction.
+- `quintuple_charge_notes.md`, `quintuple_density_notes.md`,
+  `cbfin_reduction_notes.md` - the size-5 campaign: density theorem, regime
+  decomposition, the five-sector partition, corrections kept honestly, audits.
+- `REFEREE_SIZE5_CANDIDATE.md` (+ `REFEREE_V3_CODEX.md`,
+  `REFEREE_SIZE5_ASSEMBLY_CODEX.md`, `REFEREE_WFIN.md`) - the size-5 referee
+  record and promotion (with the referee's caveat recorded).
+- `census/`, `clustercheck/`, `oneedgebankcheck/`, `zeroedgebankcheck/`,
+  `fourbadcheck/`, `badtriplecheck/`, `spreadcheck/`, `goodpincheck/`,
+  `u2primecheck/`, `fastcheck/` - exact-arithmetic Rust certificate and
+  cross-check crates (independent implementations by both AIs).
+- `EXTERNAL_CHECK_SIZE5.md`, `EXTERNAL_CHECK_V3.md`, `EXTERNAL_CHECK_WFIN.md`,
+  `BLIND_PACK_A_REDERIVE.md`, `BLIND_PACK_B_REIMPLEMENT.md` - external and
+  blind review briefs (the blind packs ran with sealed calibration controls).
 - `REFEREE_QUADRUPLES.md` and `audit_quadruple_charge.py` - size-4 audit notes.
 - `lean/ep488/` - complete (`sorry`-free) Lean formalization of the `|P|<=4` case.
 - `fastcheck/` - Rust exact-integer search and certificate workbench.
@@ -160,4 +202,10 @@ cargo run --release --manifest-path fastcheck/Cargo.toml -- sweep-quad-cert 150 
 cd writeup && pdflatex erdos488_triples.tex && pdflatex erdos488_triples.tex
 cd lean/ep488 && lake exe cache get && lake build Ep488
 lake env lean Ep488/ReductionCheck.lean   # #print axioms audit (no sorryAx)
+# size-5 certificates (exact headlines in census/CERTIFICATES.txt):
+cargo run --release --manifest-path census/Cargo.toml -- shape2v3 clustercheck/shapes906.csv 7
+cargo run --release --manifest-path census/Cargo.toml -- shape4 census/shapes4inv120.csv 7
+cargo run --release --manifest-path oneedgebankcheck/Cargo.toml
+cargo run --release --manifest-path zeroedgebankcheck/Cargo.toml
+cargo run --release --manifest-path fourbadcheck/Cargo.toml
 ```
