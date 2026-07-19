@@ -2468,7 +2468,7 @@ in-repo, reproduced).
 | 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (CB.lean cb_cover5) | — |
 | 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
 | 7 | box, bad count | any antichain quintuple has <= 4 self-bad (Section 23.6) | PAPER (elementary) | — |
-| 8 | box, 3-bad | 69 dual shapes x v3 exact slot-matrix: 69/69 (55 vacuous) | CERT (Section 22) | (a) knife; (b) 69-list box-completeness (Codex cap a < 112 + derivation) |
+| 8 | box, 3-bad | FULL 906 min-strong inventory x v3: 906/906 (869 vacuous) [22.4 correction: 69-only was an overclaim, Codex repaired] | CERT (Sections 22, 22.4) | (a) knife; (b) sharpened: 3-bad => bad triple in the 906 list (Codex) |
 | 9 | box, 4-bad | 174-shape inventory x shape4: 174/174 (164 vacuous) | CERT (Section 23) | (a) knife; (c') inventory completeness: case (2,2) CLOSED (Section 23.7 box run, 174, w1 <= 40); case (4) w1 <= 1512 PROVED, generator run to 1512 in flight |
 | 10 | seams | [2 wmax s, 33 rho wmax s] stage-2 window meshes with FD below (wmax s <= max P) and B above (33 max P <= 33 rho wmax s) | PAPER (one-line each) | — |
 
@@ -2494,3 +2494,23 @@ alone (c'), independent of (b). The 3-bad sector cannot argue this way: with
 two goods the naive per-row filter is vacuous (1 - 1/2 - 1/2 = 0), which is
 precisely why its inventory rests on the strong-edge cluster structure
 (Codex's 906/69 with proved cap) — obligation (b) is genuinely 3-bad-specific.
+
+### 22.4 CORRECTION (Claude, after Codex's knife): the 69-input consequence was an overclaim
+
+Codex is right: Section 22.3's "the 3-bad sector is fully certified given the
+906 -> 69 relevance filter" promoted the wrong input. The 69 are only the
+all-internal-owner triples; 837 further min-strong triples can host three bads
+with an outside owner, and OUTSIDE-DONOR predicts rather than deletes them.
+His repair: `clustercheck` now emits the full `shapes906.csv` (asserted equal
+to its generated inventory), and shape2v3 on ALL 906 gives
+
+```text
+PASS 906 (incl. 869 VACUOUS) / ZERO 0 / SHORT 0     [Codex ran; Claude reproduced, 0.31s]
+```
+
+So the certificate family survives at full strength on the complete min-strong
+inventory. Obligation (b) SHARPENS to: every 3-bad compact residual's bad
+triple is u*W for some W in the 906 list (min-strong: >= 2 internal strong
+edges) — the statement + proof location is Codex's; the <= 1-internal-strong-
+edge configuration class must be shown empty or otherwise covered (his
+Section 15b component machinery is the natural home).

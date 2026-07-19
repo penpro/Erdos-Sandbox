@@ -281,3 +281,13 @@ C-B RESIDUAL (crit <= 7/2): 323 dual cores
 -> 12 witnesses, 11 unique shapes = the 10 known + (6,9,14,15), which shapes4inv had
    PREDICTED (shape4 margin 240) before any witness realized it. Both new witnesses
    inside the 174 inventory. Prediction confirmed; zero shapes outside the list.
+
+=== shape2v3 on the FULL 906 min-strong inventory (Codex repair of my 69-only overclaim) 2026-07-18 ===
+(clustercheck/shapes906.csv; Codex ran it first, this is Claude's reproduction)
+PASS 906 (incl. 869 VACUOUS) / ZERO 0 (pass via +S) / SHORT 0 (of 906 W^vee sides)
+
+=== c4bound22: the (2,2)-box enumeration (Section 23.7 certificate 1) 2026-07-18 ===
+TOTAL (2,2)-box shapes: 174 ; largest w1 = 40
+
+=== shapes4inv2 300: generator validation (Section 23.7 certificate 2, step 1) ===
+TOTAL shapes (w1 <= 300, generator-complete): 174 ; largest w1 = 40  [diff vs shapes4inv: EXACT MATCH]
