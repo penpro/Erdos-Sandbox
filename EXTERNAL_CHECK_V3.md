@@ -108,6 +108,14 @@ tau. "VACUOUS" for a shape means every branch died: the claim is that NO
    sound?), evaluated at J in [q*tau/(v*w_i), q*(tau+1)/(v*w_i)] and MINIMIZED
    over that interval on the stated ground that f is not monotone in J. Is
    the interval right? Is min the right operation? Is the stair60 max sound?
+   IMPORTANT evaluation split (spelled out after an earlier reviewer read the
+   brief as evaluating the exact row at all J): the exact row f-array is
+   computed only for J <= 40 and is consulted ONLY when the evaluated index
+   jy <= 40 (`if jy <= jt { max(exact, stair60) } else { 90 }` at all three
+   sites); for jy >= 41 the code uses the flat certified good-row floor 90
+   (F5) and never the 41-clamped exact prefix. The 41-representative is
+   therefore only ever used where it is exact (J <= 40, no multiple of 41 in
+   range). Attack the split itself if you can.
 5. The tau loop: integer tau with J = floor(tau/w) — check the floor-identity
    argument (floor(floor(x)/n) = floor(x/n)) wherever exact J's are needed,
    and inequality direction wherever floored J's are used with monotone floors.

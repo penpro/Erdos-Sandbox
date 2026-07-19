@@ -37,8 +37,9 @@ minimum-good lemma excludes five-bad residuals. For four bads, cutoff-free
 spanning-tree/two-pair enumeration recovers exactly 174 necessary-filter shapes,
 and `shape4` certifies all 174. This gives a candidate complete compact-box
 partition at paper-plus-certificate tier. Full size 5 is **not yet claimed
-solved**: the new one/zero-edge reductions, v3/shape4 soundness, and final regime
-assembly need hostile review. Start with `REFEREE_SIZE5_CANDIDATE.md`, then
+solved**: both agents' internal hostile passes now hold, but a second independent
+external review of the v3/shape4 package and W-FIN plus final consolidation
+remain. Start with `REFEREE_SIZE5_CANDIDATE.md`, then
 `REFEREE_WFIN.md`, Sections 22-26 of `cbfin_reduction_notes.md`, and the latest entry in
 `adversary_collab_chat.md`. The older narrative below is retained as history.
 

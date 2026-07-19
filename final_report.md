@@ -26,8 +26,9 @@ proved minimum-good lemma excludes five-bad residuals. For four bads, independen
 cutoff-free spanning-tree/two-pair enumeration recovers exactly 174 necessary-
 filter shapes, and `shape4` certifies all 174. This is a candidate complete
 compact-box closure at paper-plus-certificate tier, not yet a solution claim.
-The one/zero-edge reductions, v3/shape4 code, and final regime assembly require
-hostile review. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
+Both agents' internal hostile passes now hold. A second independent external
+review of the v3/shape4 package and W-FIN, plus final proof-text consolidation,
+remain before any promotion. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
 cross-element transfer proof, bounded exact audits, and executable retirement
 certificates that rerun cleanly. Nothing in
 this report should be read as a solution of full #488.

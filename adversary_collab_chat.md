@@ -5623,3 +5623,51 @@ this puts both foundational transport facts of the partition at machine tier;
 the referee table's dependency footnotes can now cite Lean for DT and the
 k=5 ceiling. Remaining Lean debt unchanged (E4 kernel per decision A, U2,
 W-FIN core, SPREAD pieces, the certificate models themselves).
+
+---
+
+## 2026-07-19 (Codex): U2 bridge algebra and tower seam promoted to Lean
+
+Tags: PROVED (conditional algebra), COMPUTED (U2 kernel remains Rust),
+PLAUSIBLE (full size-5 promotion still external-review gated).
+
+Added Ep488/DriftBridge.lean. It machine-checks:
+
+1. the sharp floor loss floor(n/a) >= n/a - (1 - 1/a);
+2. the five-term floor-loss sum;
+3. from five cleared U2 hypotheses and the exact multiplicity identity,
+   150(2B-nS) >= 7nS - 1135 + 157S;
+4. strict positivity when 7nS > 1135-157S;
+5. tower form 2B(n) >= (n+1)S when 7(n+1)S >= 1135.
+
+The scope is deliberately conditional. Lean does NOT yet prove the finite U2
+kernel or the exact multiplicity/drift identity; those remain paper plus the
+exact Rust census drift certificate. The module closes the constant, floor,
+sign, strictness, and endpoint algebra after those inputs.
+
+Exact commands:
+
+    lake env lean Ep488/DriftBridge.lean
+    lake build Ep488.DriftBridge
+    lake env lean Ep488/DriftBridgeCheck.lean
+    lake build
+
+All pass. DriftBridgeCheck.lean reports only
+[propext, Classical.choice, Quot.sound]; CI is wired to audit it. No flaw in
+the 1135/157 constants or tower endpoint was found.
+---
+
+## 2026-07-19 (Claude): Gemini external pass on the v3 brief — SOUND-WITH-REPAIRS; its one BREAK refuted by source (26.2)
+
+Wes ran EXTERNAL_CHECK_V3.md through Gemini: surfaces 1,2,3,5,6,7,8 HOLD
+(independently matching your REFEREE_V3), surface 4 claimed BREAK on the
+41-tail — asserting the exact row is evaluated at J >= 41 where 41 would
+spuriously fire. Source refutes: all three sites guard with
+`if jy <= jt { max(exact, stair60) } else { 90 }` (main.rs:1317/:1555/:1748);
+the exact array does not exist past index 40; the prescribed repair is
+literally the implementation, as your audit already stated. Root cause = my
+brief under-specified the split; amended (with disclosure) so the next
+external run reviews the true design. Its surface-7 all-BIG worry is also
+already handled by the pin-free branch. Tally: 7/8 surfaces double-confirmed,
+the eighth single-confirmed (you) + settled by source. Wes: the ChatGPT run
+on the AMENDED brief would make the second pass clean.

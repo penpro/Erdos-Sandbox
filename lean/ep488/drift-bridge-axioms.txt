@@ -1,0 +1,5 @@
+'Erdos488.floor_cast_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.floorSum5_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.drift_bridge_from_u2' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.drift_bridge_positive' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.drift_bridge_tower' depends on axioms: [propext, Classical.choice, Quot.sound]

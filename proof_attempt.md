@@ -26,9 +26,10 @@ broken (`1/k` was used instead of the charge `1/c`) and has been superseded.
 Five-bad residuals are excluded by the proved minimum-good lemma. For four bads,
 the independent cutoff-free spanning-tree/two-pair enumeration recovers exactly
 174 necessary-filter shapes and `shape4` certifies all 174. Thus every compact
-bad-count/edge-count sector now has a proposed finite certificate. Full size 5
-remains open at audit tier: the new finite reductions, v3/shape4 knife, and final
-regime assembly must survive hostile review before any solution claim. The false
+bad-count/edge-count sector now has a proposed finite certificate, and the two
+agents' first hostile passes hold. Full size 5 remains open at audit tier
+pending a second independent external review of the v3/shape4 package and
+W-FIN, followed by final proof-text consolidation. The false
 G3 min-bound is retracted. See `REFEREE_WFIN.md`, Sections 22-26 of
 `cbfin_reduction_notes.md`,
 `quintuple_density_notes.md`, and `adversary_collab_chat.md` before relying

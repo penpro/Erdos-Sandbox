@@ -2464,13 +2464,13 @@ in-repo, reproduced).
 |---|--------|-----------|------|-----------------|
 | 1 | A | >= 3 good charges => 2B(n) > nS, all n | LEAN (Quint.lean ep488_quint_three_good) | — |
 | 2 | FD | max <= n < 2max, unconditional (size-4 separator + exact identity) | LEAN (Quad.lean) + PAPER | — |
-| 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | PAPER + CERT (census drift) | — |
+| 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | LEAN algebraic assembly + PAPER identity + CERT kernel | — |
 | 4 | C0 | gcd(P) > 1: scaling recursion to base + tower form | PAPER | inherits box status |
 | 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (CB.lean cb_cover5) | — |
 | 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
-| 7 | box, bad count | any antichain quintuple has <= 4 self-bad (Section 23.6) | PAPER (elementary) | — |
-| 8 | box, 3-bad | 906 min-strong inventory x v3: 906/906 (869 vacuous); exact M=120 residual audit has edge histogram [0,13,57,118] | CERT on >=2-edge subcase (Sections 22, 24-25) | one-edge class is nonempty and uncovered; zero-edge class not globally excluded; v3 knife |
-| 9 | box, 4-bad | cutoff-free tree + two-pair inventory gives 174 shapes; shape4 is 174/174 (164 vacuous) | CERT (Sections 23, 25) | hostile review of finite reduction and shape4 knife |
+| 7 | box, bad count | any antichain quintuple has <= 4 self-bad (Section 23.6) | LEAN (Ceiling.lean) | — |
+| 8 | box, 3-bad | >=2 edges: 906/v3; 1 edge: exact 19-bank; 0 edges: exact 4-bank | PAPER reductions + CERT | second external pass |
+| 9 | box, 4-bad | cutoff-free tree + two-pair inventory gives 174 shapes; shape4 is 174/174 (164 vacuous) | PAPER inventory + CERT | second external pass |
 | 10 | seams | [2 wmax s, 33 rho wmax s] stage-2 window meshes with FD below (wmax s <= max P) and B above (33 max P <= 33 rho wmax s) | PAPER (one-line each) | — |
 
 W-FIN / C-B-FIN (residual min < 2.4932e6, PAPER, jointly reviewed) underpins
@@ -2478,12 +2478,13 @@ the box being compact at all. The three-good Lean + Density reduction carry
 the >= 3-good bulk. External: ChatGPT W-FIN hostile review pending (Wes).
 
 **What is left, in total, for size 5:**
-(a) classify or directly certify the nonempty one-internal-strong-edge
-    three-bad class, and globally exclude or cover the zero-edge class;
-(b) hostilely audit `shape2v3`, `shape4`, `badtriplecheck`, and the cutoff-free
-    `fourbadcheck` reductions.
-Lean debt (kernel 157/300, U2, W-FIN core, SPREAD, box
-certificates) is scope-fenced by Wes's decision A: explicit hypotheses,
+(a) obtain the second independent external pass on the v3/shape4 and W-FIN
+    review packages;
+(b) consolidate the proof text and dependency ledger without upgrading the
+    certificate-backed steps beyond their stated tier.
+Lean debt (kernel 157/300, the U2 finite kernel and multiplicity identity,
+W-FIN core, SPREAD, box certificates) is scope-fenced by Wes's decision A:
+explicit hypotheses,
 deliberately outside Lean for now.
 
 **Note (asymmetry worth stating).** The 4-bad sector needs NO cluster
@@ -2958,3 +2959,32 @@ multiple L, any finite divisor set). Sorry-free on `[propext, Quot.sound]`
 lemma quoted under the entire dual-side partition semantics: `nselfbad` =
 primal bad count, the k = 5 ceiling's primal meaning, and the five-sector
 table's row definitions all rest on it.
+
+### 26.2 First external pass (Gemini) on EXTERNAL_CHECK_V3: SOUND-WITH-REPAIRS; the single BREAK is refuted by source
+
+Status: verdict received 2026-07-19 (Wes ran the package). Surfaces 1,2,3,5,6,
+7,8: HOLDS independently (matching Codex's REFEREE_V3 on all seven). Surface 4:
+claimed BREAK — "using 41 for the infinite tail is unsound because J traverses
+beyond 40, spuriously triggering divisibility at 41, 82, 123, ...".
+
+**Refutation (source, all three certificate sites):** the exact pinned-good
+row is computed by `f_exact(..., jt = 40)` and consulted ONLY under the guard
+`jy <= jt` (census/src/main.rs:1317 v2.2, :1555 v3, :1748 shape4); for
+`jy >= 41` the code uses the flat certified good-row floor `90` (the F5
+staircase tail) and never the clamped exact prefix. The 41-representative is
+used only where Gemini's own surface-3 verdict confirms it exact (J <= 40).
+The prescribed repair — "abandon the exact-drift calculation in favor of the
+F5 tail / stair60 whenever J >= 41" — IS the implementation. Codex's audit
+read this correctly ("for J > 40 the code uses the independent tail").
+
+Root cause: the external brief under-specified the evaluation split; the
+reviewer judged the described design, not the code. EXTERNAL_CHECK_V3.md
+section 3 item 4 is now amended to state the split explicitly (with a note
+that it was amended after this pass). Gemini's surface-7 parenthetical (an
+all-BIG column being dropped would be a completeness failure) is also already
+handled: the all-BIG matrix is enumerated as the pin-free branch with the
+universal staircase (it is not dropped).
+
+Net: 7/8 surfaces now confirmed by TWO independent reviewers; the eighth is
+confirmed by Codex and the disputed reading is settled by source inspection.
+The ChatGPT run should use the amended brief.
