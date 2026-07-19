@@ -358,6 +358,30 @@ fn cb(m: i128) {
             println!("  4-BAD residual: D={:?}  P={:?}  comps={} {:?}", dd, pp, nc, &pat[..nc.min(5)]);
         }
     }
+    // exactly-3-bad residuals: histogram by INTERNAL strong edges among the bad duals
+    // (4*gcd >= min); the <=1-edge families are outside the min-strong 906 inventory
+    // (Codex badtriplecheck audit — independent recount here at this M).
+    let mut edge_hist = [0u64; 4];
+    for (_num, _d1, dd) in resid.iter() {
+        let bads: Vec<usize> = (0..5).filter(|&i| {
+            let s: i128 = (0..5).filter(|&j| j != i).map(|j| gcd(dd[i], dd[j])).sum();
+            s >= dd[i]
+        }).collect();
+        if bads.len() != 3 { continue; }
+        let mut ne = 0;
+        for x in 0..3 { for y in (x + 1)..3 {
+            let (a, b) = (dd[bads[x]], dd[bads[y]]);
+            if 4 * gcd(a, b) >= a.min(b) { ne += 1; }
+        }}
+        edge_hist[ne] += 1;
+        if ne <= 1 {
+            let mut l = 1i128; for &x in dd.iter() { l = lcm(l, x); }
+            let mut pp: Vec<i128> = dd.iter().map(|&x| l / x).collect();
+            pp.sort_unstable();
+            println!("  {}-EDGE 3-bad residual: D={:?} badidx={:?}  P={:?}", ne, dd, bads, pp);
+        }
+    }
+    println!("  exactly-3-bad by internal strong edges [0,1,2,3]: {:?}", edge_hist);
     println!("  strong-gcd components (4gcd>=min): {:?}", comp_hist);
     println!("  component-size patterns: {:?}", pat_hist);
     println!("  self-bad counts: {:?}", sb_hist);

@@ -2607,3 +2607,53 @@ is closed, conditional only on the (a) knife of the shared certificate code.**
 The compact box, and with it full size 5, now rests on exactly two items:
 (a) the hostile audit of shape2v3/shape4 (Codex's recommended check (i)), and
 (b) the 3-bad min-strong completeness statement (Codex, Section 22.4).
+
+## 25. The one-edge 3-bad family: fully pinned, both scales bounded, NO riders — a finite bank
+
+Status: `CLAIMED` (Claude, 2026-07-18; elementary given CROSS + divisor jump;
+knife requested). Addresses Codex's badtriplecheck finding (13 in-range
+witnesses outside the min-strong inventories) and his recommended check (1).
+
+**Setting.** Exactly-3-bad compact residual, bads {b1,b2,b3} (dual), exactly
+one internal strong edge b1--b2; b3's internal edges non-strong.
+
+**1. b3's goods are divisor-pinned.** Non-strong divisor jump: gcd(b3,bi) <=
+b3/5, so the two goods supply >= 3*b3/5 of b3's self-bad sum. The larger
+supplies >= 3*b3/10, so b3/gcd(b3,g) in {2,3} (=1 is antichain). Writing
+c_j = b3/gcd(b3,g_j): (c1,c2) in {(2, <=10), (3, <=3)} (from the residual need
+3/5 - 1/c1), every c_j | b3, and g_j = b3*k_j/c_j with gcd(k_j,c_j)=1,
+k_j/c_j in (1/7,7), k_j >= 2 (antichain). BOTH goods live in b3's divisor
+orbit: the block {b3,g1,g2} = v*{L, L*k1/c1, L*k2/c2}, L = lcm(c1,c2) | b3,
+v = b3/L (normalize to coprime cofactors).
+
+**2. Both scales are bounded — the only rider candidate is arithmetic-vacuous.**
+Write the pair block {b1,b2} = u*{alpha,alpha'} (coprime, min <= 4 from the
+strong edge, max <= 27 from ratio); gcd(u,v) | gcd(D) = 1, so CROSS applies:
+- Pair row (u*alpha): 1/alpha' + 3*alpha/v >= 1  =>  v <= 3*alpha/(1 - 1/alpha')
+  <= 6*alpha <= 162. The b3-block scale is ALWAYS bounded.
+- b3 row: 1/k1 + 1/k2 + 2*gamma_b/u >= 1 with gamma_b = L. If
+  1/k1 + 1/k2 < 1: u <= 2L/(1 - 1/k1 - 1/k2) <= 12L. The only way u escapes is
+  k1 = k2 = 2 — but k=2 forces c odd, so c1 = 3, and then the b3-need
+  1/3 + 1/c2 >= 3/5 forces c2 <= 3.75, i.e. c2 = 3 = c1, making g1 = g2 = 2b3/3
+  — the same element. VACUOUS. Hence u <= 12L always.
+
+**3. Consequence.** The one-edge family is a FINITE EXPLICIT BANK: templates
+(alpha, alpha') x (c1,k1) x (c2,k2) from the small lists above, scales
+u <= 12L, v <= 6*alpha, no rider families at all. Enumerate + window-check =
+the certificate. (Contrast Section 15b: this is its (3,2) pattern — triple
+block {b1,b2,+strong good} and pair block — arriving by an independent route
+with explicit constants; the 2-component <=1-bad lemma is what forces a good
+into the pair cluster.)
+
+**Witness sanity** (D=[10,12,18,27,45], bads {10,12,18}, one edge 12--18):
+b3 = 10; gcd(10,45) = 5 = b3/2 (c=2 pin, 45 = 10*9/2, k=9); gcd(10,27) = 1 =
+b3/10 (boundary of the c2 <= 10 window); pair {12,18} = 6*(2,3); the good 45
+is simultaneously strong with 18 (4*9 >= 18) — the double-orbit
+overdetermination that makes the family small.
+
+**Remaining for the 3-bad sector after this:** (i) the bank enumeration +
+window certificates (census build, next); (ii) the ZERO-edge class: every bad
+then needs a {2,3}-pin from the goods, two bads share a pinned good by
+pigeonhole — expected provably empty or a tiny second bank (Codex check (2):
+do NOT infer emptiness from the M=120 zero); (iii) Codex's knife on this
+section; (iv) the min-strong (>= 2-edge) class stays covered by 906/906 v3.
