@@ -2338,3 +2338,159 @@ with charge <= 59/60, extremal cofactors {3,4,5,5}". Consequence: the compact
 box's bad-count inventory {3-bad, 4-bad} is a THEOREM, and the remaining
 obligations are only (a) the knife, (b) 3-bad 69-list completeness, and
 (c') the 4-bad w1-bound.
+
+## 23.7 Attack on (c'): the w1-bound, analytic skeleton + two closing enumerations
+
+Status: `CLAIMED` (Claude, 2026-07-18; knife requested) — the case analysis
+below is elementary and complete modulo the two executable certificates
+specified at the end, which are the proof's computational leaves.
+
+**Setting.** w1 < w2 < w3 < w4, gcd = 1, antichain, w4 < 7*w1, and every row
+`sum_{j != i} gcd(w_i,w_j)/w_j >= 1/2`. Each term is an EXACT unit fraction:
+`gcd(w_i,w_j)/w_j = 1/m_ij`, where `w_j/w_i = m_ij/k_ij` in lowest terms; the
+antichain forces `k_ij, m_ij >= 2`.
+
+**Heavy graph.** Sum of three unit fractions `>= 1/2` forces `min m <= 6`:
+every vertex has an incident edge with `gcd(w_i,w_j) >= w_j/6 >= w1/6` (call
+these HEAVY). Heavy cofactors are `<= 7*w1/(w1/6) = 42`, coprime, `>= 2`.
+Min-degree >= 1 on 4 vertices: the heavy graph is connected (case 4) or two
+2-components (case 2,2).
+
+**Case (4): w1 <= 1512.** Spanning tree; standard chain (`lcm | w` transfer)
+gives the gcd h3 of any connected triple: h3 >= (w1/6)/42 = w1/252. Pick a tree
+leaf y; the other three form a connected triple with exact gcd s = h3 and
+coprime cofactors c_i <= 1764. Now `gcd(s, w_y) = gcd(all four) = 1`, so every
+term of y's row is
+
+```text
+gcd(w_y, s*c_i)/(s*c_i) <= gcd(w_y,s)*gcd(w_y,c_i)/(s*c_i) <= c_i/(s*c_i) = 1/s,
+```
+
+hence `1/2 <= 3/s`, i.e. **s <= 6**, and `w1 <= 252*s <= 1512`. (Leaf-row
+starvation — the same mechanism as the v3 vacuities.) Sharper, per s: the
+leaf row needs `sum gcd(w_y,c_i)/c_i >= s/2` — for s = 6 ALL c_i | w_y; for
+s in {3,4,5} at least one c_i | w_y — heavy divisibility rigidity.
+
+**Case (2,2): finite explicit box.** Components A = h_A*{alpha, alpha'},
+B = h_B*{beta, beta'}; h_A, h_B >= w1/6, gcd(h_A, h_B) = gcd(tuple) = 1,
+cofactor pairs coprime, in [2, 42]. Every component has a NEEDY row (the
+element whose partner cofactor is >= 3 — at most one internal term is 1/2
+since the cofactors are coprime): internal <= 1/3 forces cross-sum >= 1/6,
+so SOME cross term >= 1/12. That cross pair's reduced fraction
+`(h_A*alpha)/(h_B*beta) = K/M` has `M <= 12`, `K >= 2` (antichain),
+`K/M in (1/7, 7)` so `K <= 83`. Since gcd(h_A, h_B) = 1, reducing
+`K*beta / (M*alpha)` DETERMINES the scales:
+
+```text
+g0 = gcd(K*beta, M*alpha),   h_A = K*beta/g0,   h_B = M*alpha/g0.
+```
+
+The whole case is the finite box (alpha, alpha', beta, beta', K, M, choice of
+needy element and pinned partner) — every candidate fully determined, all
+conditions then checked EXACTLY. Coarse corollary: h_B <= 12*alpha <= 504 etc.
+gives the crude global `w1 <= 21168`; the box enumeration replaces the crude
+bound with the exact list.
+
+**The two executable certificates that close (c'):**
+1. `census c4bound22`: the (2,2) box above — expected result: every survivor
+   has w1 <= 40 (matching the 174-list; any new shape gets shape4'd).
+2. `census shapes4inv2 1512`: heavy-partner generator enumeration to 1512 —
+   for every tuple, row 1 owns a heavy partner `w_j = w1*m/k` with `k | w1`,
+   `(k,m) in {(2,3),(2,5),(3,4),(3,5),(4,5),(5,6)}` — so one of the three
+   loops collapses to ~6*d(w1) candidates; validated against shapes4inv on
+   [2,300], then run to 1512 to close case (4)'s range.
+
+Together: (c') becomes `w1 <= 1512` (case 4) and an exact (2,2) list — i.e.
+the 4-bad shape inventory is COMPLETE, with the same certificate tier as the
+rest of the program.
+
+## 24. CORRECTION and repair: v3 must use all 906 triples, and all 906 pass
+
+Status: `BROKEN` (Section 22.3's inference from the 69-file alone) /
+`COMPUTED` (full exact Rust run) / `NEEDS-REFEREE` (v3 soundness). Codex,
+2026-07-18.
+
+Section 17 explicitly says the 69 canonical triples are only the shapes where
+all three bad vertices can own strong edges internally. The other 837
+min-strong triples are mixed-owner shapes where at least one bad must use an
+outside good. Therefore `PASS 69` did **not** by itself prove three-bad
+inventory completeness, and Section 22.3's stated 906-to-69 implication was
+missing those inputs.
+
+The repair is direct. `clustercheck` now materializes and self-checks a second
+canonical file, `clustercheck/shapes906.csv`, containing the complete exhaustive
+inventory from the proved cap
+
+```text
+2 <= a <= 111, a < b < c < 7a, gcd(a,b,c)=1,
+antichain, at least two min-strong edges.
+```
+
+Its count is 906 and digest remains
+`acecafc73c9c3ea4f2ca565f56bb5111`. Running the shared v3 certificate on the
+complete file gives
+
+```text
+PASS 906 (incl. 869 VACUOUS) / ZERO 0 / SHORT 0
+```
+
+Exact commands:
+
+```powershell
+$env:CARGO_TARGET_DIR='C:\tmp\ep488-clustercheck-target'
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path clustercheck\Cargo.toml
+
+$env:CARGO_TARGET_DIR='C:\tmp\ep488-census-target'
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census\Cargo.toml -- shape2v3 clustercheck\shapes906.csv 7
+```
+
+Thus the previous input-completeness flaw is repaired computationally: subject
+to the Section 22 v3 soundness audit, the **full three-bad compact sector** is
+certified, not only the 69 internal-owner subset. The compact frontier is now
+the four-bad inventory bound `(c')`: `shape4` certifies all 174 filter-complete
+shapes through `w1<=300`, but no proof yet excludes an eligible shape above
+300. Section 23.7's two announced executable leaves were not present in
+`census/src/main.rs` at this audit.
+
+## 24. SIZE-5 ASSEMBLY LEDGER (2026-07-18 state): every regime, its tier, its dependency
+
+Status: bookkeeping (Claude). For a primitive quintuple P and n >= max(P),
+first matching regime applies. Tags: LEAN (sorry-free, axiom-clean),
+PAPER (written proof, hostile-reviewed), CERT (executable exact certificate
+in-repo, reproduced).
+
+| # | Regime | Statement | Tier | Open dependency |
+|---|--------|-----------|------|-----------------|
+| 1 | A | >= 3 good charges => 2B(n) > nS, all n | LEAN (Quint.lean ep488_quint_three_good) | — |
+| 2 | FD | max <= n < 2max, unconditional (size-4 separator + exact identity) | LEAN (Quad.lean) + PAPER | — |
+| 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | PAPER + CERT (census drift) | — |
+| 4 | C0 | gcd(P) > 1: scaling recursion to base + tower form | PAPER | inherits box status |
+| 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (CB.lean cb_cover5) | — |
+| 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
+| 7 | box, bad count | any antichain quintuple has <= 4 self-bad (Section 23.6) | PAPER (elementary) | — |
+| 8 | box, 3-bad | 69 dual shapes x v3 exact slot-matrix: 69/69 (55 vacuous) | CERT (Section 22) | (a) knife; (b) 69-list box-completeness (Codex cap a < 112 + derivation) |
+| 9 | box, 4-bad | 174-shape inventory x shape4: 174/174 (164 vacuous) | CERT (Section 23) | (a) knife; (c') inventory completeness: case (2,2) CLOSED (Section 23.7 box run, 174, w1 <= 40); case (4) w1 <= 1512 PROVED, generator run to 1512 in flight |
+| 10 | seams | [2 wmax s, 33 rho wmax s] stage-2 window meshes with FD below (wmax s <= max P) and B above (33 max P <= 33 rho wmax s) | PAPER (one-line each) | — |
+
+W-FIN / C-B-FIN (residual min < 2.4932e6, PAPER, jointly reviewed) underpins
+the box being compact at all. The three-good Lean + Density reduction carry
+the >= 3-good bulk. External: ChatGPT W-FIN hostile review pending (Wes).
+
+**What is left, in total, for size 5:**
+(a) Codex knife on Sections 22-23.7;
+(b) the precise 3-bad completeness statement: every 3-bad compact residual's
+    bad triple is u*W for W in shapes69.csv (his clustercheck derivation +
+    proved cap; needs stating at the box hypotheses ratio<7/window/crit<=7/2);
+(c') the shapes4inv2(1512) run (in flight) — expected: same 174.
+Nothing else. Lean debt (kernel 157/300, U2, W-FIN core, SPREAD, box
+certificates) is scope-fenced by Wes's decision A: explicit hypotheses,
+deliberately outside Lean for now.
+
+**Note (asymmetry worth stating).** The 4-bad sector needs NO cluster
+derivation: any 4-bad quintuple's bad-quadruple is s*(w1..w4) with
+s = gcd(bads) by construction, the 1/2-filter is necessary and scale-free, and
+ratio/antichain/gcd descend to the shape. So 4-bad completeness = the w1-bound
+alone (c'), independent of (b). The 3-bad sector cannot argue this way: with
+two goods the naive per-row filter is vacuous (1 - 1/2 - 1/2 = 0), which is
+precisely why its inventory rests on the strong-edge cluster structure
+(Codex's 906/69 with proved cap) — obligation (b) is genuinely 3-bad-specific.

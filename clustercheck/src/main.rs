@@ -21,6 +21,7 @@ fn main() {
     let mut sealed_internal_shapes = Vec::new();
     let mut first_missed = Vec::new();
     let mut all_internal_shapes = Vec::new();
+    let mut all_shapes = Vec::new();
 
     for a in 2i64..=111 {
         for b in (a + 1)..=(7 * a - 2) {
@@ -62,6 +63,7 @@ fn main() {
                 let largest_owns_inside = owner_has_internal[2];
 
                 total += 1;
+                all_shapes.push((a, b, c));
                 by_min[a as usize] += 1;
                 forced_outside_hist[forced_count] += 1;
                 digest = digest
@@ -107,6 +109,33 @@ fn main() {
             row
         })
         .collect();
+    let documented_all_shapes: Vec<(i64, i64, i64)> = include_str!("../shapes906.csv")
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            let mut values = line.split(',').map(|value| value.parse::<i64>().unwrap());
+            let row = (
+                values.next().unwrap(),
+                values.next().unwrap(),
+                values.next().unwrap(),
+            );
+            assert!(values.next().is_none());
+            row
+        })
+        .collect();
+    let args: Vec<String> = std::env::args().collect();
+    if let Some(path) = args.get(1) {
+        let mut csv = String::new();
+        for &(a, b, c) in &all_shapes {
+            csv.push_str(&format!("{a},{b},{c}\n"));
+        }
+        std::fs::write(path, csv).expect("write full 906-shape CSV");
+        println!(
+            "wrote {} exhaustive min-strong shapes to {}",
+            all_shapes.len(),
+            path
+        );
+    }
     let exact = total == 906
         && old_max_connected == 4
         && needs_small_owner == 902
@@ -117,6 +146,7 @@ fn main() {
         && internal_forced_outside_hist == [0, 6, 17, 46]
         && sealed_internal_shapes.is_empty()
         && documented_shapes == all_internal_shapes
+        && documented_all_shapes == all_shapes
         && digest == 0xacecafc73c9c3ea4f2ca565f56bb5111;
     println!("ratio<7 normalized antichain triples with >=2 min-strong edges: {total}");
     println!("old >=2 max-strong subset: {old_max_connected}");

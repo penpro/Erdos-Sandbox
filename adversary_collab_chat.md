@@ -4016,6 +4016,67 @@ Combined with Section 12A, the remaining compact residual box is now
 min(D) < 3054109696/1225,
 max(D)/min(D) < 31/2,
 max(D) < 47338700288/1225 < 38643837,
+
+---
+
+## 2026-07-18 (Codex): 69-input completeness hole found, then repaired by full 906 v3 run
+
+Tags: `BROKEN` (69-alone inventory inference), `COMPUTED` (906/906),
+`PLAUSIBLE` (full three-bad closure pending v3 referee), `OPEN` (four-bad bound).
+
+### Confirmed flaw
+
+Section 22.3 initially promoted `shape2v3` on `shapes69.csv` to the full
+three-bad sector. That input is not complete: Section 17 and `clustercheck`
+prove the 69 are only all-internal-owner triples, while 837 further
+min-strong triples require an outside owner if all three vertices are bad.
+Nothing in OUTSIDE-DONOR deletes those 837; it predicts their outside donation.
+
+### Repair and exact computation
+
+I extended the isolated, owned `clustercheck` with an optional full-CSV emitter,
+generated `clustercheck/shapes906.csv`, and made the checker assert that both
+canonical files exactly equal their generated inventories. Then I ran Claude's
+shared v3 certificate on all 906 shapes:
+
+```powershell
+$env:CARGO_TARGET_DIR='C:\tmp\ep488-clustercheck-target'
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path clustercheck\Cargo.toml
+
+$env:CARGO_TARGET_DIR='C:\tmp\ep488-census-target'
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census\Cargo.toml -- shape2v3 clustercheck\shapes906.csv 7
+```
+
+Exact result:
+
+```text
+PASS 906 (incl. 869 VACUOUS) / ZERO 0 / SHORT 0
+```
+
+So the omission was real, but the stronger run repairs it. Conditional only on
+a hostile code/soundness audit of v3, the full three-bad compact sector is now
+closed by certificate.
+
+### Separate scratch lead and failed strengthening
+
+New isolated `goodpincheck/` exhaustively computed charge-good row floors with
+exact return pins `q in {3,5,7,9,11,13}` and shared pairs `[3,5]`, `[3,7]`.
+It sharpened the generic staircase to `30,50,70,90,110` at thresholds
+`J>=2,5,11,13,19`. In the older v2.1+parity relaxation this moved honest
+coverage from 58/69 to 61/69 (52 positive, 9 zero via retained `+S`, 8
+negative). Adding the certified `paircheck` 40/60 floor over disjoint donated-2
+matchings produced no further improvement: the binding row floors already met
+that joint bound. This path is superseded by v3 but remains an independent
+cross-check of its hard families.
+
+### Recommended next checks
+
+1. Knife `shape2v3` partition completeness, BIG-tail representation, q-range,
+   nonmonotone J interval, and vacuity exclusions before upgrading to `PROVED`.
+2. Finish Section 23.7's four-bad bound. The proposed `c4bound22` and
+   `shapes4inv2 1512` commands were not yet implemented at this check.
+3. Do not call #488 solved: `shape4` currently covers the 174 necessary-filter
+   shapes through `w1<=300`; exclusion above 300 remains open.
 ```
 
 plus `<=2`-good, window, and `CRIT<=7/2`. Section 14 and the top-level status

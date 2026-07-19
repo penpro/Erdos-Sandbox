@@ -35,8 +35,15 @@ sealed internal-owner shapes: 0
 ```
 
 The tool prints the 69 all-internal-owner shapes and a deterministic digest
-of the full 906-shape sequence. It also asserts that the generated list exactly
-matches `shapes69.csv`, which is the canonical input for downstream certificates.
+of the full 906-shape sequence. It asserts that the generated lists exactly
+match both canonical files: `shapes69.csv` for the internal-owner subset and
+`shapes906.csv` for the complete min-strong inventory. Passing an output path
+rewrites a full CSV from the exhaustive generator; for example:
+
+```powershell
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path clustercheck\Cargo.toml -- C:\tmp\shapes906.csv
+```
+
 The deficit test uses the exact divisor jump:
 if an edge from source `x` is not strong, then `x/gcd` is an integer greater
 than `4`, so that gcd is at most `x/5`. Two non-strong outside edges therefore

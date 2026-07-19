@@ -4,7 +4,7 @@
 
 Partial result, not a full solution.
 
-**Current state (2026-07-17).** The strongest local theorem is the sorry-free
+**Current state (2026-07-18).** The strongest local theorem is the sorry-free
 Lean proof for primitive-core size `≤4`. The size-5 density inequality
 `2δ>S` and the finite-`n` C-B covering criterion are proved at their stated
 tiers. A hostilely reviewed W-FIN argument now proves the C-B residual is finite.
@@ -14,15 +14,17 @@ exact bad-edge cofactors sharpens the actual residual cutoff to below
 separator whenever `max/min >= 7`. Full size 5 is still open only in the
 compact residual box `min < 3054109696/1225`, `max/min < 7`, `max < 17452056`,
 together with the existing goodness/window/CRIT constraints; this is still
-beyond the exact Rust bank. A new OUTSIDE-DONOR certificate plus the exact
-non-strong divisor bound proves that every compact residual has at most two
-strong-gcd components. Consequently it has a finite-block two-scale normal form
-`D=tW union sV`, `gcd(t,s)=1`. A coordinate-correct dual scale bound makes both
-scales explicitly finite per compact block pair, leaving a potentially large
-finite bank that is not yet generated or covered. The committed v2.1 triple
-relaxation has 45 positive families; a temporary exact shared-donor parity audit
-covers 58 of 69 after retaining `+S`, leaving 11 negatives and not full residual
-coverage. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
+beyond direct enumeration. The full exhaustive 906-shape three-bad inventory
+now passes Claude's v3 exact slot-matrix certificate (`869` vacuous, no zero or
+short families), after Codex corrected the earlier incomplete 69-shape input.
+This remains `COMPUTED` pending a hostile audit of v3's partition and tail
+soundness. The proved minimum-good lemma excludes five-bad residuals. For four
+bads, exact enumeration through normalized minimum `300` gives 174 necessary-
+filter shapes and `shape4` certifies all 174, but no proof yet excludes an
+eligible shape above `300`. Section 23.7 gives a promising analytic reduction
+to a connected bound `≤1512` and a finite `(2,2)` box; the closing generators
+are not yet implemented. This four-bad inventory bound is the current compact
+frontier. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
 cross-element transfer proof, bounded exact audits, and executable retirement
 certificates that rerun cleanly. Nothing in
 this report should be read as a solution of full #488.

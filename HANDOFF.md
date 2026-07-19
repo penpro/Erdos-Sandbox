@@ -17,24 +17,25 @@ computer-checkable proof of a case where the experts are currently stuck.
 
 ## Current research thread after posting
 
-**Status update (2026-07-17).** The size-`≤4` result is now sorry-free in Lean.
+**Status update (2026-07-18).** The size-`≤4` result is now sorry-free in Lean.
 For size 5, the density and C-B covering theorems are proved, and the reviewed
 W-FIN argument proves the C-B residual is finite. The universal source-owned
 cutoff is below `2.562 * 10^12`; the residual-specific `CRIT` audit and exact
 bad-edge cofactors cut this to `2.494 * 10^6`. Full size 5 is still open because
 SPREAD covers every primitive quintuple with `max/min >= 7`; the
 remaining compact residual box has `min < 3054109696/1225`, `max/min < 7`, and
-`max < 17452056`, still beyond the exact Rust bank. OUTSIDE-DONOR and the
-two-pair obstruction now prove that every compact residual has at most two
-strong-gcd components, giving a finite-block two-scale form
-`D=tW union sV`, `gcd(t,s)=1`. This removes the unrestricted four-bad inventory
-as the organizing problem. A dual-coordinate scale bound now makes both compact
-scales finite for each block pair, so the remaining global job is a potentially
-large finite bank, not an unbounded rider theorem. The committed v2.1 scan has
-45 positive all-internal triple families; a temporary exact shared-donor parity
-audit covers 58 of 69 after retaining `+S`, leaving 11 negatives. The remaining
-task is block-library generation plus bank coverage. Start with `REFEREE_WFIN.md`,
-Sections 15b and 18-21 of `cbfin_reduction_notes.md`, and the latest entry in
+`max < 17452056`, still beyond direct enumeration. The exact v3 slot-matrix
+certificate passes the complete, self-checked 906-shape three-bad inventory:
+869 shapes are vacuous and every remaining family has positive margin. This
+repairs an earlier run that used only the 69 all-internal-owner shapes, but v3
+still needs an independent hostile soundness audit. The minimum-good lemma
+excludes five-bad residuals. In the four-bad sector, the necessary-filter census
+is exhaustive through normalized minimum 300, finds 174 shapes (none above 40),
+and `shape4` certifies all 174. The open gate is proving no eligible four-bad
+shape lies above 300. Section 23.7 reduces that to a connected-case bound 1512
+and a finite `(2,2)` scale box; the two closing Rust commands are not yet
+implemented. Start with `REFEREE_WFIN.md`, Sections 22-24 of
+`cbfin_reduction_notes.md`, and the latest entry in
 `adversary_collab_chat.md`. The older narrative below is retained as history.
 
 The public update has been posted. The active internal frontier is now:

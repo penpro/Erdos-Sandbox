@@ -4,7 +4,7 @@ Notation. `A ⊂ ℤ_{≥1}` finite, `a* = max A`. `B = {k≥1 : a|k for some a�
 `B(x) = |B∩[1,x]|`. `C = ℤ_{≥1}∖B` (non-multiples), `C(x)=x−B(x)`.
 Target **(★)**: for all `m>n≥a*`, `n·B(m) < 2·m·B(n)` (equivalently `B(m)/m < 2B(n)/n`).
 
-**Current-status notice (2026-07-17).** This file preserves the early proof path
+**Current-status notice (2026-07-18).** This file preserves the early proof path
 and is not the current frontier summary. Primitive-core size `≤4` is now proved
 locally and formalized sorry-free in `lean/ep488`. For size 5, the density
 inequality is proved, and W-FIN now proves that the C-B residual is finite.
@@ -13,16 +13,20 @@ The universal W-FIN cutoff is below `2.562 * 10^12`; the residual inequality
 below `2.494 * 10^6`. SPREAD proves the full finite-`n` separator for
 `max/min >= 7`; the remaining open class is the compact residual box
 `min < 3054109696/1225`, `max/min < 7`, `max < 17452056`, still beyond the checked
-bank. The OUTSIDE-DONOR certificate and an elementary pair-component argument
-now prove that every such residual has at most two strong-gcd components, hence
-a finite-block two-scale form `D=tW union sV`, `gcd(t,s)=1`. Dual scale-bounding
-now makes both compact scales explicitly finite for each block pair, reducing
-the frontier to a potentially large finite bank rather than unbounded riders.
-The committed v2.1 relaxation has 45 positive all-internal triple families; an
-exact shared-donor parity audit covers 58 of 69 after retaining `+S`, leaving 11
-negative pending integration into the shared checker. Other component-bank
-sectors remain. The false G3 min-bound is retracted. See
-`REFEREE_WFIN.md`, `cbfin_reduction_notes.md`,
+bank. OUTSIDE-DONOR and the pair-component argument give a finite-block
+two-scale form. Claude's v3 exact slot-matrix certificate now passes the full
+canonical 906-shape three-bad inventory (`869` vacuous, no zero or short
+families); Codex repaired the earlier incomplete 69-file run by generating and
+self-checking `clustercheck/shapes906.csv`. This is `COMPUTED` and still needs a
+hostile v3 soundness audit. Five-bad residuals are excluded by the proved
+minimum-good lemma. For four bads, the necessary-filter enumeration is complete
+through normalized minimum `300`, yields 174 shapes (empirically ending at
+`40`), and `shape4` certifies all 174. The sole compact-sector gap is now a
+proof that no eligible four-bad shape occurs above the searched range; Section
+23.7 reduces it to a connected bound `≤1512` plus a finite `(2,2)` box, but its
+announced executable leaves are not yet implemented. Full size 5 remains open.
+The false G3 min-bound is retracted. See `REFEREE_WFIN.md`,
+Sections 22-24 of `cbfin_reduction_notes.md`,
 `quintuple_density_notes.md`, and `adversary_collab_chat.md` before relying
 on the older status paragraphs below.
 

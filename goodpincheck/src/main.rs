@@ -97,17 +97,7 @@ fn main() {
     // Every charge-good row has at most one modulus 2. The certified drift
     // f >= (29/600)J - 1/2 therefore gives f60 >= 204 for every J >= 81.
     let tail_floor60 = (29 * (J_LAST + 1) - 300) / 10;
-    let pin_sets: &[&[i32]] = &[
-        &[],
-        &[3],
-        &[5],
-        &[7],
-        &[9],
-        &[11],
-        &[13],
-        &[3, 5],
-        &[3, 7],
-    ];
+    let pin_sets: &[&[i32]] = &[&[], &[3], &[5], &[7], &[9], &[11], &[13], &[3, 5], &[3, 7]];
 
     println!("exact charge-good pinned-row floors; units 1/60");
     println!("finite layers J={J_FIRST}..{J_LAST}; tail floor={tail_floor60}/60");

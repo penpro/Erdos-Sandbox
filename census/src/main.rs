@@ -1837,6 +1837,124 @@ fn shapes4inv(w1max: i128, rho: i128) {
     println!("TOTAL 4-bad candidate shapes (w1 <= {}, filter-complete): {}", w1max, found.len());
 }
 
+/// Shared exact validity check for a 4-bad candidate shape (the shapes4inv filter):
+/// sorted distinct, antichain, gcd 1, ratio < rho, every row sum gcd/w >= 1/2.
+fn valid4shape(w: &[i128; 4], rho: i128) -> bool {
+    for i in 0..4 { for j in (i + 1)..4 {
+        if w[i] == w[j] || w[j] % w[i] == 0 { return false; }
+    }}
+    if gcd(gcd(w[0], w[1]), gcd(w[2], w[3])) != 1 { return false; }
+    if w[3] >= rho * w[0] { return false; }
+    for i in 0..4 {
+        let mut prod = 1i128;
+        for j in 0..4 { if j != i { prod *= w[j]; } }
+        let mut lhs = 0i128;
+        for j in 0..4 { if j != i { lhs += gcd(w[i], w[j]) * (prod / w[j]); } }
+        if 2 * lhs < prod { return false; }
+    }
+    true
+}
+
+/// (c') certificate 1 — the CASE (2,2) BOX (Section 23.7). In a (2,2) heavy
+/// split A = h_A*{alpha, alpha'}, B = h_B*{beta, beta'}: cofactor pairs coprime
+/// in [2,42]; some A-row is needy (partner cofactor alpha' >= 3), its cross-sum
+/// >= 1/6, so a cross term >= 1/12: that pair's reduced fraction K/M has
+/// M <= 12, K <= 83, K/M in (1/7,7); gcd(h_A,h_B) = 1 then DETERMINES
+/// h_A = K*beta/g0, h_B = M*alpha/g0, g0 = gcd(K*beta, M*alpha). Enumerating
+/// the finite box and verifying candidates exactly is therefore COMPLETE for
+/// every (2,2)-type 4-bad shape, with no a-priori w1 bound needed.
+fn c4bound22(rho: i128) {
+    println!("=== (c') case (2,2) box: needy-row K/M pinning, exact verification (rho<{}) ===", rho);
+    let nthreads = std::thread::available_parallelism().map(|n| n.get() as i128).unwrap_or(4).max(1);
+    let found: Vec<[i128; 4]> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads).map(|tid| {
+            s.spawn(move || {
+                let mut out: Vec<[i128; 4]> = Vec::new();
+                let mut a = 2 + tid;
+                while a <= 42 {
+                    for ap in 3..=42i128 {
+                        if gcd(a, ap) != 1 { continue; }
+                        for b in 2..=42i128 { for bp in 2..=42i128 {
+                            if b == bp || gcd(b, bp) != 1 { continue; }
+                            for m in 2..=12i128 { for k in 2..=83i128 {
+                                if gcd(k, m) != 1 { continue; }
+                                if m >= 7 * k || k >= 7 * m { continue; }
+                                let g0 = gcd(k * b, m * a);
+                                let ha = k * b / g0;
+                                let hb = m * a / g0;
+                                // pin consistency: the (needy, pinned) pair's reduced
+                                // denominator must actually be m
+                                let e_a = ha * a; let e_b = hb * b;
+                                let g = gcd(e_a, e_b);
+                                if e_b != g * m { continue; }
+                                let mut w = [ha * a, ha * ap, hb * b, hb * bp];
+                                w.sort_unstable();
+                                if valid4shape(&w, rho) { out.push(w); }
+                            }}
+                        }}
+                    }
+                    a += nthreads;
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let set: std::collections::BTreeSet<[i128; 4]> = found.into_iter().collect();
+    for w in set.iter() { println!("  {} , {} , {} , {}", w[0], w[1], w[2], w[3]); }
+    let wmax = set.iter().map(|w| w[0]).max().unwrap_or(0);
+    println!("TOTAL (2,2)-box shapes: {} ; largest w1 = {}", set.len(), wmax);
+}
+
+/// (c') certificate 2 — heavy-partner generator enumeration (Section 23.7).
+/// Row 1 of any valid shape owns a heavy partner w_j = w1*m/k with k | w1 and
+/// (k,m) in {(2,3),(2,5),(3,4),(3,5),(4,5),(5,6)} (reduced numerator <= 6,
+/// wj > w1 forces k < m <= 6, antichain forces k >= 2). So one loop collapses
+/// to <= 6 candidates. Complete for ALL shapes (both heavy-graph cases) up to
+/// w1max; run to 1512 to close case (4)'s proved range (Section 23.7).
+fn shapes4inv2(w1max: i128, rho: i128) {
+    println!("=== 4-bad inventory v2: heavy-partner generator, w1 <= {}, ratio < {} ===", w1max, rho);
+    let nthreads = std::thread::available_parallelism().map(|n| n.get() as i128).unwrap_or(4).max(1);
+    let pairs: [(i128, i128); 6] = [(2, 3), (2, 5), (3, 4), (3, 5), (4, 5), (5, 6)];
+    let found: Vec<[i128; 4]> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads).map(|tid| {
+            s.spawn(move || {
+                let mut out: Vec<[i128; 4]> = Vec::new();
+                let mut w1 = 2 + tid;
+                while w1 <= w1max {
+                    let hi = rho * w1;
+                    for (k, m) in pairs.iter() {
+                        if w1 % k != 0 { continue; }
+                        let wj = w1 / k * m;
+                        if wj <= w1 || wj >= hi { continue; }
+                        // remaining two elements: wa < wb in (w1, hi), distinct from wj
+                        for wa in (w1 + 1)..hi {
+                            if wa == wj || wa % w1 == 0 { continue; }
+                            for wb in (wa + 1)..hi {
+                                if wb == wj || wb % w1 == 0 || wb % wa == 0 { continue; }
+                                let mut w = [w1, wj, wa, wb];
+                                w.sort_unstable();
+                                if valid4shape(&w, rho) { out.push(w); }
+                            }
+                        }
+                    }
+                    w1 += nthreads;
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let set: std::collections::BTreeSet<[i128; 4]> = found.into_iter().collect();
+    for w in set.iter() { println!("  {} , {} , {} , {}", w[0], w[1], w[2], w[3]); }
+    let wmax = set.iter().map(|w| w[0]).max().unwrap_or(0);
+    println!("TOTAL shapes (w1 <= {}, generator-complete): {} ; largest w1 = {}", w1max, set.len(), wmax);
+}
+
 /// STAGE-2 v2: donation-VALUE descriptors. Each good's stair source = its best
 /// donation (i, v), v in 2..=6 (v>=7 gives J-bound below the flat stair region —
 /// treated as none). Descriptor space 16x16; rows constrained only at the named
@@ -1945,6 +2063,17 @@ fn main() {
         }).collect();
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape2v2(r, &shapes);
+        return;
+    }
+    if args[1] == "c4bound22" {
+        let r: i128 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(7);
+        c4bound22(r);
+        return;
+    }
+    if args[1] == "shapes4inv2" {
+        let w1max: i128 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(1512);
+        let r: i128 = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(7);
+        shapes4inv2(w1max, r);
         return;
     }
     if args[1] == "shapes4inv" {
