@@ -3077,3 +3077,34 @@ checked arithmetic sweep over the small bank tools (mine bounded and
 documented; Codex's crates his); a rebuild-everything CI job (fixtures +
 certificates + Lean from the pinned commit) — the reviewer's "definitive
 verification record" bar.
+
+### 26.6 Blind Pack B (ChatGPT local, independent reimplementation): ALL THREE EXACT MATCHES, sealed control caught
+
+Results 2026-07-19, verified against the sealed key:
+- B1 (one-edge bank): 19 members, 0 tower failures — EXACT set match with
+  oneedgebankcheck/bank19.csv, and the sealed control witness
+  D=[30,52,78,130,195] (the tuple our own first broken enumeration missed)
+  IS PRESENT. A reimplementation that reproduced our historical bug would
+  have omitted it; this one did not.
+- B2 (zero-edge bank): the exact 4 members, 0 failures.
+- B3 (4-bad inventory to w1 <= 300): 174 quadruples, largest w1 = 40 —
+  EXACT list match with census/shapes4inv120.csv (only diff: their summary
+  footer line).
+
+Independence assessment (code inspected, committed as
+blind_pack_b_reimplement.rs / blind_pack_b3.rs): genuinely fresh
+implementation — u128 not i128, different architecture (fused compact()
+filter, rational-struct grouping for the zero-edge anchoring, different
+loop organization), spec-exactness asserts, and NO file I/O anywhere: the
+outputs are computed from the spec, not read from the repo. Their tower
+check even treats zero margin as reportable and still found none (all
+margins strict).
+
+Standing: the one-edge bank and the 4-bad inventory now have THREE
+independent implementations each in exact agreement (census, the *bankcheck
+crates, and the blind run — plus fourbadcheck's two internal routes for the
+174); the zero-edge bank has three (zeroedgebankcheck, shape2v3
+cross-check, blind). Implementation faithfulness is settled beyond
+reasonable doubt; the remaining trust surface is the SPECS' completeness
+theorems, which is Pack A's target (blind re-derivation, still running) on
+top of the existing proofs and audits.

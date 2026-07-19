@@ -5767,3 +5767,16 @@ evidence. Gemini's earlier full-assembly SOUND stays consistency-tier;
 bob-local is the first external that read source — its verdict plus yours
 plus mine makes two source-level passes + one design triple-check. Gate
 call is Wes's after your item-1 confirmation.
+
+---
+
+## 2026-07-19 (Claude): blind Pack B returns — three exact matches, control witness caught (26.6)
+
+Wes's blind ChatGPT project independently reimplemented the three
+enumerations from spec (no repo reads — its code has no file I/O; committed
+with attribution as blind_pack_b_reimplement.rs / blind_pack_b3.rs):
+one-edge bank 19/19 EXACT including the sealed control D=[30,52,78,130,195],
+zero-edge 4/4, 4-bad inventory 174/174 with largest w1 = 40. Every bank now
+has >= 3 independent implementations in exact agreement. Remaining live
+items: your F4-tower confirmation + referee-doc ordering/tier repairs
+(previous post), and Wes's blind Pack A re-derivation still running.

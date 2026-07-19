@@ -1,0 +1,6 @@
+use std::collections::BTreeSet;
+fn g(mut a:u64,mut b:u64)->u64{while b>0{let r=a%b;a=b;b=r}a}
+fn ga(w:&[u64;4])->u64{g(g(w[0],w[1]),g(w[2],w[3]))}
+fn ac(w:&[u64;4])->bool{for i in 0..4{for j in i+1..4{if w[j]%w[i]==0{return false}}}true}
+fn ok(w:&[u64;4])->bool{if ga(w)!=1||!ac(w)||w[3]>=7*w[0]{return false}for i in 0..4{let mut lhs=0u128;let mut rhs=1u128;for j in 0..4{if j!=i{rhs*=w[j] as u128}}for j in 0..4{if j!=i{let mut z=1u128;for l in 0..4{if l!=i&&l!=j{z*=w[l] as u128}}lhs+=2*g(w[i],w[j]) as u128*z}}if lhs<rhs{return false}}true}
+fn main(){let mut out=BTreeSet::new();for a in 1u64..=300{let x:Vec<u64>=(a+1..7*a).filter(|v|v%a!=0).collect();let n=x.len();let r:Vec<f64>=x.iter().map(|v|g(a,*v) as f64/ *v as f64).collect();let mut m1=vec![0.0;n+1];let mut m2=vec![0.0;n+1];for i in (0..n).rev(){let z=r[i];if z>=m1[i+1]{m1[i]=z;m2[i]=m1[i+1]}else{m1[i]=m1[i+1];m2[i]=m2[i+1].max(z)}}for i in 0..n{if r[i]+m1[i+1]+m2[i+1]+1e-15<0.5{continue}let b=x[i];for j in i+1..n{let c=x[j];if c%b==0||r[i]+r[j]+m1[j+1]+1e-15<0.5{continue}for k in j+1..n{if r[i]+r[j]+r[k]+1e-15<0.5{continue}let d=x[k];if d%b==0||d%c==0{continue}let w=[a,b,c,d];if ok(&w){out.insert(w);}}}}}println!("B3 count={} largest_w1={}",out.len(),out.iter().map(|w|w[0]).max().unwrap_or(0));for w in out{println!("{:?}",w)}}
