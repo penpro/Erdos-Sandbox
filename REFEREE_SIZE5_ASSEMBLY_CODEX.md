@@ -18,7 +18,9 @@ for every `m>n>=max(P)`. Divisibility-redundant elements are removed first.
 
 ## 2. n-range tiling
 
-For a primitive quintuple base:
+At the original scale, A, FD, the U2 bridge, C-B, and SPREAD are
+gcd-agnostic and are tested before any normalization. Only a member left in
+the compact box is sent through C0 to its primitive base. For that base:
 
 - `max(P)<=n<2max(P)`: FD, using the size-4 separator.
 - `n>=2max(P)` and `7nS>1135-157S`: U2 bridge.
@@ -59,6 +61,11 @@ For `P=tP0`,
 ```text
 B_(tP0)(n)=B_P0(floor(n/t)).
 ```
+
+The v3/shape4 stage-2 margin is also tower-calibrated: the exact identity
+gives `2B(m)-mS >= 2*sum_i f_i-5+S`, while the stored `m60` is exactly
+`60*(2*sum_i f_i-5)`. Hence `m60>=0` implies
+`2B(m)-mS>=S`, including every reported ZERO branch.
 
 The direct banks check tower form while `7(m+1)S0<1135`. On the complement,
 U2 gives

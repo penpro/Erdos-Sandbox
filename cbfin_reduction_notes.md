@@ -2465,7 +2465,7 @@ in-repo, reproduced).
 | 1 | A | >= 3 good charges => 2B(n) > nS, all n | LEAN (Quint.lean ep488_quint_three_good) | — |
 | 2 | FD | max <= n < 2max, unconditional (size-4 separator + exact identity) | LEAN (Quad.lean) + PAPER assembly | — |
 | 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | LEAN identity/application/assembly + CERT kernel | — |
-| 4 | C0 | gcd(P) > 1: scaling to the primitive base — ORDER CORRECTED (external audit, 26.5): applies AFTER A/FD/Bridge/C-B/SPREAD (those are gcd-agnostic, applied at original scale); C0 feeds ONLY box sectors, whose banks tower-check and whose tail is drift_bridge_tower | PAPER + LEAN seam | stage-2 margin => tower calibration (Codex confirm) |
+| 4 | C0 | gcd(P) > 1: scaling to the primitive base — applies only after A/FD/Bridge/C-B/SPREAD at the original scale; C0 feeds box sectors, whose stage-2 margin and banks are tower-calibrated and whose tail is drift_bridge_tower | PAPER + LEAN seam | — |
 | 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (cb_cover5, conditional) + PAPER (CRIT>7/2 => its hypothesis) | — |
 | 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
 | 7 | box, bad count | any antichain quintuple has <= 4 self-bad (Section 23.6) | LEAN (Ceiling.lean) | — |
@@ -2482,7 +2482,7 @@ the >= 3-good bulk. External: ChatGPT W-FIN hostile review pending (Wes).
     review packages;
 (b) consolidate the proof text and dependency ledger without upgrading the
     certificate-backed steps beyond their stated tier.
-Lean debt (kernel 157/300, the finite universal U2 kernel,
+Lean debt (kernel 157/300, the lower U2 retirements 5/8 and one/two/three-modulus finite kernels,
 W-FIN core, SPREAD, box certificates) is scope-fenced by Wes's decision A:
 explicit hypotheses,
 deliberately outside Lean for now.
@@ -3054,11 +3054,10 @@ carry NO gcd hypothesis (checked: Quint.lean:458, CB.lean:86) — A, FD,
 Bridge, C-B, SPREAD are gcd-agnostic and apply at the ORIGINAL scale; C0
 then feeds ONLY the box sectors, where the banks tower-check explicitly and
 `drift_bridge_tower` covers the tail. Brief section 3 and ledger row 4 are
-repaired to this order. ONE SUB-ITEM left open: an explicit statement that
-the stage-2 (v3/shape4) margin-with-retained-S is calibrated to the TOWER
-form (2B - mS >= S), not just the separator — Codex to confirm (he wrote
-the F4 convention and audited surface 6); if it is separator-only, the box
-sectors need the one-line strengthening or the bank towers absorb the load.
+repaired to this order. Codex confirmed the remaining calibration directly:
+`2B(m)-mS >= 2*sum_i f_i-5+S`, while stage 2 stores
+`m60=60*(2*sum_i f_i-5)`. Therefore `m60>=0` implies
+`2B(m)-mS>=S`, exactly the nonstrict tower form; ZERO branches are valid.
 
 **Finding 2 (correct): tier labels overstate.** C-B is LEAN(conditional
 cb_cover5) + PAPER (the CRIT>7/2 => hypothesis step); FD is LEAN + paper
@@ -3108,3 +3107,40 @@ cross-check, blind). Implementation faithfulness is settled beyond
 reasonable doubt; the remaining trust surface is the SPECS' completeness
 theorems, which is Pack A's target (blind re-derivation, still running) on
 top of the existing proofs and audits.
+
+### 26.7 Blind Pack A (two repo-blind solvers, parallel session): claims 1-4 MATCH, discriminator passed twice, one pack defect caught, and a second analytic (c') proof
+
+Outcome (protocol entry in the chat, artifacts in that session's tmp/):
+1. The retraction discriminator (claim 3c) passed in the strongest form:
+   BOTH blind solvers derived the corrected slot directions and bounds cold
+   — including the (2,2)-c exception and the identical spread fallback —
+   and neither reproduced the retracted wrong-slot form. They proved a
+   SHARPER u-bound, u*(alpha-1) <= gcd(alpha,v)*Sgam, which implies our
+   banked one (gcd(alpha,v) <= alpha): kept on the shelf.
+2. Claim 1's ceiling is ATTAINED: {24,36,40,45,60} gives sum = 59e/60
+   exactly (slots {5,5,3,4}; verified here: 12+12+20+15 = 59). Ceiling.lean
+   proves the strict < e form, which equality does not contradict.
+3. NEW second analytic proof of the 4-bad finiteness (obligation c'),
+   cutoff-free: bounded-t connectivity of the filter rows + p-adic lcm
+   pinning, max(w) <= 293^9 under the box ratio hypothesis, with slack down
+   to any row threshold > 1/3. Independent of the 23.7/23.8 spanning-tree
+   closure and of all enumerations. Status CLAIMED-verified (the running
+   session walked it; Codex knife invited). Correlated-evidence caveat
+   logged: both solvers share a base model.
+4. PACK DEFECT (mine, drafting): Pack A claim 5 asks to PROVE
+   max(w)/min(w) < 7 as a consequence of 4-badness — it is a box HYPOTHESIS
+   (from SPREAD), never a consequence. Verified counterexamples:
+   w = (4,6,10,45) (ratio 11.25) passes every 1/2-filter row; without the
+   ratio hypothesis the filter set is INFINITE ((2,3,5,p) for all p >= 7).
+   Nothing banked is affected — every in-repo use of w4/w1 < 7 is
+   hypothesis-scoped (23.5). Decision: KEEP the defect as a calibrated
+   rubber-stamp trap for the still-running external projects (both honest
+   blind solvers refuted it — that is the trap working); sealed-key update
+   for Wes: claim 5's ratio sub-claim expects REFUTED, finiteness-as-written
+   expects REFUTED (the (2,3,5,p) family), finiteness-under-ratio expects
+   PROVED.
+
+With Codex's tower-calibration confirmation (26.5, now including the Lean
+`quintuple_drift_bridge_tower`) this closes every open finding from every
+review round. The gate now consists solely of Wes's promotion decision plus
+whatever the still-running external blind projects return.

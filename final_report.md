@@ -4,6 +4,14 @@
 
 Partial result, not a full solution.
 
+`Ep488/DriftBridge.lean` machine-checks the U2 multiplicity identity,
+reduced-cofactor application/reindexing, constants, and tower endpoint.
+`Ep488/DriftKernelReduction.lean` now also checks terminal-box divisor
+lowering and one-period propagation; `u2primecheck/` verifies the resulting
+35 prime multisets exactly. `Ep488/DriftRetirement.lean` additionally proves
+the `m>=11` peel. The lower `5,8` retirement steps and one/two/three-modulus
+finite kernels remain paper plus Rust-certificate inputs.
+
 **Current state (2026-07-18).** The strongest local theorem is the sorry-free
 Lean proof for primitive-core size `≤4`. The size-5 density inequality
 `2δ>S` and the finite-`n` C-B covering criterion are proved at their stated

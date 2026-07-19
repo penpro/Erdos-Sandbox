@@ -73,11 +73,11 @@ covers the tail). First matching regime in THAT order:
 |---|---|---|---|
 | A | ≥3 good charges ⟹ separator, all n | LEAN | `Ep488/Quint.lean` (`ep488_quint_three_good`) |
 | FD | max ≤ n < 2max, unconditional | LEAN+paper | `Ep488/Quad.lean` (size-4 separator) + notes |
-| Bridge | 7nS > 1135 − 157S (incl. n ≥ 33max) | LEAN algebra + Rust kernel | `Ep488/DriftBridge.lean` (conditional algebra) + `census` `drift` certificate (U2 kernel) |
-| C0 | gcd(P) > 1: scaling recursion + tower form | paper + Lean seam | `DriftBridge.lean` (`drift_bridge_tower`), notes |
-| C-B | ≤2 good and CRIT > 7/2 | LEAN | `Ep488/CB.lean` (`cb_cover5`) |
+| Bridge | 7nS > 1135 − 157S (incl. n ≥ 33max) | LEAN identity/application/assembly + paper + Rust kernel | `Ep488/DriftBridge.lean` + `census` `drift` certificate |
+| C-B | ≤2 good and CRIT > 7/2 | LEAN conditional theorem + paper implication | `Ep488/CB.lean` (`cb_cover5`) + notes |
 | SPREAD | max/min ≥ 7 | paper + certificates | notes §14, `spreadcheck/`, `census/CERTIFICATES.txt` |
-| box | the compact residual | certificates (below) | — |
+| C0 | box member with gcd(P) > 1: scaling recursion + tower form | paper + Lean seam | `DriftBridge.lean` (`drift_bridge_tower`), notes |
+| box | the compact residual after the gcd-agnostic regimes | certificates (below) | — |
 
 Seam statements: `REFEREE_SIZE5_ASSEMBLY_CODEX.md` §2/§5 and notes §27
 (overlaps at both ends; the tower cap ↔ bridge handoff; strict/nonstrict

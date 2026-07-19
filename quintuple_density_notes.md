@@ -763,8 +763,20 @@ argument — it must use the sign, not the size, of the deficit.
   is a well-scoped follow-up (I–E/average over one period, divisor-monotonicity
   coupling, Route B lowering, 35-multiset check).
 - **Also already Lean-proved:** `ep488_quint_three_good` (≥3-good ⟹ #488, all `n`).
-- **Not yet formalized:** U1/U2 and the drift bridge (same machinery tier as the
-  kernel), and the `≤2`-good window cover (open mathematics first).
+- **U2 reduction substantially formalized:** `Ep488/DriftBridge.lean` proves
+  the multiplicity identity, reduced-cofactor application/reindexing, exact
+  floor losses, the `1135/157` bridge, and the tower endpoint.
+  `Ep488/DriftKernelReduction.lean` additionally proves divisor monotonicity,
+  reduction of the terminal `[2,10]^4` box to `{2,3,5,7}^4`, and propagation
+  from one LCM period to every endpoint. The matching exact
+  `u2primecheck/` certificate passes all 256 ordered tuples (35 multisets),
+  sharp at `(2,2,3,5), J=10`. `Ep488/DriftRetirement.lean` proves the
+  pointwise/floor peel and the sorted `m4>=11` retirement, reducing the full
+  four-modulus line to `U2ThreeKernel` plus the prime-period certificate.
+  The lower `5,8` retirement chain and one/two/three-modulus finite kernels
+  remain paper + `census drift` inputs. Compact-window certificate models
+  remain outside Lean by scope
+  decision.
 
 ## Reproduce
 

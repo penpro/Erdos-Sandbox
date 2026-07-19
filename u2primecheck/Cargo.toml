@@ -1,0 +1,7 @@
+[package]
+name = "u2primecheck"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+overflow-checks = true

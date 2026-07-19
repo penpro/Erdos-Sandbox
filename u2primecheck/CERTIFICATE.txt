@@ -1,0 +1,4 @@
+U2 PRIME PERIOD CERTIFICATE: PASS
+ordered tuples checked: 256
+unordered multisets checked: 35
+global minimum prefix slack: 0 at [2, 2, 3, 5], J=10, period=30, period-slope slack=0

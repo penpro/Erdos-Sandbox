@@ -44,10 +44,15 @@ the input shape inventories or the rest of the size-5 assembly.
    gives a strict upper bound below `33*7*wmax`, while the inclusive code endpoint
    checks one extra value.
 
-6. **Margin assembly: HOLDS.** `m60=2*sum(f*60)-300` is exactly the F4 margin
-   with the positive `+S` omitted. Positive margins prove the target; a zero
-   margin is rescued by retained `S>0`. Main runs have no zero cases. Bad-row
-   tails use `floor(7J/5)-14`, a conservative integer lower bound for U2.
+6. **Margin assembly: HOLDS, including tower calibration.** The exact drift
+   identity and integer floor loss give
+   `2B(n)-nS >= 2*sum_i f_i - 5 + S`. Thus
+   `m60=2*sum(f*60)-300` is `60*(2*sum_i f_i-5)`, with the positive
+   `60S` deliberately retained outside the stored margin. Consequently
+   `m60>=0` implies `2B(n)-nS>=S`, exactly the nonstrict tower form
+   `2B(n)>=(n+1)S`; it is stronger than the strict separator needed at the
+   original scale. Main runs have no zero cases. Bad-row tails use
+   `floor(7J/5)-14`, a conservative integer lower bound for U2.
 
 7. **shape4 analogue: HOLDS.** The 4x1 class partition and q pinning are the
    same argument. A pinned good has four exact reciprocal moduli and is checked

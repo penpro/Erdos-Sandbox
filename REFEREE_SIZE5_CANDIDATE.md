@@ -32,10 +32,11 @@ The current regime assembly is:
 1. At least three good charges: sorry-free Lean theorem.
 2. First doubling `max(P)<=n<2max(P)`: size-4 separator plus the new maximum.
 3. Bridge `7nS>1135-157S`: U2 drift theorem.
-4. Nonprimitive scaling: tower form for the primitive base.
-5. At most two good charges and `CRIT>7/2`: C-B covering theorem.
-6. `max(P)/min(P)>=7`: SPREAD certificate.
-7. What remains is the compact primitive C-B residual.
+4. At most two good charges and `CRIT>7/2`: C-B covering theorem.
+5. `max(P)/min(P)>=7`: SPREAD certificate.
+6. What remains is the compact box.
+7. Only box members use nonprimitive scaling to a primitive base; the box
+   certificates and U2 tail are in tower form.
 
 W-FIN and its residual refinement prove this residual finite at paper tier; the
 edge-count reductions below are intended to replace its impractical numerical

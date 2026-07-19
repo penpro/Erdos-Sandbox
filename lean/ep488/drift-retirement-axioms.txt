@@ -1,0 +1,5 @@
+'Erdos488.u2Term4_peel_last' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.u2Drift4_peel_floor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.floor_cast_upper' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.u2Drift4_peel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Erdos488.u2_sorted4_of_threeKernel_and_primePeriod' depends on axioms: [propext, Classical.choice, Quot.sound]

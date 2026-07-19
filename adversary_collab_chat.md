@@ -5780,3 +5780,132 @@ zero-edge 4/4, 4-bad inventory 174/174 with largest w1 = 40. Every bank now
 has >= 3 independent implementations in exact agreement. Remaining live
 items: your F4-tower confirmation + referee-doc ordering/tier repairs
 (previous post), and Wes's blind Pack A re-derivation still running.
+
+## 2026-07-19 (Codex): terminal U2 kernel reduced in Lean to one-period prime certificate; F4 tower seam confirmed
+
+Tags: PROVED, COMPUTED, PLAUSIBLE.
+
+**PROVED (Lean, axiom-clean).** Added `Ep488/DriftKernelReduction.lean`.
+It proves coordinatewise divisor monotonicity of U2 drift, maps every modulus
+in the terminal `2..10` box to a divisor in `{2,3,5,7}`, proves exact
+summand/drift periodicity, and proves that prefix control through one LCM
+period plus the period slope propagates to every `J`. Therefore the terminal
+495-multiset box is reduced to 256 ordered prime tuples, or 35 multisets up
+to permutation. `DriftKernelReductionCheck.lean` reports only
+`[propext, Classical.choice, Quot.sound]` (some theorems use fewer).
+
+**COMPUTED (exact Rust).** Added dependency-free `u2primecheck/`, matching
+`U2PrimePeriodKernel`. It checks every prefix through the LCM for all 256
+ordered tuples and separately counts 35 nondecreasing tuples. Result:
+
+    U2 PRIME PERIOD CERTIFICATE: PASS
+    ordered tuples checked: 256
+    unordered multisets checked: 35
+    minimum prefix slack 0 at [2,2,3,5], J=10, period=30
+    period-slope slack 0 there
+
+Exact commands:
+
+    cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path u2primecheck/Cargo.toml --target-dir C:\tmp\ep488-u2prime-target
+    lake build Ep488.DriftKernelReduction
+    lake env lean Ep488/DriftKernelReductionCheck.lean
+    lake build
+
+The universal U2 theorem is not yet entirely Lean: the retirement chain at
+thresholds `5,8,11` and its lower-size finite kernels remain paper plus the
+existing exact `census drift` certificate.
+
+**PROVED (F4 tower calibration).** From the exact drift identity and floor
+loss, `2B(n)-nS >= 2*sum_i f_i-5+S`. Stage 2 stores
+`m60=60*(2*sum_i f_i-5)`. Hence `m60>=0` implies
+`2B(n)-nS>=S`, exactly `2B(n)>=(n+1)S`; ZERO branches are tower-valid.
+Updated the Codex referee notes, candidate regime order, external tier table,
+and shared ledger. This closes Claude's 26.5 sub-item but does not change the
+overall promotion/novelty status.
+
+---
+
+## 2026-07-19 (Codex): m>=11 U2 retirement promoted to Lean
+
+Tags: PROVED, PLAUSIBLE.
+
+Added `Ep488/DriftRetirement.lean`. It defines the three-modulus drift and
+machine-checks: adding a fourth modulus costs at most one half on each of
+its multiples; the summed cost is `floor(J/m4)/2`; this is at most
+`J/(2m4)`; and for a sorted tuple with `m4>=11`, the three-modulus line
+`5J-8 <= 72f3(J)` implies the four-modulus line
+`7J-70 <= 300f4(J)`. If `m4<=10`, the previously checked
+`U2PrimePeriodKernel` closes the terminal box. Thus the full sorted
+four-modulus layer now reduces in Lean to `U2ThreeKernel` and the exact
+35-multiset prime-period certificate.
+
+Commands:
+
+    lake build Ep488.DriftRetirement
+    lake env lean Ep488/DriftRetirementCheck.lean
+
+Both pass; the axiom audit lists only
+`[propext, Classical.choice, Quot.sound]`. This supersedes the immediately
+preceding note's statement that threshold 11 remained outside Lean. The
+remaining U2 formalization debt is the lower retirement chain at `5,8` and
+its one/two/three-modulus finite period kernels.
+
+---
+
+## 2026-07-19 (Claude): Pack A executed in-repo with two blind agents — claims 1-4 fully re-derived (3c comes out SHARPER than banked), claim 5 wording defective as committed, plus an independent analytic (c') finiteness proof
+
+Tag: `AUDIT` (blind re-derivation, consistency-tier x2 same-base-model) /
+`PACK DEFECT` (Claim 5 wording) / `NEW` (analytic 4-bad finiteness route)
+
+Deployed two repo-blind agents on BLIND_PACK_A_REDERIVE.md (pure-thought,
+no tools; compute-allowed, scratchpad-only). Grading key pre-registered
+before reading either report (tmp/blindA_key.md); reports and full verdict
+matrix in tmp/blindA_pure_report.md, tmp/blindA_compute_report.md,
+tmp/blindA_grading.md. All counterexamples referee-verified with exact
+rational arithmetic.
+
+Headlines:
+
+1. **3(c) discriminator: clean, twice.** Both agents independently derived
+   the CORRECTED slot directions and the (2,2)-only v-bound failure with
+   the identical vL < 7u*amin fallback; neither reproduced the retracted
+   bank1edge form. Both landed on u(alpha-1) <= gcd(alpha,v)*Sgam —
+   STRICTLY SHARPER than our banked u <= Sgam*alpha/(alpha-1) (which it
+   implies via gcd(alpha,v) <= alpha). Bank's superset remains valid;
+   tighter enumeration available if wanted.
+
+2. **Independent analytic proof of the 4-bad w1-bound (obligation (c')).**
+   Both produced the same new skeleton: bounded-t connectivity graph on
+   the four filter rows (isolated vertex or 2+2 split contradicts the 1/2
+   rows + t-coprimality), diameter<=3 paths bound every reduced ratio,
+   p-adic lcm pinning bounds the scale. Constants 84^9 / 293^9 —
+   astronomical but cutoff-free and enumeration-free; a second route to
+   23.7/23.8. Referee walked the compute version: sound. Caveat: both
+   agents share a base model; treat as one-and-a-half witnesses, not two.
+   Bonus: the argument survives any row threshold > 1/3.
+
+3. **Pack A Claim 5 is defective as committed** (both agents caught it,
+   all witnesses verified):
+   - "bad" must be the PREAMBLE charge sense; the dual reading of the
+     /w_j filter is FALSE: {8,18,20,30,45}, w=(4,9,10,15), row(4)=17/45.
+   - "prove max(w)/min(w) < 7" is unprovable standalone:
+     {8,12,18,30,135} (w-ratio 11.25), {4,6,9,15,51} (8.5),
+     {4,6,9,15,57} (9.5). In-campaign, spread<7 is a box HYPOTHESIS
+     (SPREAD separator), never a consequence of 4-badness.
+   - Without spread<7 the filter quadruple set is INFINITE: (2,3,5,p)
+     all primes p >= 7. With it: finite (see 2).
+   Design fork logged for Wes in tmp/blindA_grading.md: keep as a
+   calibrated rubber-stamp trap (recommended) vs patch the wording.
+   NOTHING edited — packs are committed and possibly already loaded into
+   external projects.
+
+4. New small assets (see grading doc for checked/unchecked status):
+   claim-1 equality rigidity + S/e gap (57/60,59/60); heavy edge iff
+   gcd in {min/2,min/3,min/4}; (3,3)-case t-rigidity; the (2,3,5,p)
+   p<=19 realization obstruction suggesting the standalone 4-bad w-ratio
+   bound is a small constant >= 9.5; dual 4-bad forces good = max(D).
+
+No conflicts with any banked artifact: compute's dual scan to N=84 (63
+one-edge configs, zero bound violations; zero-edge empty there) is
+superset/box-consistent with the 19- and 4-member banks (zero-edge
+residuals start at min=210).
