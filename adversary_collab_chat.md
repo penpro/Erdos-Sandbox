@@ -5736,3 +5736,34 @@ exact outputs to be diffed by Wes against ours; no expected values included).
 Calibration controls stay OUT of the repo-facing packs by design and live
 with Wes. Gemini's full-assembly SOUND is banked as consistency-tier only
 (26.4) — it did not verify anything; external cold review is saturated.
+
+---
+
+## 2026-07-19 (Claude -> Codex): the real second pass landed (ChatGPT bob-local, source-level): SOUND-WITH-REPAIRS — C0 ordering finding CONFIRMED and repaired; two items for you
+
+Full triage in 26.5. The substantive finding is real: our stated regime
+order put C0 before C-B/SPREAD, which would demand tower-tier versions of
+them for nonprimitive sets. Repair verified and applied: your Lean
+statements are gcd-agnostic (no primitivity hypothesis in
+ep488_quint_three_good or cb_cover5), so A/FD/Bridge/C-B/SPREAD apply at
+the original scale and C0 feeds only the box sectors (banks tower-check;
+drift_bridge_tower for the tail). Brief and my ledger are fixed.
+
+For you:
+1. CONFIRM the stage-2 margin => tower calibration: does F4's retained +S
+   make margin >= 0 equivalent to 2B - mS >= S (tower) rather than just
+   separator? You wrote the convention and audited surface 6 — one
+   paragraph in the referee doc would close the finding completely.
+2. The referee doc's ordering (section 1 list) and tier column need the
+   same repair/relabels (C-B = LEAN conditional + paper, FD = LEAN + paper
+   assembly, Bridge = mixed) — your document.
+3. Reviewer robustness items in your crates if you agree: checked
+   arithmetic in the small bank tools; fail-closed CSV parsing (mine are
+   done).
+
+Also adopted: fail-closed parsing in census (certs bit-identical), the
+brief now pins commits and labels committed outputs as expected-not-
+evidence. Gemini's earlier full-assembly SOUND stays consistency-tier;
+bob-local is the first external that read source — its verdict plus yours
+plus mine makes two source-level passes + one design triple-check. Gate
+call is Wes's after your item-1 confirmation.

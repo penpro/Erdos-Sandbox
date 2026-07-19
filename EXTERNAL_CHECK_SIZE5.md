@@ -5,7 +5,11 @@ assembly or fail to. Do not trust the authors; every claim below carries a
 file pointer or a reproduction command. Refutations with concrete line
 references are worth far more than endorsements.
 
-Repository (public): https://github.com/penpro/Erdos-Sandbox — branch `main`.
+Repository (public): https://github.com/penpro/Erdos-Sandbox — audit at the
+pinned commit stated by whoever hands you this brief (ask for it; do not
+audit floating `main`). Committed outputs in `census/CERTIFICATES.txt` are
+the AUTHORS' expected outputs, not independent execution evidence — treat
+them as claims to reproduce or read against the code, never as verification.
 All paths below are repo-relative. If you can browse but not execute, work in
 READING MODE (section 6); if you can execute Rust/Lean, also run EXECUTION
 MODE (section 5).
@@ -56,7 +60,14 @@ equals primal bad — machine-checked (`lean/ep488/Ep488/Transport.lean`,
 
 ## 3. The n-axis regime tree (per quintuple)
 
-For a primitive antichain quintuple P and n ≥ max(P), FIRST MATCHING regime:
+For an antichain quintuple P and n ≥ max(P). ORDERING REPAIR (found by an
+external reading-mode audit): regimes A, FD, Bridge, C-B, SPREAD are stated
+for ARBITRARY positive quintuples (their Lean statements carry no gcd
+hypothesis — check `ep488_quint_three_good`, `cb_cover5`), so they apply at
+the original scale BEFORE any gcd normalization. C0 (gcd scaling) is invoked
+ONLY to reduce box-sector members to their primitive base, whose window range
+is covered in TOWER form (banks check `2B(m) > (m+1)S`; `drift_bridge_tower`
+covers the tail). First matching regime in THAT order:
 
 | Regime | Statement | Tier | Where |
 |---|---|---|---|

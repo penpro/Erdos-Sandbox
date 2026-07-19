@@ -2463,10 +2463,10 @@ in-repo, reproduced).
 | # | Regime | Statement | Tier | Open dependency |
 |---|--------|-----------|------|-----------------|
 | 1 | A | >= 3 good charges => 2B(n) > nS, all n | LEAN (Quint.lean ep488_quint_three_good) | — |
-| 2 | FD | max <= n < 2max, unconditional (size-4 separator + exact identity) | LEAN (Quad.lean) + PAPER | — |
+| 2 | FD | max <= n < 2max, unconditional (size-4 separator + exact identity) | LEAN (Quad.lean) + PAPER assembly | — |
 | 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | LEAN identity/application/assembly + CERT kernel | — |
-| 4 | C0 | gcd(P) > 1: scaling recursion to base + tower form | PAPER | inherits box status |
-| 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (CB.lean cb_cover5) | — |
+| 4 | C0 | gcd(P) > 1: scaling to the primitive base — ORDER CORRECTED (external audit, 26.5): applies AFTER A/FD/Bridge/C-B/SPREAD (those are gcd-agnostic, applied at original scale); C0 feeds ONLY box sectors, whose banks tower-check and whose tail is drift_bridge_tower | PAPER + LEAN seam | stage-2 margin => tower calibration (Codex confirm) |
+| 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (cb_cover5, conditional) + PAPER (CRIT>7/2 => its hypothesis) | — |
 | 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
 | 7 | box, bad count | any antichain quintuple has <= 4 self-bad (Section 23.6) | LEAN (Ceiling.lean) | — |
 | 8 | box, 3-bad | >=2 edges: 906/v3; 1 edge: exact 19-bank; 0 edges: exact 4-bank | PAPER reductions + CERT | second external pass |
@@ -3038,3 +3038,42 @@ that would still move confidence: (a) a third party actually executing the
 certificates (human or agent with a toolchain), or (b) replaying the finite
 enumerations inside Lean (native_decide-style), which would make third-party
 trust unnecessary. (b) is the optional-hardening path already on the ledger.
+
+### 26.5 THE REAL SECOND PASS (ChatGPT "bob-local", reading-mode with source): SOUND-WITH-REPAIRS — one genuine finding, all repairs triaged
+
+Verdict 2026-07-19: no mathematical or source-level failure found; two
+presentation repairs demanded. This is the first external review that read
+the actual source; its findings are specific and mostly correct.
+
+**Finding 1 (REAL, the substantive one): C0 sits too early in the stated
+regime order.** A nonprimitive quintuple intercepted by C0 needs the
+downstream regimes in TOWER form on the base, but C-B/SPREAD rows are stated
+as separator-only. VERIFIED against source: the repair is the reviewer's own
+option 1 and it is available because `ep488_quint_three_good` and `cb_cover5`
+carry NO gcd hypothesis (checked: Quint.lean:458, CB.lean:86) — A, FD,
+Bridge, C-B, SPREAD are gcd-agnostic and apply at the ORIGINAL scale; C0
+then feeds ONLY the box sectors, where the banks tower-check explicitly and
+`drift_bridge_tower` covers the tail. Brief section 3 and ledger row 4 are
+repaired to this order. ONE SUB-ITEM left open: an explicit statement that
+the stage-2 (v3/shape4) margin-with-retained-S is calibrated to the TOWER
+form (2B - mS >= S), not just the separator — Codex to confirm (he wrote
+the F4 convention and audited surface 6); if it is separator-only, the box
+sectors need the one-line strengthening or the bank towers absorb the load.
+
+**Finding 2 (correct): tier labels overstate.** C-B is LEAN(conditional
+cb_cover5) + PAPER (the CRIT>7/2 => hypothesis step); FD is LEAN + paper
+assembly; Bridge is Lean-algebra + Rust kernel + paper. Ledger row 5
+relabeled; the referee doc's tier column is Codex's to align.
+
+**Adopted immediately:** (i) CSV parsing in the certificate arms is now
+FAIL-CLOSED (malformed rows abort; previously filter_map could silently
+drop rows); (ii) the brief no longer says committed outputs are evidence —
+they are the authors' expected outputs; (iii) the brief demands a pinned
+commit instead of floating main; (iv) certificates re-verified bit-identical
+after the parsing change (906/906, 174/174).
+
+**Queued:** reconcile stale W-FIN dependency wording in older notes sections;
+checked arithmetic sweep over the small bank tools (mine bounded and
+documented; Codex's crates his); a rebuild-everything CI job (fixtures +
+certificates + Lean from the pinned commit) — the reviewer's "definitive
+verification record" bar.

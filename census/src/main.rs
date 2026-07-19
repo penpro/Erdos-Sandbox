@@ -2267,9 +2267,12 @@ fn main() {
     if args[1] == "shape4" {
         let path = args.get(2).expect("shape file");
         let txt = std::fs::read_to_string(path).expect("read shapes");
-        let shapes: Vec<[i128; 4]> = txt.lines().filter_map(|l| {
-            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
-            if v.len() == 4 { Some([v[0], v[1], v[2], v[3]]) } else { None }
+        // fail-closed parsing (external audit): malformed rows abort, never skip
+        let shapes: Vec<[i128; 4]> = txt.lines().filter(|l| !l.trim().is_empty()).map(|l| {
+            let v: Vec<i128> = l.trim().split(',')
+                .map(|t| t.trim().parse().expect("malformed shape CSV row")).collect();
+            assert!(v.len() == 4, "shape CSV row must have exactly 4 fields");
+            [v[0], v[1], v[2], v[3]]
         }).collect();
         for w in shapes.iter() { for &x in w.iter() {
             assert!(0 < x && x <= 40_000_000, "shape coefficient outside audited i128 bound");
@@ -2281,9 +2284,12 @@ fn main() {
     if args[1] == "shape2v3" {
         let path = args.get(2).expect("shape file");
         let txt = std::fs::read_to_string(path).expect("read shapes");
-        let shapes: Vec<[i128; 3]> = txt.lines().filter_map(|l| {
-            let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
-            if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
+        // fail-closed parsing (external audit): malformed rows abort, never skip
+        let shapes: Vec<[i128; 3]> = txt.lines().filter(|l| !l.trim().is_empty()).map(|l| {
+            let v: Vec<i128> = l.trim().split(',')
+                .map(|t| t.trim().parse().expect("malformed shape CSV row")).collect();
+            assert!(v.len() == 3, "shape CSV row must have exactly 3 fields");
+            [v[0], v[1], v[2]]
         }).collect();
         for w in shapes.iter() { for &x in w.iter() {
             assert!(0 < x && x <= 40_000_000, "shape coefficient outside audited i128 bound");
