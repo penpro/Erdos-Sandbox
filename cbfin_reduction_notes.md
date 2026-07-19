@@ -2464,7 +2464,7 @@ in-repo, reproduced).
 |---|--------|-----------|------|-----------------|
 | 1 | A | >= 3 good charges => 2B(n) > nS, all n | LEAN (Quint.lean ep488_quint_three_good) | — |
 | 2 | FD | max <= n < 2max, unconditional (size-4 separator + exact identity) | LEAN (Quad.lean) + PAPER | — |
-| 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | LEAN identity/assembly + PAPER/CERT U2 application | — |
+| 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | LEAN identity/application/assembly + CERT kernel | — |
 | 4 | C0 | gcd(P) > 1: scaling recursion to base + tower form | PAPER | inherits box status |
 | 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (CB.lean cb_cover5) | — |
 | 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
@@ -2482,7 +2482,7 @@ the >= 3-good bulk. External: ChatGPT W-FIN hostile review pending (Wes).
     review packages;
 (b) consolidate the proof text and dependency ledger without upgrading the
     certificate-backed steps beyond their stated tier.
-Lean debt (kernel 157/300, the U2 finite kernel and cofactor/reindex application,
+Lean debt (kernel 157/300, the finite universal U2 kernel,
 W-FIN core, SPREAD, box certificates) is scope-fenced by Wes's decision A:
 explicit hypotheses,
 deliberately outside Lean for now.
@@ -3017,3 +3017,24 @@ brief): every DESIGN surface has at least two independent HOLDs; every
 claimed BREAK/trap has been settled by source inspection (none fired); two
 robustness repairs landed. The clean remaining step is unchanged: one
 external run WITH the source attached, on the amended brief.
+
+### 26.4 Gemini on the full-assembly brief: SOUND — but consistency-tier only, and logged as such
+
+Verdict received 2026-07-19: all components HOLDS, overall SOUND. Honest
+assessment (Wes spotted it immediately): this is NOT an audit. Tells: "are
+CLAIMED to compile cleanly" (no Lean run), no line reference beyond the
+brief's own, zero new findings, and the required "what I could not check"
+section is absent. Value: a fresh-reader consistency check of the assembly
+narrative — the architecture parses, the partition reads as total, the
+dependency ledger reads as honest. It does NOT count toward the promotion
+gate's second hostile pass.
+
+Process signal worth recording: across three external rounds plus the
+internal cross-audits, NEW findings have gone 2 (real repairs) -> 1 refuted
+break -> 0. External LLM review has saturated at design tier — cold readers
+cannot execute Rust/Lean, and the design surfaces are now triple-confirmed.
+Additional cold reads have ~zero expected yield. The only verification KINDS
+that would still move confidence: (a) a third party actually executing the
+certificates (human or agent with a toolchain), or (b) replaying the finite
+enumerations inside Lean (native_decide-style), which would make third-party
+trust unnecessary. (b) is the optional-hardening path already on the ledger.
