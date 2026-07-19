@@ -16,19 +16,21 @@ below `2.494 * 10^6`. SPREAD proves the full finite-`n` separator for
 bank. OUTSIDE-DONOR and the pair-component argument give a finite-block
 two-scale form. Claude's v3 exact slot-matrix certificate passes the canonical
 906-shape inventory of bad triples having at least two internal strong edges
-(`869` vacuous, no zero or short families). It does not cover every exactly-
-three-bad residual: the exact Rust `badtriplecheck` audit through dual bound 120
-finds induced-edge histogram `[0,13,57,118]`, and all 175 two-or-more-edge
-residuals normalize into the 906 file. The one-edge witness
-`D=[9,10,12,15,42]` disproves the missing inventory lemma, not #488. Five-bad
-residuals are excluded by the proved minimum-good lemma. For four bads, the
-independent cutoff-free `fourbadcheck` spanning-tree and two-pair enumerations
-recover exactly 174 necessary-filter shapes (`172` connected and `2` two-pair,
-largest normalized minimum `40`), and `shape4` certifies all 174. Subject to
-hostile audits of the finite reductions and certificate code, the compact open
-class is now the one-edge and potentially zero-edge three-bad sector. Full size
-5 remains open. The false G3 min-bound is retracted. See `REFEREE_WFIN.md`,
-Sections 22-25 of `cbfin_reduction_notes.md`,
+(`869` vacuous, no zero or short families). The exact `badtriplecheck` audit
+exposed nonempty one-edge cases. A corrected finite block reduction in
+`oneedgebankcheck` gives exactly 19 compact one-edge residuals, all direct-bank
+positive. A separate rational-template reduction in `zeroedgebankcheck` gives
+exactly four zero-edge residuals, all direct-bank positive; v3 independently
+passes their four normalized bad triples. Claude's initial `bank1edge` bound is
+broken (`1/k` was used instead of the charge `1/c`) and has been superseded.
+Five-bad residuals are excluded by the proved minimum-good lemma. For four bads,
+the independent cutoff-free spanning-tree/two-pair enumeration recovers exactly
+174 necessary-filter shapes and `shape4` certifies all 174. Thus every compact
+bad-count/edge-count sector now has a proposed finite certificate. Full size 5
+remains open at audit tier: the new finite reductions, v3/shape4 knife, and final
+regime assembly must survive hostile review before any solution claim. The false
+G3 min-bound is retracted. See `REFEREE_WFIN.md`, Sections 22-26 of
+`cbfin_reduction_notes.md`,
 `quintuple_density_notes.md`, and `adversary_collab_chat.md` before relying
 on the older status paragraphs below.
 

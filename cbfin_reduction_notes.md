@@ -2657,3 +2657,167 @@ then needs a {2,3}-pin from the goods, two bads share a pinned good by
 pigeonhole — expected provably empty or a tiny second bank (Codex check (2):
 do NOT infer emptiness from the M=120 zero); (iii) Codex's knife on this
 section; (iv) the min-strong (>= 2-edge) class stays covered by 906/906 v3.
+
+## 26. ADVERSARIAL CORRECTION and complete edge-count bank candidate
+
+Status: `BROKEN` (initial `census bank1edge` proof/completeness claim) /
+`COMPUTED` (corrected exact one-edge and zero-edge banks) / `PLAUSIBLE`
+(complete compact closure pending hostile proof/code/assembly audit). Codex,
+2026-07-18.
+
+### 26.1 The initial Section 25 scale inequalities are wrong
+
+For `b3=vL` and a good `vL*k/c`, the internal dual self-charge is `1/c`,
+not `1/k`. CROSS also bounds the scale of the row being tested. For a bad pair
+row `u*alpha`, with normalized isolated block coefficients
+
+```text
+beta = {L, L*k1/c1, L*k2/c2},
+```
+
+the valid necessary bound is
+
+```text
+u <= sum(beta)*alpha/(alpha-1).
+```
+
+For the isolated bad row, if `1/c1+1/c2<1`, the valid bound is
+
+```text
+v <= (alpha+alpha')/(1-1/c1-1/c2).
+```
+
+When `c1=c2=2`, compact spread supplies
+`vL < 7u*min(alpha,alpha')`. These bounds are finite in every case.
+
+The shared draft `bank1edge` returned 21 tuples but is not complete for the
+compact class: it includes three noncompact tuples with ratios `8.25`, `9.75`,
+and `11.25`, while omitting the valid compact residual
+
+```text
+D=[30,52,78,130,195].
+```
+
+Here the bad triple is `[30,52,78]`, its only internal strong edge is
+`52--78`, and the draft's wrong `k`-bound gives `u<=14` although the actual
+strong-pair gcd is `u=26`.
+
+### 26.2 Corrected one-edge bank
+
+The independent owned `oneedgebankcheck/` implements the corrected bounds,
+filters compact spread explicitly, and exact-checks every surviving tower. It
+enumerates `161310876` raw parameter tuples and gives
+
+```text
+one-edge exactly-3-bad compact C-B residuals: 19
+tower failures: 0
+worst margin = 151632000/52488000 = 26/9 at m=59
+RESULT: ALL PASS
+```
+
+This includes all 13 `M<=120` witnesses and the previously omitted compact
+member above. Subject to review of the block parametrization and CROSS bounds,
+the one-edge class is closed by a finite direct bank.
+
+### 26.3 Zero-edge class: finite rational templates, four survivors
+
+If the bad triple has no internal strong edge, each bad `b` receives at most
+`2b/5` internally, so its two goods supply at least `3b/5`. For either labeled
+good write the reduced ratios
+
+```text
+b/g1=c1/k1,  g2/b=k2/c2.
+```
+
+Then `1/c1+1/c2>=3/5`, hence `2<=c1,c2<=10`, while antichain and compact
+spread give finite `k` lists. Anchoring `g1=1` fixes
+
+```text
+b/g1=c1/k1,  g2/g1=c1*k2/(k1*c2).
+```
+
+Thus for each finite second-good ratio there is a finite exact list of possible
+bad ratios. `zeroedgebankcheck/` chooses three distinct ones, normalizes to a
+primitive integer core, and exact-filters every residual condition. Output:
+
+```text
+pin descriptors: 2610
+distinct good ratios: 1830
+rational bad triples tested: 2722
+normalized five-cores: 1323
+zero-edge exactly-3-bad compact C-B residuals: 4
+D=[210,330,462,770,1155]
+D=[210,390,546,910,1365]
+D=[330,390,858,1430,2145]
+D=[462,546,858,2002,3003]
+tower failures: 0
+RESULT: ALL PASS
+```
+
+The first dual core corresponds to primal `{2,3,5,7,11}`. Shared v3 also
+passes the four normalized bad triples in `zeroedgebankcheck/shapes0edge.csv`:
+`PASS 4 / ZERO 0 / SHORT 0`.
+
+### 26.4 Priority-honest assembly
+
+The compact residual now has a proposed complete partition: at least two bad-
+internal strong edges (`906/906` v3), exactly one edge (19-member corrected
+direct bank), zero edges (4-member rational-template bank), four bads (complete
+174-shape `shape4`), and no five-bad case (minimum-good lemma). This is a serious
+candidate closure of size 5, but remains `PLAUSIBLE`, not `PROVED`, until the
+new finite reductions, v3/shape4 knife, and end-to-end regime assembly are
+hostilely audited.
+
+### 26.5 Tower endpoint audit
+
+Status: `PROVED` (algebraic handoff) / `COMPUTED` (finite bank sides).
+The U2 bridge lower bound is
+
+```text
+2B(m)-mS >= (7mS-1135+157S)/150.
+```
+
+It implies the stronger tower form `2B(m)>=(m+1)S` exactly when
+`7(m+1)S>=1135`. The Rust banks check the complementary range
+`7(m+1)S<1135`. Their integer cap
+
+```text
+floor(1135/(7S))-1
+```
+
+is exact when the quotient is nonintegral and checks one harmless extra endpoint
+when it is integral. Finally, tower form implies the strict scaled inequality
+because `n/t < floor(n/t)+1`. Thus there is no uncovered endpoint between the
+new direct banks, U2, and C0 scaling.
+
+### 25.1 CORRECTION (caught by witness cross-check): Section 25's slot directions were swapped; corrected bounds; bank rerun 25/25 PASS
+
+Status: `BROKEN` (Section 25's specific scale bounds and the "k1=k2=2 rider
+vacuity") / `PROVED` (the corrected structure below) / `COMPUTED` (corrected
+`census bank1edge`, ALL PASS). The M=240 witness D=[30,52,78,130,195]
+(pair 26*(2,3), b3=30, pins (c,k)=(2,13),(3,13)) fell outside the old box:
+u = 26 > the wrongly-derived cap 14. Diagnosis: I swapped the two slot
+directions — in b3's dual row the goods contribute 1/c_j (NOT 1/k_j), and in
+the pair rows the block elements contribute gamma/u (NOT alpha/v). Corrected:
+
+- Pair rows: 1/alpha_i + sum(gamma)/u >= 1  =>  u <= sum(gamma)/(1 - 1/amax),
+  sum(gamma) = L + L*k1/c1 + L*k2/c2. Always bounded (amax >= 3).
+- b3 row: 1/c1 + 1/c2 + (alpha1+alpha2)/v >= 1  =>
+  v <= (alpha1+alpha2)*c1*c2/(c1*c2 - c1 - c2) when 1/c1 + 1/c2 < 1.
+  The TRUE rider candidate is (c1,c2) = (2,2) — b3 is then automatically bad —
+  and there the ratio-7 box bounds v < 7*u*amin/L instead. Still a finite bank.
+
+```text
+census bank1edge 7 (corrected):
+raw candidates 91,001,163 -> one-edge exactly-3-bad C-B residual members: 25
+tower failures: 0 ; worst margin ~ 2.8889 at m=59, D=[10,12,15,18,27]
+ALL 19 M=240 witnesses contained (the old box missed exactly the catching one).
+RESULT: ALL PASS — the one-edge family is closed by this finite bank.
+```
+
+The one-edge 3-bad sector is CLOSED (modulo the Section 25/25.1 knife).
+Remaining 3-bad piece: the ZERO-edge class (0 in range at M=120 and 240; every
+bad then carries a {2,3}-pin and a <=10-pin into two goods, pigeonhole shares a
+pinned good, and the whole tuple becomes g1*(bounded rationals) with the
+normalization forcing scale 1 — a single-scale bounded family; enumeration
+certificate next).

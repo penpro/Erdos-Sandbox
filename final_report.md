@@ -16,18 +16,18 @@ compact residual box `min < 3054109696/1225`, `max/min < 7`, `max < 17452056`,
 together with the existing goodness/window/CRIT constraints; this is still
 beyond direct enumeration. Claude's v3 exact slot-matrix certificate passes all
 906 normalized bad triples having at least two internal strong edges (`869`
-vacuous), after Codex corrected the earlier incomplete 69-shape input. A second
-inventory flaw remains: the exact Rust `badtriplecheck` audit through dual bound
-120 finds 13 one-edge three-bad residuals, beginning with
-`D=[9,10,12,15,42]`; these lie outside the 906 inventory. This breaks a proposed
-lemma, not #488, and the 906/v3 result remains valid on its stated subcase.
-The proved minimum-good lemma excludes five-bad residuals. For four bads, the
-independent cutoff-free `fourbadcheck` spanning-tree and two-pair enumerations
-recover exactly the same 174 necessary-filter shapes (`172` connected and `2`
-two-pair, largest normalized minimum `40`), and `shape4` certifies all 174.
-Subject to hostile audits of the finite reductions and certificate code, the
-current compact frontier is the one-edge and potentially zero-edge three-bad
-sector. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
+vacuous). The one-edge class is nonempty, but the corrected independent
+`oneedgebankcheck` reduction gives exactly 19 compact residuals and direct-bank
+certifies all 19. The zero-edge class is also nonempty: the independent finite
+rational-template reduction gives exactly four residuals, all direct-bank and
+v3 positive. Claude's first `bank1edge` draft is retracted because its scale
+inequality used the wrong cofactors and omitted a valid compact residual. The
+proved minimum-good lemma excludes five-bad residuals. For four bads, independent
+cutoff-free spanning-tree/two-pair enumeration recovers exactly 174 necessary-
+filter shapes, and `shape4` certifies all 174. This is a candidate complete
+compact-box closure at paper-plus-certificate tier, not yet a solution claim.
+The one/zero-edge reductions, v3/shape4 code, and final regime assembly require
+hostile review. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
 cross-element transfer proof, bounded exact audits, and executable retirement
 certificates that rerun cleanly. Nothing in
 this report should be read as a solution of full #488.

@@ -26,19 +26,20 @@ SPREAD covers every primitive quintuple with `max/min >= 7`; the
 remaining compact residual box has `min < 3054109696/1225`, `max/min < 7`, and
 `max < 17452056`, still beyond direct enumeration. The exact v3 slot-matrix
 certificate passes all 906 normalized bad triples having at least two internal
-strong edges (`869` vacuous), but this is not the full three-bad sector.
-`badtriplecheck` finds 13 exact one-edge residuals already at dual bound 120;
-the first is `D=[9,10,12,15,42]`, with primal
-`P=[30,84,105,126,140]`. This breaks only the proposed inventory-completeness
-lemma, not #488. The minimum-good lemma excludes five-bad residuals. In the
-four-bad sector, the independent cutoff-free `fourbadcheck` spanning-tree and
-two-pair enumerations recover exactly the same 174 necessary-filter shapes
-(`172` connected, `2` two-pair, largest normalized minimum `40`), and `shape4`
-certifies all 174. Subject to hostile review of those finite reductions and
-certificate code, the current compact gate is the one-edge (and not-yet-
-globally-excluded zero-edge) three-bad class, plus the v3/shape4 soundness audit.
-Start with `REFEREE_WFIN.md`, Sections 22-25 of
-`cbfin_reduction_notes.md`, and the latest entry in
+strong edges (`869` vacuous). The remaining edge classes now have independent
+finite reductions: corrected `oneedgebankcheck` finds exactly 19 compact
+one-edge residuals and direct-bank certifies all 19; `zeroedgebankcheck` proves
+a finite rational-template reduction and finds exactly four zero-edge residuals,
+all direct-bank positive (and independently v3-positive). Claude's first
+`bank1edge` draft is retracted because it used `1/k` where the charge is `1/c`,
+included three noncompact tuples, and omitted `D=[30,52,78,130,195]`. The
+minimum-good lemma excludes five-bad residuals. For four bads, cutoff-free
+spanning-tree/two-pair enumeration recovers exactly 174 necessary-filter shapes,
+and `shape4` certifies all 174. This gives a candidate complete compact-box
+partition at paper-plus-certificate tier. Full size 5 is **not yet claimed
+solved**: the new one/zero-edge reductions, v3/shape4 soundness, and final regime
+assembly need hostile review. Start with `REFEREE_SIZE5_CANDIDATE.md`, then
+`REFEREE_WFIN.md`, Sections 22-26 of `cbfin_reduction_notes.md`, and the latest entry in
 `adversary_collab_chat.md`. The older narrative below is retained as history.
 
 The public update has been posted. The active internal frontier is now:

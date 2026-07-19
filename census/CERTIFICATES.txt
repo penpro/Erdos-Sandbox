@@ -297,3 +297,36 @@ TOTAL shapes (w1 <= 1512, generator-complete): 174 ; largest w1 = 40
 diff vs the 174 reference: EXACT MATCH. Case (4) proved bound w1 <= 1511 (leaf
 starvation, S23.7) + this generator-complete sweep, plus the (2,2) K/M box (no bound
 needed): the 4-bad shape inventory is COMPLETE = the 174 list; shape4 174/174.
+
+=== bank1edge 7 (Section 25.1 corrected): the one-edge 3-bad finite bank 2026-07-18 ===
+raw candidate tuples (deduped): 91001163
+one-edge exactly-3-bad C-B residual bank members: 25
+tower failures: 0 ; overflow-skipped: 0
+worst margin (2B-(m+1)S) ~ 2.8889 at m=59 D=[10, 12, 15, 18, 27]
+RESULT: ALL PASS — the one-edge family is closed by this finite bank
+  member D=[9, 10, 12, 15, 42]
+  member D=[10, 11, 12, 18, 45]
+  member D=[10, 12, 14, 18, 45]
+  member D=[10, 12, 15, 18, 27]
+  member D=[10, 12, 16, 18, 45]
+  member D=[10, 12, 18, 21, 45]
+  member D=[10, 12, 18, 25, 27]
+  member D=[10, 12, 18, 25, 45]
+  member D=[10, 12, 18, 27, 45]
+  member D=[10, 28, 35, 42, 63]
+  member D=[20, 28, 30, 42, 105]
+  member D=[20, 30, 36, 45, 54]
+  member D=[20, 30, 42, 70, 105]
+  member D=[20, 44, 66, 110, 165]
+  member D=[20, 52, 78, 130, 195]
+  member D=[28, 90, 126, 210, 315]
+  member D=[30, 44, 66, 110, 165]
+  member D=[30, 52, 78, 130, 195]
+  member D=[30, 68, 102, 170, 255]
+  member D=[30, 76, 114, 190, 285]
+  member D=[40, 42, 60, 105, 140]
+  member D=[42, 44, 66, 154, 231]
+  member D=[42, 52, 78, 182, 273]
+  member D=[42, 68, 102, 238, 357]
+  member D=[70, 84, 126, 180, 315]
+validation: all 19 cb-240 one-edge witnesses contained (0 missing)

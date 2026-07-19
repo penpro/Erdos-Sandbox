@@ -12,6 +12,9 @@ Before making or upgrading any mathematical claim, read:
 3. `proof_attempt.md`
 4. `final_report.md`
 
+Before upgrading any size-5 claim, also read and attack
+`REFEREE_SIZE5_CANDIDATE.md`.
+
 Before selecting a new problem, switching the active target, or calling a result
 "new", "solved", "publishable", or "worth publishing", add or review an entry in
 `adversary_collab_chat.md`.

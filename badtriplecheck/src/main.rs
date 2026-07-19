@@ -210,7 +210,7 @@ fn main() {
         let examples: Vec<_> = rows
             .iter()
             .filter(|row| row.2 == edge_count)
-            .take(10)
+            .take(20)
             .collect();
         println!("{edge_count}-edge witnesses: {}", examples.len());
         for (dd, bad, _) in examples {

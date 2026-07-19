@@ -27,6 +27,7 @@ C-B residual: 195
 self-bad histogram [0..5]: [0, 0, 0, 188, 7, 0]
 exactly-3-bad induced strong edges [0,1,2,3]: [0, 13, 57, 118]
 >=2-edge residual coverage by clustercheck\shapes906.csv: 175/175
+1-edge normalized shapes (5): {[5,6,9], [5,14,21], [9,10,12], [10,15,18], [10,15,21]}
 RESULT: ALL PASS
 ```
 
@@ -35,3 +36,18 @@ internal strong edges, is not complete for the full three-bad residual sector.
 The first one-edge witness is `D=[9,10,12,15,42]`, whose bad indices are
 `[0,1,2]`; its primal set is `P=[30,84,105,126,140]`. This refutes only the
 inventory-completeness lemma, not Erdos Problem #488.
+
+The five one-edge shapes seen through `M=120` are stored, with the range in the
+filename, at `shapes1edge_m120.csv`. This is a bounded fixture, not a global
+inventory claim. The existing shared v3 engine certifies all five:
+
+```powershell
+$env:CARGO_TARGET_DIR='C:\tmp\ep488-census-target'
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census\Cargo.toml -- shape2v3 badtriplecheck\shapes1edge_m120.csv 7
+```
+
+Expected result:
+
+```text
+PASS 5 (incl. 0 VACUOUS) / ZERO 0 (pass via +S) / SHORT 0
+```

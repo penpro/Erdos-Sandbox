@@ -1979,6 +1979,141 @@ fn shapes4inv2(w1max: i128, rho: i128) {
     println!("TOTAL shapes (w1 <= {}, generator-complete): {} ; largest w1 = {}", w1max, set.len(), wmax);
 }
 
+/// Section 25 certificate: the one-edge 3-bad family as a FINITE BANK.
+/// Structure theorem (Section 25): bads {b1,b2,b3}, one internal strong edge
+/// b1--b2 = u*(al,al') (coprime, min <= 4, within ratio); b3's goods are
+/// divisor-pinned: block = v*{L, L*k1/c1, L*k2/c2}, L = lcm(c1,c2), c1 = the
+/// smaller pin in {2,3}, need 1/c1 + 1/c2 >= 3/5, k_j >= 2 coprime to c_j,
+/// k_j/c_j in (1/7,7). Scale bounds (necessary, from badness + CROSS with
+/// gcd(u,v) = 1): v <= 3*al*al'/(max-1), u <= 2*L*k1*k2/(k1*k2 - k1 - k2)
+/// (the only unbounded candidate k1=k2=2 is arithmetic-vacuous). This mode
+/// enumerates the full box, keeps candidates that ARE one-edge exactly-3-bad
+/// C-B residuals (computed from the tuple, not the labels), and tower-checks
+/// every one: 2B(m) > (m+1)S on [max(P), cap], cap = 1135*prod/(7*nsum) - 1.
+fn bank1edge(rho: i128) {
+    println!("=== Section 25 bank: one-edge 3-bad family, full enumeration + tower check (rho<{}) ===", rho);
+    let nthreads = std::thread::available_parallelism().map(|n| n.get() as i128).unwrap_or(4).max(1);
+    // pair templates (ordered al, alp)
+    let mut pairs: Vec<(i128, i128)> = Vec::new();
+    for al in 2..=27i128 { for alp in 2..=27i128 {
+        if al == alp || gcd(al, alp) != 1 { continue; }
+        let (mn, mx) = (al.min(alp), al.max(alp));
+        if mn > 4 || mx >= 7 * mn { continue; }
+        pairs.push((al, alp));
+    }}
+    let found: Vec<[i128; 5]> = std::thread::scope(|s| {
+        let handles: Vec<_> = (0..nthreads as usize).map(|tid| {
+            let pairs = &pairs;
+            s.spawn(move || {
+                let mut out: Vec<[i128; 5]> = Vec::new();
+                for (pi, &(al, alp)) in pairs.iter().enumerate() {
+                    if pi % (nthreads as usize) != tid { continue; }
+                    let (amin, amax) = (al.min(alp), al.max(alp));
+                    for c1 in 2..=3i128 { for k1 in 2..(7 * c1) {
+                        if gcd(k1, c1) != 1 { continue; }
+                        for c2 in c1..=10i128 {
+                            if 5 * (c1 + c2) < 3 * c1 * c2 { continue; } // b3-need 1/c1+1/c2 >= 3/5
+                            for k2 in 2..(7 * c2) {
+                                if gcd(k2, c2) != 1 { continue; }
+                                if k1 * c2 == k2 * c1 { continue; } // distinct goods
+                                let ll = lcm(c1, c2);
+                                let g1t = ll * k1 / c1;
+                                let g2t = ll * k2 / c2;
+                                // CORRECTED bounds (Section 25'): pair rows give
+                                // u <= sum(gamma)/(1 - 1/amax); the b3 row gives
+                                // v <= (al+alp)/(1 - 1/c1 - 1/c2) unless (c1,c2)=(2,2)
+                                // (b3 auto-bad), where the ratio-7 box bounds v < 7*u*amin/L.
+                                let sgam = ll + g1t + g2t;
+                                let umax = sgam * amax / (amax - 1);
+                                let cden = c1 * c2 - c1 - c2;
+                                for u in 1..=umax {
+                                    let vr = (7 * u * amin) / ll; // ratio-7: v*L < 7*u*amin
+                                    let vmax = if cden > 0 { vr.min((al + alp) * c1 * c2 / cden) } else { vr };
+                                    for v in 1..=vmax {
+                                    let mut dd = [u * al, u * alp, v * ll, v * g1t, v * g2t];
+                                    dd.sort_unstable();
+                                    // basic validity
+                                    let mut ok = true;
+                                    'pv: for i in 0..5 { for j in (i + 1)..5 {
+                                        if dd[i] == dd[j] || dd[j] % dd[i] == 0 { ok = false; break 'pv; }
+                                    }}
+                                    if !ok { continue; }
+                                    let g = dd.iter().fold(0i128, |x, &y| gcd(x, y));
+                                    if g != 1 { continue; }
+                                    out.push(dd);
+                                }}
+                            }
+                        }
+                    }}
+                }
+                out
+            })
+        }).collect();
+        let mut all = Vec::new();
+        for h in handles { all.extend(h.join().unwrap()); }
+        all
+    });
+    let set: std::collections::BTreeSet<[i128; 5]> = found.into_iter().collect();
+    println!("raw candidate tuples (deduped): {}", set.len());
+    // keep the ones that ARE one-edge exactly-3-bad C-B residuals
+    let mut bank: Vec<[i128; 5]> = Vec::new();
+    for dd in set.iter() {
+        let sumd: i128 = dd.iter().sum();
+        if 7 * sumd > 1135 * dd[0] { continue; } // window-relevant
+        let bads: Vec<usize> = (0..5).filter(|&i| {
+            let s: i128 = (0..5).filter(|&j| j != i).map(|j| gcd(dd[i], dd[j])).sum();
+            s >= dd[i]
+        }).collect();
+        if bads.len() != 3 { continue; }
+        let mut sg = 0i128;
+        for i in 0..5 { for j in (i + 1)..5 { sg += gcd(dd[i], dd[j]); } }
+        let num = sumd - 2 * sg;
+        if 2 * num > 7 * dd[0] { continue; } // CRIT <= 7/2
+        let mut ne = 0;
+        for x in 0..3 { for y in (x + 1)..3 {
+            let (a, b) = (dd[bads[x]], dd[bads[y]]);
+            if 4 * gcd(a, b) >= a.min(b) { ne += 1; }
+        }}
+        if ne != 1 { continue; }
+        bank.push(*dd);
+    }
+    println!("one-edge exactly-3-bad C-B residual bank members: {}", bank.len());
+    // tower-check every member (checked products; overflow members reported loudly)
+    let mut fails = 0u64;
+    let mut overflow = 0u64;
+    let mut worst: (f64, i128, [i128; 5]) = (f64::INFINITY, 0, [0; 5]);
+    for dd in bank.iter() {
+        let mut l = 1i128;
+        for &x in dd.iter() { l = lcm(l, x); }
+        let p0: Vec<i128> = dd.iter().map(|&x| l / x).collect();
+        let mut p = p0; p.sort_unstable();
+        let mut prod: i128 = 1;
+        let mut ovf = false;
+        for &x in p.iter() { match prod.checked_mul(x) { Some(v) => prod = v, None => { ovf = true; break; } } }
+        if ovf { overflow += 1; println!("  OVERFLOW-SKIP D={:?} (needs bigint tower check)", dd); continue; }
+        let nsum: i128 = p.iter().map(|&x| prod / x).sum();
+        let mx = p[4];
+        let cap = (1135 * prod) / (7 * nsum) - 1;
+        let mut bc: i128 = 0;
+        for m in 1..=cap {
+            if p.iter().any(|&a| m % a == 0) { bc += 1; }
+            if m >= mx {
+                let marg = 2 * bc * prod - (m + 1) * nsum;
+                if marg <= 0 { fails += 1; }
+                let mf = marg as f64 / prod as f64;
+                if mf < worst.0 { worst = (mf, m, *dd); }
+            }
+        }
+    }
+    println!("tower failures: {} ; overflow-skipped: {}", fails, overflow);
+    if worst.0.is_finite() {
+        println!("worst margin (2B-(m+1)S) ~ {:.4} at m={} D={:?}", worst.0, worst.1, worst.2);
+    }
+    for dd in bank.iter().take(40) { println!("  member D={:?}", dd); }
+    if bank.len() > 40 { println!("  ... ({} total)", bank.len()); }
+    println!("RESULT: {}", if fails == 0 { "ALL PASS — the one-edge family is closed by this finite bank" } else { "FAILURES FOUND" });
+}
+
 /// STAGE-2 v2: donation-VALUE descriptors. Each good's stair source = its best
 /// donation (i, v), v in 2..=6 (v>=7 gives J-bound below the flat stair region —
 /// treated as none). Descriptor space 16x16; rows constrained only at the named
@@ -2087,6 +2222,11 @@ fn main() {
         }).collect();
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape2v2(r, &shapes);
+        return;
+    }
+    if args[1] == "bank1edge" {
+        let r: i128 = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(7);
+        bank1edge(r);
         return;
     }
     if args[1] == "c4bound22" {
