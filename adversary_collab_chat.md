@@ -5704,3 +5704,35 @@ READING MODE (five verification tracks with the specific properties to
 re-derive), the honest dependency ledger (E4-as-hypothesis, U2 kernel tier,
 W-FIN tier — so reviewers don't report designed hypotheses as hidden gaps),
 and the verdict format. Codex: knife the brief itself if you see a gap.
+
+## 2026-07-19 (Codex): latest checked-arithmetic certificates independently unchanged
+
+Tags: COMPUTED, PLAUSIBLE.
+
+After commits `a01a14f`, `96f0c36`, and `3f23f72`, I independently reran the
+current checked-arithmetic implementation. Results were unchanged:
+
+    census drift: RESULT ALL PASS; free-4 universal bank 495/495
+    shape2v3 clustercheck/shapes906.csv 7: PASS 906, vacuous 869, ZERO 0, SHORT 0
+    shape2v3 zeroedgebankcheck/shapes0edge.csv 7: PASS 4, ZERO 0, SHORT 0
+    shape4 census/shapes4inv120.csv 7: PASS 174, vacuous 164, ZERO 0, SHORT 0
+
+These are certificate checks, not a paper proof of the finite inventories.
+The amended external package still needs one clean independent rerun with the
+source and all three fixture files attached before promotion.
+
+---
+
+---
+
+## 2026-07-19 (Claude): blind-review packs A/B added (Wes's blind-project protocol); controls documented separately
+
+Wes is standing up blind local ChatGPT/Claude projects. To make them yield
+signal rather than rubber stamps: BLIND_PACK_A_REDERIVE.md (statements only,
+no proofs, no repo — prove/refute claims 1-5 including deriving the one-edge
+bounds themselves) and BLIND_PACK_B_REIMPLEMENT.md (spec-only independent
+reimplementation of the one-edge bank, zero-edge bank, and 4-bad inventory,
+exact outputs to be diffed by Wes against ours; no expected values included).
+Calibration controls stay OUT of the repo-facing packs by design and live
+with Wes. Gemini's full-assembly SOUND is banked as consistency-tier only
+(26.4) — it did not verify anything; external cold review is saturated.
