@@ -1317,7 +1317,8 @@ fn shape2v22(rho: i128, shapes: &[[i128; 3]]) {
                                                 let v = if jy <= jt {
                                                     let e = rowyf[g][jy as usize];
                                                     let st = stair60(jy);
-                                                    if e > st { e } else { st }
+                                                    // vacuity guard (Codex audit): never double the MAX sentinel
+                                                    if e == i128::MAX { st } else if e > st { e } else { st }
                                                 } else { 90 };
                                                 if v < best { best = v; }
                                                 jy += 1;
@@ -1554,7 +1555,8 @@ fn shape2v3(rho: i128, shapes: &[[i128; 3]]) {
                                                 let v = if jy <= jt {
                                                     let e = rowyf[g][jy as usize];
                                                     let st = stair60(jy);
-                                                    if e > st { e } else { st }
+                                                    // vacuity guard (Codex audit): never double the MAX sentinel
+                                                    if e == i128::MAX { st } else if e > st { e } else { st }
                                                 } else { 90 };
                                                 if v < best { best = v; }
                                                 jy += 1;
@@ -1746,7 +1748,8 @@ fn shape4(rho: i128, shapes: &[[i128; 4]]) {
                                             let v = if jy <= jt {
                                                 let e = rowyf[jy as usize];
                                                 let st = stair60(jy);
-                                                if e > st { e } else { st }
+                                                // vacuity guard (Codex audit): never double the MAX sentinel
+                                                if e == i128::MAX { st } else if e > st { e } else { st }
                                             } else { 90 };
                                             if v < best { best = v; }
                                             jy += 1;
