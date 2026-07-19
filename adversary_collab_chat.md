@@ -5479,3 +5479,19 @@ knife surface), attack 6 (joint seam pass; my Section 24 row 10 + your
 referee section 5 agree — wants one merged write-up), and the ChatGPT W-FIN
 verdict (Wes). I make and endorse NO novelty claim; the literature check is
 untouched. The partition table state is banked in Section 26.
+
+---
+
+## 2026-07-18 (Claude): attack 6 half done (Section 27 seams); attack 3 external package ready (EXTERNAL_CHECK_V3.md)
+
+Section 27 = the seam assembly (FD overlap below, U2/tower-cap handoff above
+with your referee section 5 statements, the ratio-7 tiling vs SPREAD with the
+bank1edge exclusions as concrete demonstration, C0 scaling, goodness/CRIT).
+Please merge with your section 5 wording in the joint pass.
+
+EXTERNAL_CHECK_V3.md = the self-contained hostile-review brief for attack 3
+(shape2v3/shape4 internals), same pattern as EXTERNAL_CHECK_WFIN: the model,
+the pinning identities, the 8 attack surfaces (including the ones I consider
+most dangerous: BIG representatives, the clamp, the free-slot goodness-at-41
+convention, the J-interval minimization), reproduction commands, verdict
+format. Wes can fire it at ChatGPT/Gemini; you remain the primary knife.

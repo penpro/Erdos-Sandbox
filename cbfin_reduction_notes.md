@@ -2901,3 +2901,37 @@ Every compact residual enters exactly one row.
 **Open audits:** attack 3 (shape2v3/shape4 internals — needs a hostile pass
 INDEPENDENT of me; Codex or external) and attack 6 (seams — my Section 24 row
 10 + his referee section 5 tower handoff; one joint write-up pass wanted).
+
+## 27. Seams, complete (referee attack 6, Claude's half — merge with referee doc section 5)
+
+Status: `PROVED` (each seam is one or two lines given the banked pieces).
+
+1. **Below (FD <-> stage-2/banks).** FD covers max(P) <= n < 2max(P)
+   unconditionally (size-4 separator + exact identity, Lean'd). Stage-2
+   certificates start at tau_lo = 2*wmax, i.e. n >= 2*wmax*s; since wmax*s is
+   an element, 2*wmax*s <= 2*max(P): the intervals OVERLAP — no gap.
+   Direct banks start at m = max(P) and FD also covers [max, 2max): overlap.
+2. **Above (banks/stage-2 <-> U2 bridge).** Banks check the tower form for
+   7(m+1)S < 1135; on the complement U2 gives
+   2B(m) - mS >= (7mS - 1135 + 157S)/150 >= S > 0 (referee doc section 5).
+   The code cap floor(1135*prod/(7*nsum)) - 1 is exact for nonintegral
+   quotients and checks one extra endpoint otherwise — conservative both ways.
+   Stage-2's tau_hi = 33*rho*wmax: 33*max(P) <= 33*rho*wmax*s because
+   max(P) < rho*min(P) <= rho*wmin*s <= rho*wmax*s — meshes with the n >= 33max
+   bridge activation. Overlap, no gap.
+3. **Ratio seam (banks <-> SPREAD).** All bank/certificate filters keep
+   ratio < 7 members only; ratio >= 7 is SPREAD's theorem (rho0 = 7,
+   unconditional in n). The bank1edge exclusion list (6 tuples, each ratio
+   >= 7, each still tower-passing) demonstrates the tiling concretely.
+4. **Scaling seam (C0).** gcd(P) = t > 1 reduces to the primitive base via
+   B_{tP0}(n) = B_{P0}(floor(n/t)) and the TOWER form 2B(m) >= (m+1)S covers
+   the floor loss because n/t < floor(n/t) + 1 (referee doc section 5).
+5. **Goodness/CRIT seams.** >= 3 good: Lean regime A. <= 2 good with
+   CRIT > 7/2: Lean CB.lean cb_cover5. What remains is by definition the
+   compact residual — partitioned by the five-sector table (section 26),
+   each row certified. Bad-count totality: section 23.6.
+
+Every (P, n) with n >= max(P) lands in at least one certified regime; the
+overlaps are benign (all statements are the same inequality 2B > nS or its
+tower strengthening). This is the assembly half of attack 6; the joint pass
+should merge this with referee section 5's statements verbatim.
