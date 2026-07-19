@@ -1,7 +1,12 @@
 # External hostile-review package: the shape2v3 / shape4 certificates (referee attack 3)
 
-Self-contained brief for an INDEPENDENT reviewer (human or AI) with no access
-to this project's history. Your job is to BREAK the certificate design below,
+Brief for an INDEPENDENT reviewer (human or AI) with no access to this
+project's history. IT IS NOT SELF-CONTAINED (an earlier cold-prompt run
+correctly flagged this): a real audit requires the actual source and inputs.
+Attach or fetch (public repo https://github.com/penpro/Erdos-Sandbox, main):
+`census/src/main.rs`, `census/Cargo.toml`, `clustercheck/shapes906.csv`,
+`zeroedgebankcheck/shapes0edge.csv`, `census/shapes4inv120.csv`. Without
+them, only the DESIGN below can be judged, not the implementation. Your job is to BREAK the certificate design below,
 or fail to. You are not asked to trust anything; every claim has a
 reproduction command. The authors want refutations, not endorsements.
 
@@ -82,6 +87,9 @@ via the identity gcd(A/q, B) = gcd(A, qB)/q for q | A. If both goods carry
 exact slots, their mutual moduli are exact too (identity
 gcd(A/q, B/r) = gcd(Ar, Bq)/(qr)). The certificate enumerates all class
 matrices, all q values in range, forces all implied moduli, and kills branches
+(canonical pin rule: a good with several exact slots is pinned through its
+FIRST exact slot in row order; the others are consistency-checked, so each
+configuration is counted through exactly one branch)
 whose forced values contradict (a) the declared classes, (b) the antichain
 (modulus 1), (c) the pinned good's own goodness (exact reciprocal sum >= 1),
 or (d) some bad row's badness. Surviving branches get exact margin scans over
@@ -119,13 +127,29 @@ tau. "VACUOUS" for a shape means every branch died: the claim is that NO
 5. The tau loop: integer tau with J = floor(tau/w) — check the floor-identity
    argument (floor(floor(x)/n) = floor(x/n)) wherever exact J's are needed,
    and inequality direction wherever floored J's are used with monotone floors.
-6. The assembly: margin m60 = 2*(goods) + 2*(bads) - 300, PASS iff > 0 for
-   all tau in [2*wmax, 231*wmax]; ZERO (== 0) passes via the retained +S > 0.
+6. The assembly: margin m60 = 2*(goods) + 2*(bads) - 300; the acceptance
+   condition is m60 >= 0 for all tau in [2*wmax, 231*wmax] (m60 > 0 is
+   reported PASS, m60 == 0 is reported ZERO and passes via the retained
+   +S > 0; the two reports are separated so zero-margin cases stay visible).
 7. shape4 (4 bads, ONE good): same machinery with a 4x1 class matrix; the
    pinned good's row has NO free slot. Check the analogous surfaces, and the
-   all-BIG column's coverage of arbitrarily large goods.
-8. Arithmetic: i128 overflow anywhere? (Moduli clamped at 41; pins bounded by
-   the shapes; check the products.)
+   all-BIG column's coverage of arbitrarily large goods. The all-BIG branch
+   is NOT dropped and needs no q: the free good receives the UNIVERSAL
+   charge-good staircase floor (F4) at J >= 2, which is valid for every good
+   of any size; J >= 2 holds because n >= 2*max(P) >= 2*good. Attack that
+   justification rather than assuming the branch is missing.
+8. Arithmetic: the goodness products now use CHECKED multiplication (any
+   overflow aborts the certificate loudly rather than wrapping), and the CSV
+   loaders assert every coefficient is in (0, 4*10^7], which keeps the
+   largest four-factor product below i128::MAX with headroom. Verify those
+   two claims in source and that no other product can exceed the audited
+   bounds.
+9. Goodness direction (the clamping trap): clamped moduli (41-representative)
+   are used ONLY inside drift-prefix evaluation (where they are exact for
+   J <= 40) and in bad-row badness tests (conservative inclusion). Every
+   GOODNESS test uses exact unclamped integers; the infinite-tail free slot
+   drops its reciprocal (existential goodness). Verify in source that no
+   goodness rejection ever uses a clamped value.
 
 ## 4. Reproduction
 

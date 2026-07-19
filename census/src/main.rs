@@ -911,6 +911,13 @@ fn shape2v1(rho: i128) {
     println!("(goods floored by DRIFT-1 odd-class; badness-restricted bad rows; S dropped — conservative)");
 }
 
+/// Checked product for exact goodness tests (ChatGPT external pass, surface 8):
+/// overflow must abort the certificate loudly, never wrap.
+fn cprod(vals: &[i128]) -> i128 {
+    vals.iter().fold(1i128, |a, &b| a.checked_mul(b)
+        .expect("goodness product overflow: input coefficients exceed the audited bound"))
+}
+
 /// charge-good staircase floor (f*60), certified by spreadcheck (reproduced):
 /// f >= 1/2 (J>=2), 5/6 (J>=6), 7/6 (J>=12), 3/2 (J>=15).
 fn stair60(j: i128) -> i128 {
@@ -1259,9 +1266,12 @@ fn shape2v22(rho: i128, shapes: &[[i128; 3]]) {
                                 let (r, other_m) = if g == 0 { (&r0, mg0) } else { (&r1, mg1) };
                                 if r.is_empty() { continue; }
                                 let known = [sy[g][0], sy[g][1], sy[g][2]];
-                                let mut p: i128 = known.iter().product();
+                                let mut p: i128 = cprod(&known);
                                 let mut num: i128 = known.iter().map(|&m| p / m).sum();
-                                if other_m > 0 { num = num * other_m + p; p *= other_m; }
+                                if other_m > 0 {
+                                    num = num.checked_mul(other_m).expect("goodness overflow") + p;
+                                    p = p.checked_mul(other_m).expect("goodness overflow");
+                                }
                                 if num >= p { continue 'branch; } // y_g cannot be good
                                 if other_m > 0 {
                                     rowyf[g] = f_exact(&[clamp(known[0]), clamp(known[1]), clamp(known[2]), clamp(other_m)], jt);
@@ -1510,9 +1520,12 @@ fn shape2v3(rho: i128, shapes: &[[i128; 3]]) {
                                 if pin[g].is_none() { continue; }
                                 let other_m = if g == 0 { mg0 } else { mg1 };
                                 let known = [sy[g][0], sy[g][1], sy[g][2]];
-                                let mut p: i128 = known.iter().product();
+                                let mut p: i128 = cprod(&known);
                                 let mut num: i128 = known.iter().map(|&m| p / m).sum();
-                                if other_m > 0 { num = num * other_m + p; p *= other_m; }
+                                if other_m > 0 {
+                                    num = num.checked_mul(other_m).expect("goodness overflow") + p;
+                                    p = p.checked_mul(other_m).expect("goodness overflow");
+                                }
                                 if num >= p { continue 'branch; } // pinned good cannot be good
                                 if other_m > 0 {
                                     rowyf[g] = f_exact(&[clamp(known[0]), clamp(known[1]), clamp(known[2]), clamp(other_m)], jt);
@@ -1720,7 +1733,7 @@ fn shape4(rho: i128, shapes: &[[i128; 4]]) {
                                     else { if srow[j] < 7 { continue 'branch; } }
                                     if sy[j] < 2 { continue 'branch; }
                                 }
-                                let p: i128 = sy.iter().product();
+                                let p: i128 = cprod(&sy);
                                 let num: i128 = sy.iter().map(|&m| p / m).sum();
                                 if num >= p { continue 'branch; } // the good cannot be good
                                 rowyf = f_exact(&[clamp(sy[0]), clamp(sy[1]), clamp(sy[2]), clamp(sy[3])], jt);
@@ -2258,6 +2271,9 @@ fn main() {
             let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
             if v.len() == 4 { Some([v[0], v[1], v[2], v[3]]) } else { None }
         }).collect();
+        for w in shapes.iter() { for &x in w.iter() {
+            assert!(0 < x && x <= 40_000_000, "shape coefficient outside audited i128 bound");
+        }}
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape4(r, &shapes);
         return;
@@ -2269,6 +2285,9 @@ fn main() {
             let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
             if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
         }).collect();
+        for w in shapes.iter() { for &x in w.iter() {
+            assert!(0 < x && x <= 40_000_000, "shape coefficient outside audited i128 bound");
+        }}
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape2v3(r, &shapes);
         return;
@@ -2280,6 +2299,9 @@ fn main() {
             let v: Vec<i128> = l.trim().split(',').filter_map(|t| t.trim().parse().ok()).collect();
             if v.len() == 3 { Some([v[0], v[1], v[2]]) } else { None }
         }).collect();
+        for w in shapes.iter() { for &x in w.iter() {
+            assert!(0 < x && x <= 40_000_000, "shape coefficient outside audited i128 bound");
+        }}
         let r: i128 = if args.len() > 3 { args[3].parse().unwrap_or(7) } else { 7 };
         shape2v22(r, &shapes);
         return;

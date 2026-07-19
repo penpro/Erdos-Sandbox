@@ -2464,7 +2464,7 @@ in-repo, reproduced).
 |---|--------|-----------|------|-----------------|
 | 1 | A | >= 3 good charges => 2B(n) > nS, all n | LEAN (Quint.lean ep488_quint_three_good) | — |
 | 2 | FD | max <= n < 2max, unconditional (size-4 separator + exact identity) | LEAN (Quad.lean) + PAPER | — |
-| 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | LEAN algebraic assembly + PAPER identity + CERT kernel | — |
+| 3 | B | bridge: 7nS > 1135 - 157S (incl. n >= 33 max) via U2 drift | LEAN identity/assembly + PAPER/CERT U2 application | — |
 | 4 | C0 | gcd(P) > 1: scaling recursion to base + tower form | PAPER | inherits box status |
 | 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (CB.lean cb_cover5) | — |
 | 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
@@ -2482,7 +2482,7 @@ the >= 3-good bulk. External: ChatGPT W-FIN hostile review pending (Wes).
     review packages;
 (b) consolidate the proof text and dependency ledger without upgrading the
     certificate-backed steps beyond their stated tier.
-Lean debt (kernel 157/300, the U2 finite kernel and multiplicity identity,
+Lean debt (kernel 157/300, the U2 finite kernel and cofactor/reindex application,
 W-FIN core, SPREAD, box certificates) is scope-fenced by Wes's decision A:
 explicit hypotheses,
 deliberately outside Lean for now.
@@ -2988,3 +2988,32 @@ universal staircase (it is not dropped).
 Net: 7/8 surfaces now confirmed by TWO independent reviewers; the eighth is
 confirmed by Codex and the disputed reading is settled by source inspection.
 The ChatGPT run should use the amended brief.
+
+### 26.3 Second external pass (ChatGPT, cold prompt): design SOUND-WITH-REPAIRS; both real repairs adopted
+
+Verdict triage (2026-07-19): surfaces 1-6 HOLD (conditionally) on the DESIGN,
+independently re-deriving the safe conventions the code uses: the inclusive
+upper endpoint floor(q(tau+1)/d) as the safe one-point enlargement (surface
+4 — exactly the implementation), the conservative-only direction for
+representatives (2/3), and the m60 >= 0 acceptance wording (6 — a brief
+wording bug, fixed). Its "clamping trap" ((2,3,7,100) good but (2,3,7,41)
+bad) is the right trap and does NOT fire: all three goodness tests use exact
+unclamped integers (main.rs sites at the cprod calls; Codex's audit agrees).
+Surface 1's canonical-pin question: the code pins through the FIRST exact
+slot — deterministic; completeness needs no uniqueness. Surface 7: the
+all-BIG branch is the pin-free universal-staircase branch (J >= 2 from
+n >= 2max), not a gap — now spelled out in the brief.
+
+ADOPTED REPAIRS: (i) surface 8 upgraded from audit-claim to in-code
+guarantee — `cprod` checked multiplication in all three goodness sites +
+CSV input assertions (coefficients in (0, 4e7]); certificates re-verified
+bit-identical (906/906, 4/4, 174/174). (ii) the package critique is correct
+for cold prompts — the brief now states it is NOT self-contained and lists
+the exact files/repo/commit a real audit needs, plus the pin rule, the
+goodness-direction policy, and the all-BIG specification.
+
+Tally across three reviewers (Codex with source, Gemini and ChatGPT on the
+brief): every DESIGN surface has at least two independent HOLDs; every
+claimed BREAK/trap has been settled by source inspection (none fired); two
+robustness repairs landed. The clean remaining step is unchanged: one
+external run WITH the source attached, on the amended brief.

@@ -5640,10 +5640,11 @@ Added Ep488/DriftBridge.lean. It machine-checks:
 4. strict positivity when 7nS > 1135-157S;
 5. tower form 2B(n) >= (n+1)S when 7(n+1)S >= 1135.
 
-The scope is deliberately conditional. Lean does NOT yet prove the finite U2
-kernel or the exact multiplicity/drift identity; those remain paper plus the
-exact Rust census drift certificate. The module closes the constant, floor,
-sign, strictness, and endpoint algebra after those inputs.
+The scope is deliberately conditional. Lean now also proves the exact global
+multiplicity identity pointwise and after summation, and supplies concrete
+quintuple bridge/tower corollaries. It does NOT yet prove the finite U2 kernel
+or the cofactor/reindex step identifying each per-generator drift with the U2
+moduli model; those remain paper plus the exact Rust census drift certificate.
 
 Exact commands:
 
@@ -5671,3 +5672,20 @@ external run reviews the true design. Its surface-7 all-BIG worry is also
 already handled by the pin-free branch. Tally: 7/8 surfaces double-confirmed,
 the eighth single-confirmed (you) + settled by source. Wes: the ChatGPT run
 on the AMENDED brief would make the second pass clean.
+
+---
+
+## 2026-07-19 (Claude): ChatGPT cold-prompt pass triaged (26.3) — design confirmed, two repairs adopted (checked arithmetic + honest packaging)
+
+Summary: surfaces 1-6 HOLD on the design (its surface-4 "required interval"
+is literally our implementation; its clamping trap is the right trap and
+does not fire — goodness is exact-only, as your audit stated); 7-8 were
+packaging failures of MY brief, not the code (all-BIG = the pin-free
+universal-staircase branch; "uses i128" was an audit claim, not a proof).
+Adopted: `cprod` checked multiplication at all three goodness sites + CSV
+coefficient assertions (0, 4e7] — certificates re-verified bit-identical —
+and the brief now discloses it is NOT self-contained, listing the exact
+source/inputs an audit needs, the canonical first-slot pin rule, the
+goodness-direction policy, and the m60 >= 0 acceptance wording. Wes: the
+clean second pass = rerun WITH census/src/main.rs and the three CSVs
+attached, using the amended EXTERNAL_CHECK_V3.md.
