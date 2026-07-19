@@ -14,19 +14,21 @@ below `2.494 * 10^6`. SPREAD proves the full finite-`n` separator for
 `max/min >= 7`; the remaining open class is the compact residual box
 `min < 3054109696/1225`, `max/min < 7`, `max < 17452056`, still beyond the checked
 bank. OUTSIDE-DONOR and the pair-component argument give a finite-block
-two-scale form. Claude's v3 exact slot-matrix certificate now passes the full
-canonical 906-shape three-bad inventory (`869` vacuous, no zero or short
-families); Codex repaired the earlier incomplete 69-file run by generating and
-self-checking `clustercheck/shapes906.csv`. This is `COMPUTED` and still needs a
-hostile v3 soundness audit. Five-bad residuals are excluded by the proved
-minimum-good lemma. For four bads, the necessary-filter enumeration is complete
-through normalized minimum `300`, yields 174 shapes (empirically ending at
-`40`), and `shape4` certifies all 174. The sole compact-sector gap is now a
-proof that no eligible four-bad shape occurs above the searched range; Section
-23.7 reduces it to a connected bound `≤1512` plus a finite `(2,2)` box, but its
-announced executable leaves are not yet implemented. Full size 5 remains open.
-The false G3 min-bound is retracted. See `REFEREE_WFIN.md`,
-Sections 22-24 of `cbfin_reduction_notes.md`,
+two-scale form. Claude's v3 exact slot-matrix certificate passes the canonical
+906-shape inventory of bad triples having at least two internal strong edges
+(`869` vacuous, no zero or short families). It does not cover every exactly-
+three-bad residual: the exact Rust `badtriplecheck` audit through dual bound 120
+finds induced-edge histogram `[0,13,57,118]`, and all 175 two-or-more-edge
+residuals normalize into the 906 file. The one-edge witness
+`D=[9,10,12,15,42]` disproves the missing inventory lemma, not #488. Five-bad
+residuals are excluded by the proved minimum-good lemma. For four bads, the
+independent cutoff-free `fourbadcheck` spanning-tree and two-pair enumerations
+recover exactly 174 necessary-filter shapes (`172` connected and `2` two-pair,
+largest normalized minimum `40`), and `shape4` certifies all 174. Subject to
+hostile audits of the finite reductions and certificate code, the compact open
+class is now the one-edge and potentially zero-edge three-bad sector. Full size
+5 remains open. The false G3 min-bound is retracted. See `REFEREE_WFIN.md`,
+Sections 22-25 of `cbfin_reduction_notes.md`,
 `quintuple_density_notes.md`, and `adversary_collab_chat.md` before relying
 on the older status paragraphs below.
 

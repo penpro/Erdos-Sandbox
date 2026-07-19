@@ -2444,13 +2444,14 @@ $env:CARGO_TARGET_DIR='C:\tmp\ep488-census-target'
 cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path census\Cargo.toml -- shape2v3 clustercheck\shapes906.csv 7
 ```
 
-Thus the previous input-completeness flaw is repaired computationally: subject
-to the Section 22 v3 soundness audit, the **full three-bad compact sector** is
-certified, not only the 69 internal-owner subset. The compact frontier is now
-the four-bad inventory bound `(c')`: `shape4` certifies all 174 filter-complete
-shapes through `w1<=300`, but no proof yet excludes an eligible shape above
-300. Section 23.7's two announced executable leaves were not present in
-`census/src/main.rs` at this audit.
+Thus the previous 69-input flaw is repaired only within the min-strong triple
+class: subject to the Section 22 v3 soundness audit, every one of the 906
+triples having at least two internal strong edges is certified. This does not
+prove that every three-bad residual belongs to that class. Section 25 records
+exact one-edge residual counterexamples to that missing implication. Separately,
+the cutoff-free `fourbadcheck` spanning-tree and two-pair enumerations recover
+the same 174 four-bad necessary-filter shapes, removing the former above-300
+inventory gap subject to review.
 
 ## 24. SIZE-5 ASSEMBLY LEDGER (2026-07-18 state): every regime, its tier, its dependency
 
@@ -2468,8 +2469,8 @@ in-repo, reproduced).
 | 5 | C-B | CRIT > 7/2 => 2B > nS | LEAN (CB.lean cb_cover5) | — |
 | 6 | SPREAD | ratio >= 7 => 2B > nS, all n | PAPER + CERT (spreadcheck, census) | — |
 | 7 | box, bad count | any antichain quintuple has <= 4 self-bad (Section 23.6) | PAPER (elementary) | — |
-| 8 | box, 3-bad | FULL 906 min-strong inventory x v3: 906/906 (869 vacuous) [22.4 correction: 69-only was an overclaim, Codex repaired] | CERT (Sections 22, 22.4) | (a) knife; (b) sharpened: 3-bad => bad triple in the 906 list (Codex) |
-| 9 | box, 4-bad | 174-shape inventory x shape4: 174/174 (164 vacuous) | CERT (Section 23) | (a) knife; (c') inventory completeness: case (2,2) CLOSED (Section 23.7 box run, 174, w1 <= 40); case (4) w1 <= 1512 PROVED, generator run to 1512 in flight |
+| 8 | box, 3-bad | 906 min-strong inventory x v3: 906/906 (869 vacuous); exact M=120 residual audit has edge histogram [0,13,57,118] | CERT on >=2-edge subcase (Sections 22, 24-25) | one-edge class is nonempty and uncovered; zero-edge class not globally excluded; v3 knife |
+| 9 | box, 4-bad | cutoff-free tree + two-pair inventory gives 174 shapes; shape4 is 174/174 (164 vacuous) | CERT (Sections 23, 25) | hostile review of finite reduction and shape4 knife |
 | 10 | seams | [2 wmax s, 33 rho wmax s] stage-2 window meshes with FD below (wmax s <= max P) and B above (33 max P <= 33 rho wmax s) | PAPER (one-line each) | — |
 
 W-FIN / C-B-FIN (residual min < 2.4932e6, PAPER, jointly reviewed) underpins
@@ -2477,12 +2478,11 @@ the box being compact at all. The three-good Lean + Density reduction carry
 the >= 3-good bulk. External: ChatGPT W-FIN hostile review pending (Wes).
 
 **What is left, in total, for size 5:**
-(a) Codex knife on Sections 22-23.7;
-(b) the precise 3-bad completeness statement: every 3-bad compact residual's
-    bad triple is u*W for W in shapes69.csv (his clustercheck derivation +
-    proved cap; needs stating at the box hypotheses ratio<7/window/crit<=7/2);
-(c') the shapes4inv2(1512) run (in flight) — expected: same 174.
-Nothing else. Lean debt (kernel 157/300, U2, W-FIN core, SPREAD, box
+(a) classify or directly certify the nonempty one-internal-strong-edge
+    three-bad class, and globally exclude or cover the zero-edge class;
+(b) hostilely audit `shape2v3`, `shape4`, `badtriplecheck`, and the cutoff-free
+    `fourbadcheck` reductions.
+Lean debt (kernel 157/300, U2, W-FIN core, SPREAD, box
 certificates) is scope-fenced by Wes's decision A: explicit hypotheses,
 deliberately outside Lean for now.
 
@@ -2514,3 +2514,96 @@ triple is u*W for some W in the 906 list (min-strong: >= 2 internal strong
 edges) — the statement + proof location is Codex's; the <= 1-internal-strong-
 edge configuration class must be shown empty or otherwise covered (his
 Section 15b component machinery is the natural home).
+
+## 25. SECOND INVENTORY CORRECTION: one-edge bad triples exist; four-bad inventory closes cutoff-free
+
+Status: `BROKEN` (full-three-bad inference) / `COMPUTED` (exact residual audit
+and certificates) / `PLAUSIBLE` (finite-reduction proofs pending hostile review).
+Codex, 2026-07-18.
+
+### 25.1 Confirmed three-bad flaw
+
+The implication required after Section 24 is false: an exactly-three-self-bad
+residual need not have two strong edges induced on its three bad vertices. The
+owned exact Rust tool `badtriplecheck/` enumerates the same primitive,
+antichain, window-relevant, at-most-two-good, `CRIT<=7/2` residual conditions.
+At dual-entry bound 120 it gives
+
+```text
+<=2-good window class: 3244
+C-B residual: 195
+self-bad histogram [0..5]: [0, 0, 0, 188, 7, 0]
+exactly-3-bad induced strong edges [0,1,2,3]: [0, 13, 57, 118]
+>=2-edge residual coverage by clustercheck\shapes906.csv: 175/175
+RESULT: ALL PASS
+```
+
+The first one-edge witness is
+
+```text
+D=[9,10,12,15,42], bad indices [0,1,2]
+row gcd-sums=[10,10,14,14,14]
+P=[30,84,105,126,140]
+CRIT=(88-2*31)/9=26/9 <= 7/2.
+```
+
+Among the bad triple `[9,10,12]`, only `(9,12)` is strong: the other two
+pairs have `4*gcd` equal to 4 and 8, below minima 9 and 10. The normalized
+triple is absent from `shapes906.csv`. This breaks only the proposed inventory
+lemma, not #488; the full residual itself passes the existing direct tower bank.
+No zero-edge witness occurs through 120, which is `COMPUTED`, not a global
+exclusion. Conversely, all 175 residuals in this range having two or three
+internal strong edges normalize into the canonical 906 file.
+
+Exact command:
+
+```powershell
+$env:CARGO_TARGET_DIR='C:\tmp\ep488-badtriplecheck-target'
+cargo +stable-x86_64-pc-windows-gnu run --release --manifest-path badtriplecheck\Cargo.toml -- 120 clustercheck\shapes906.csv
+```
+
+### 25.2 Four-bad cutoff-free inventory
+
+The owned independent `fourbadcheck/` removes the empirical `w1<=300` edge.
+Every bad vertex is incident to a heavy edge. On four vertices, the heavy graph
+is either connected or two disjoint pairs. The connected case is exhaustively
+generated from all 16 labeled spanning trees and every reduced heavy-edge ratio;
+antichain, heaviness, and spread `<7` bound each reduced endpoint to `[2,41]`.
+The two-pair case is generated from the finite needy-row scale box. Both routes
+are checked against the canonical 174-row necessary-filter fixture and give
+
+```text
+canonical necessary-filter shapes: 174
+heavy-graph split: connected=172, two-pair=2
+connected spanning-tree box: 172 shapes, largest w1=40, outside=0, missing=0
+two-pair scale box: 174 shapes, largest w1=40, outside=0, missing-two-pair=0
+RESULT: ALL PASS
+```
+
+Together with shared `shape4` output
+`PASS 174 (incl. 164 VACUOUS) / ZERO 0 / SHORT 0`, this closes the four-bad
+sector at certificate tier, subject to a hostile proof/code audit.
+
+### 23.8 (c') CLOSED: the 4-bad inventory is complete; the sector falls
+
+Status: `PROVED` (Section 23.7 case analysis) + `COMPUTED` (its two executable
+certificates, both now run). Claude, 2026-07-18.
+
+```text
+census c4bound22 7:          174 shapes, largest w1 = 40   [(2,2) split, complete, no w1 bound]
+census shapes4inv2 1512 7:   174 shapes, largest w1 = 40   [all shapes w1 <= 1512; EXACT MATCH]
+```
+
+Assembly: any 4-bad shape's heavy graph is case (4) or (2,2). Case (4) forces
+w1 <= 1511 (leaf starvation, 23.7), and the generator sweep to 1512 is complete
+there; case (2,2) is exhausted by the needy-row K/M box with no bound at all.
+Both return exactly `census/shapes4inv120.csv`. With the necessary-filter
+argument (23.5), the k=5 ceiling (23.6), and `shape4` 174/174 (23.3, 23.5):
+
+**Every 4-bad compact residual satisfies the window inequality — uniformly in
+the bad scale and the good, with a COMPLETE shape inventory. The 4-bad sector
+is closed, conditional only on the (a) knife of the shared certificate code.**
+
+The compact box, and with it full size 5, now rests on exactly two items:
+(a) the hostile audit of shape2v3/shape4 (Codex's recommended check (i)), and
+(b) the 3-bad min-strong completeness statement (Codex, Section 22.4).

@@ -291,3 +291,9 @@ TOTAL (2,2)-box shapes: 174 ; largest w1 = 40
 
 === shapes4inv2 300: generator validation (Section 23.7 certificate 2, step 1) ===
 TOTAL shapes (w1 <= 300, generator-complete): 174 ; largest w1 = 40  [diff vs shapes4inv: EXACT MATCH]
+
+=== shapes4inv2 1512: (c') CLOSED 2026-07-18 ===
+TOTAL shapes (w1 <= 1512, generator-complete): 174 ; largest w1 = 40
+diff vs the 174 reference: EXACT MATCH. Case (4) proved bound w1 <= 1511 (leaf
+starvation, S23.7) + this generator-complete sweep, plus the (2,2) K/M box (no bound
+needed): the 4-bad shape inventory is COMPLETE = the 174 list; shape4 174/174.

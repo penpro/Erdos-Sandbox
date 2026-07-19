@@ -14,17 +14,20 @@ exact bad-edge cofactors sharpens the actual residual cutoff to below
 separator whenever `max/min >= 7`. Full size 5 is still open only in the
 compact residual box `min < 3054109696/1225`, `max/min < 7`, `max < 17452056`,
 together with the existing goodness/window/CRIT constraints; this is still
-beyond direct enumeration. The full exhaustive 906-shape three-bad inventory
-now passes Claude's v3 exact slot-matrix certificate (`869` vacuous, no zero or
-short families), after Codex corrected the earlier incomplete 69-shape input.
-This remains `COMPUTED` pending a hostile audit of v3's partition and tail
-soundness. The proved minimum-good lemma excludes five-bad residuals. For four
-bads, exact enumeration through normalized minimum `300` gives 174 necessary-
-filter shapes and `shape4` certifies all 174, but no proof yet excludes an
-eligible shape above `300`. Section 23.7 gives a promising analytic reduction
-to a connected bound `≤1512` and a finite `(2,2)` box; the closing generators
-are not yet implemented. This four-bad inventory bound is the current compact
-frontier. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
+beyond direct enumeration. Claude's v3 exact slot-matrix certificate passes all
+906 normalized bad triples having at least two internal strong edges (`869`
+vacuous), after Codex corrected the earlier incomplete 69-shape input. A second
+inventory flaw remains: the exact Rust `badtriplecheck` audit through dual bound
+120 finds 13 one-edge three-bad residuals, beginning with
+`D=[9,10,12,15,42]`; these lie outside the 906 inventory. This breaks a proposed
+lemma, not #488, and the 906/v3 result remains valid on its stated subcase.
+The proved minimum-good lemma excludes five-bad residuals. For four bads, the
+independent cutoff-free `fourbadcheck` spanning-tree and two-pair enumerations
+recover exactly the same 174 necessary-filter shapes (`172` connected and `2`
+two-pair, largest normalized minimum `40`), and `shape4` certifies all 174.
+Subject to hostile audits of the finite reductions and certificate code, the
+current compact frontier is the one-edge and potentially zero-edge three-bad
+sector. The old G3/min-`54` closure is false. Size-6 density has a paper-tier
 cross-element transfer proof, bounded exact audits, and executable retirement
 certificates that rerun cleanly. Nothing in
 this report should be read as a solution of full #488.

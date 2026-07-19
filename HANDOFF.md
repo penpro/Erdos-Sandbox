@@ -25,16 +25,19 @@ bad-edge cofactors cut this to `2.494 * 10^6`. Full size 5 is still open because
 SPREAD covers every primitive quintuple with `max/min >= 7`; the
 remaining compact residual box has `min < 3054109696/1225`, `max/min < 7`, and
 `max < 17452056`, still beyond direct enumeration. The exact v3 slot-matrix
-certificate passes the complete, self-checked 906-shape three-bad inventory:
-869 shapes are vacuous and every remaining family has positive margin. This
-repairs an earlier run that used only the 69 all-internal-owner shapes, but v3
-still needs an independent hostile soundness audit. The minimum-good lemma
-excludes five-bad residuals. In the four-bad sector, the necessary-filter census
-is exhaustive through normalized minimum 300, finds 174 shapes (none above 40),
-and `shape4` certifies all 174. The open gate is proving no eligible four-bad
-shape lies above 300. Section 23.7 reduces that to a connected-case bound 1512
-and a finite `(2,2)` scale box; the two closing Rust commands are not yet
-implemented. Start with `REFEREE_WFIN.md`, Sections 22-24 of
+certificate passes all 906 normalized bad triples having at least two internal
+strong edges (`869` vacuous), but this is not the full three-bad sector.
+`badtriplecheck` finds 13 exact one-edge residuals already at dual bound 120;
+the first is `D=[9,10,12,15,42]`, with primal
+`P=[30,84,105,126,140]`. This breaks only the proposed inventory-completeness
+lemma, not #488. The minimum-good lemma excludes five-bad residuals. In the
+four-bad sector, the independent cutoff-free `fourbadcheck` spanning-tree and
+two-pair enumerations recover exactly the same 174 necessary-filter shapes
+(`172` connected, `2` two-pair, largest normalized minimum `40`), and `shape4`
+certifies all 174. Subject to hostile review of those finite reductions and
+certificate code, the current compact gate is the one-edge (and not-yet-
+globally-excluded zero-edge) three-bad class, plus the v3/shape4 soundness audit.
+Start with `REFEREE_WFIN.md`, Sections 22-25 of
 `cbfin_reduction_notes.md`, and the latest entry in
 `adversary_collab_chat.md`. The older narrative below is retained as history.
 
